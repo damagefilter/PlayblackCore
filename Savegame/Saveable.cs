@@ -9,12 +9,11 @@ namespace Playblack.Savegame {
     /// </summary>
     public class Saveable : MonoBehaviour {
 
-        [Tooltip("If non-empty the save manager will request this asset from the asset manager before restoring data.")]
-        [SerializeField] private string assetPath;
-
         /// <summary>
         /// Used to identify this saveable and the gameobject it is attached to in the scene.
         /// </summary>
+        [Tooltip("If non-empty the save manager will request this asset from the asset manager before restoring data.")]
+        [SerializeField] private string assetPath;
         private string uuid;
         public string UUIDS {
             get {
