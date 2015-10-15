@@ -5,7 +5,7 @@ namespace Playblack.Savegame {
     /// This attribute is used to mark and identify fields 
     /// that should be stored into a savegame.
     /// </summary>
-    [AttributeUsage(AttributeTargets.Field)]
+    [AttributeUsage(AttributeTargets.Field | AttributeTargets.Property)]
     public class SaveableFieldAttribute : System.Attribute {
 
         public readonly SaveField fieldType;

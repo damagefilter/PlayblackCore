@@ -99,7 +99,7 @@ namespace Playblack.Signals {
         }
         
         /// <summary>
-        /// Calls the event registered by this name on the event dispatcher
+        /// Makes the signal handler fire an output with the given name and the given component.
         /// </summary>
         /// <param name="name">Name.</param>
         protected void FireOutput(string name, string component) {
@@ -112,7 +112,7 @@ namespace Playblack.Signals {
         }
 
         /// <summary>
-        /// Takes care of re-wiring the signals.
+        /// Runs through all known output signals and hooks up the linking information to real gameobjects in the scene.
         /// </summary>
         public void RewireOutputs() {
             if (outputs == null) {
@@ -129,6 +129,16 @@ namespace Playblack.Signals {
                 }
             }
         }
+
+        #region Unity Related
+        public void Awake() {
+            SignalHandlerTracker.Instance.Track(this);
+        }
+
+        public void OnDestroy() {
+            SignalHandlerTracker.Instance.Untrack(this);
+        }
+        #endregion
     }
 }
 

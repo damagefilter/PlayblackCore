@@ -8,8 +8,121 @@ namespace Playblack.Signals {
     /// for connecting their inputs.
     /// </summary>
     public class SignalHandlerTracker : MonoBehaviour {
-        private Dictionary<string, SignalHandler> trackedHandlers;
-        private Dictionary<string, SignalHandler> preTrackedHandlers;
+        #region Singleton
+        private static SignalHandlerTracker _instance;
+        private static object _lock = new object();
+
+        public static SignalHandlerTracker Instance {
+            get {
+                if (applicationIsQuitting) {
+                    Debug.LogWarning("[Singleton] Instance " + typeof(SignalHandlerTracker) +
+                        " already destroyed on application quit." +
+                        "Won't create again - returning null.");
+                    return null;
+                }
+
+                lock (_lock) {
+                    if (_instance == null) {
+                        _instance = (SignalHandlerTracker)FindObjectOfType(typeof(SignalHandlerTracker));
+
+                        if (_instance == null) {
+                            GameObject singleton = new GameObject();
+                            _instance = singleton.AddComponent<SignalHandlerTracker>();
+                            singleton.name = "SignalHandlerTracker";
+
+                            DontDestroyOnLoad(singleton);
+
+                            Debug.Log("An instance of " + typeof(SignalHandlerTracker) +
+                                " is needed in the scene, so '" + singleton +
+                                "' was created with DontDestroyOnLoad.");
+                        }
+                    }
+
+                    return _instance;
+                }
+            }
+        }
+
+        private static bool applicationIsQuitting = false;
+        /// <summary>
+        /// When unity quits, it destroys objects in a random order.
+        /// In principle, a Singleton is only destroyed when application quits.
+        /// If any script calls Instance after it have been destroyed, 
+        ///   it will create a buggy ghost object that will stay on the Editor scene
+        ///   even after stopping playing the Application. Really bad!
+        /// So, this was made to be sure we're not creating that buggy ghost object.
+        /// </summary>
+        public void OnDestroy() {
+            applicationIsQuitting = true;
+        }
+        #endregion
+
+        private List<SignalHandler> trackedHandlers;
+        private List<SignalHandler> preTrackedHandlers;
+
+        /// <summary>
+        /// Starts tracking a signal handler.
+        /// </summary>
+        /// <param name="handler"></param>
+        public void Track(SignalHandler handler) {
+            if (!trackedHandlers.Contains(handler)) {
+                this.trackedHandlers.Add(handler);
+                if (preTrackedHandlers.Contains(handler)) {
+                    preTrackedHandlers.Remove(handler);
+                }
+            }
+            
+        }
+
+        /// <summary>
+        /// Starts pre-tracking a signal handler.
+        /// Once properly tracked a handler is auto-removed from the pre-tracking list.
+        /// </summary>
+        /// <param name="handler"></param>
+        public void PreTrack(SignalHandler handler) {
+            this.preTrackedHandlers.Add(handler);
+        }
+
+        /// <summary>
+        /// Manually untrack a handler.
+        /// This can be called in a handlers OnDestroy() method.
+        /// If the handler was already destroyed, is null or is untracked, nothing will happen.
+        /// </summary>
+        /// <param name="handler"></param>
+        public void Untrack(SignalHandler handler) {
+            if (handler != null && trackedHandlers.Contains(handler)) {
+                trackedHandlers.Remove(handler);
+            }
+            if (handler != null && preTrackedHandlers.Contains(handler)) {
+                preTrackedHandlers.Remove(handler);
+            }
+        }
+
+        /// <summary>
+        /// Get a list of handlers by their scene name.
+        /// If there are multiple handlers with the same scene name, all will be returned.
+        /// </summary>
+        /// <param name="name"></param>
+        /// <returns></returns>
+        public List<SignalHandler> GetByName(string name) {
+            return null;
+        }
+
+        /// <summary>
+        /// Clears the tracking lists and removes all handlers and their gameObjects from the scene.
+        /// </summary>
+        public void ClearTrackedHandlers() {
+            // First actually destroy all the things.
+            for (int i = 0; i < preTrackedHandlers.Count; ++i) {
+                Destroy(preTrackedHandlers[i].gameObject);
+            }
+            for (int i = 0; i < trackedHandlers.Count; ++i) {
+                Destroy(trackedHandlers[i].gameObject);
+            }
+            // Then clear them out.
+            this.preTrackedHandlers.Clear();
+            this.trackedHandlers.Clear();
+        }
     }
 }
 

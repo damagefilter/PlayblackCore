@@ -54,7 +54,7 @@ namespace Playblack.Signals {
 
         public void AttachInput(string sceneName, string inputMethod, string parameter, float executionDelay) {
             var l = new OutputEventListener() {
-                entityName = sceneName,
+                handlerName = sceneName,
                 method = inputMethod,
                 param = parameter,
                 delay = executionDelay

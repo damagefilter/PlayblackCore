@@ -24,7 +24,7 @@ namespace Playblack.Signals {
         public float delay;
 
         [ProtoMember(4)]
-        public string entityName;
+        public string handlerName;
 
         public void Execute(string component) {
             if (matchedHandlers != null) {
@@ -57,10 +57,10 @@ namespace Playblack.Signals {
         /// </summary>
         public void ConnectInputs() {
             this.matchedHandlers = new List<SignalHandler>();
-            if (string.IsNullOrEmpty(this.entityName)) {
+            if (string.IsNullOrEmpty(this.handlerName)) {
                 return;
             }
-            matchedHandlers.AddRange(ClientEntityTracker.GetBySceneName(this.entityName, false));
+            matchedHandlers.AddRange(SignalHandlerTracker.Instance.GetByName(this.handlerName));
         }
 
 

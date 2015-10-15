@@ -12,9 +12,9 @@ namespace Playblack.Logic {
     [SaveableComponent]
     public class Entity : MonoBehaviour {
 
-        [SaveableField(SaveField.FIELD_STRING)]
         private string sceneName;
 
+        [SaveableField(SaveField.FIELD_STRING)]
         public string SceneName {
             get {
                 if (string.IsNullOrEmpty(sceneName)) {
