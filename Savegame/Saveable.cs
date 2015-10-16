@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
 using System.Collections;
+using Playblack.Savegame.Model;
 
 namespace Playblack.Savegame {
     /// <summary>
@@ -23,6 +24,10 @@ namespace Playblack.Savegame {
         void Awake() {
             this.uuid = ((GetInstanceID() + Time.time) * UnityEngine.Random.Range(1f, 1024f)).ToString();
             // TODO: Throw event to register this at the SaveManager
+        }
+
+        public DataBlock OnSave() {
+            return null;
         }
     }
 }

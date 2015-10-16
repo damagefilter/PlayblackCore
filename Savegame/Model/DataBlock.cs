@@ -5,10 +5,10 @@ using UnityEngine;
 
 namespace Playblack.Savegame.Model {
     /// <summary>
-    /// A save entry. Data inside this is written into a save file
+    /// A block of data representing a saveable component.
     /// </summary>
     [ProtoContract]
-    public class Save {
+    public class DataBlock {
         #region Data Section
         /// <summary>
         /// Identify to which saveable object this save must be applied to
@@ -48,13 +48,13 @@ namespace Playblack.Savegame.Model {
         List<FieldDescription> saveData;
         #endregion
 
-        public Save(string uuid) {
+        public DataBlock(string uuid) {
             loadAsset = false;
             saveData = new List<FieldDescription>();
             this.uuid = uuid;
         }
 
-        public Save(string uuid, string assetPath, string assetBundle) {
+        public DataBlock(string uuid, string assetPath, string assetBundle) {
             loadAsset = true;
             this.assetBundle = assetBundle;
             this.assetPath = assetPath;
@@ -187,10 +187,6 @@ namespace Playblack.Savegame.Model {
 
         public byte[] ToBytes() {
             return Serializer.SerializeProtoObject(this);
-        }
-
-        public static Save ReadBytes(byte[] b) {
-            return Serializer.DeserializeProtoObject<Save>(b);
         }
     }
 }

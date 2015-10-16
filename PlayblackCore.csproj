@@ -54,7 +54,9 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Logic\Entity.cs" />
-    <Compile Include="Savegame\Save.cs" />
+    <Compile Include="Savegame\Model\FieldDescription.cs" />
+    <Compile Include="Savegame\Model\DataBlock.cs" />
+    <Compile Include="Savegame\Model\Serializer.cs" />
     <Compile Include="Savegame\Saveable.cs" />
     <Compile Include="Savegame\SaveableComponentAttribute.cs" />
     <Compile Include="Savegame\SaveableFieldAttribute.cs" />
@@ -66,7 +68,6 @@
     <Compile Include="Signals\ParameterInputFunc.cs" />
     <Compile Include="Signals\SignalHandler.cs" />
     <Compile Include="Signals\SignalHandlerTracker.cs" />
-    <Compile Include="Signals\SignalReceiver.cs" />
     <Compile Include="Signals\SimpleInputFunc.cs" />
     <Compile Include="ThreadPool.cs" />
   </ItemGroup>
