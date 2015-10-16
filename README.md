@@ -1,4 +1,4 @@
-#Playblack Core Library
+# Playblack Core Library
 Library with some common and hopefully useful functionality to use with the Unity game engine.
  
 Currently under development. Described features may not be present yet as I am extracting (and mostly rewriting) them
@@ -21,18 +21,32 @@ It has an editor interface and works on two kinds of components.
 AI components and sequencer components.
 
 
-### Event Sequencer
+### Sequencer
 An editor based on the BT that can be used to create scripted sequences, dialogues and many many more things.
 
 
 ### Component Signal Processing (CSP)
 An event system revolving around the game world.
 Think this: You want a counter in your game and once the counter hits some defined maximum,
-you want a door to be opened. Once the player walked through that door you want a scripted sequence (Event Sequencer)
+you want a door to be opened. Once the player walked through that door you want a scripted sequence (Sequencer)
 to fire up that shows how the lights in the corridor flicker, a camera drive through the corridor and back.
 After that, give control back to the player.
 And you want to create this in the editor without any special code to define all this logic.
 With CSP you can do just that.
+
+
+### Event System
+Event system where events are raised based on method signatures.
+If you ever delved into the world of minecraft modding, you'll feel right at home.
+Example for a callback:
+
+ void OnSave(GameSavingEvent event) { /*DO something!*/}
+
+Will be raised like so:
+
+ new GameSavingEvent().Call();
+
+Okay!
 
 
 ## Compiling
