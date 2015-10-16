@@ -8,7 +8,7 @@ namespace Playblack.Savegame.Model {
     /// <summary>
     /// Class of static methods helping with serializing and deserializing from and to byte arrays.
     /// </summary>
-    public class Serializer {
+    public static class DataSerializer {
         #region Serialize
         /// <summary>
         /// Serializes any simple object into a byte array.

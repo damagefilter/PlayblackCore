@@ -33,10 +33,6 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="Microsoft.CSharp" />
-    <Reference Include="protobuf-net, Version=2.0.0.668, Culture=neutral, PublicKeyToken=257b51d87d2e4d67, processorArchitecture=MSIL">
-      <HintPath>packages\protobuf-net.2.0.0.668\lib\net40\protobuf-net.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Data" />
@@ -51,14 +47,16 @@
       <HintPath>lib\Unity5.2\UnityEngine.UI.dll</HintPath>
       <Private>False</Private>
     </Reference>
+    <Reference Include="protobuf-net, Version=2.0.0.668, Culture=neutral, PublicKeyToken=257b51d87d2e4d67">
+      <HintPath>packages\protobuf-net.2.0.0.668\lib\net40\protobuf-net.dll</HintPath>
+    </Reference>
+    <Reference Include="FastMember">
+      <HintPath>packages\FastMember.1.0.0.11\lib\net40\FastMember.dll</HintPath>
+    </Reference>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Logic\Entity.cs" />
     <Compile Include="Savegame\Model\FieldDescription.cs" />
-    <Compile Include="Savegame\Model\DataBlock.cs" />
-    <Compile Include="Savegame\Model\Serializer.cs" />
-    <Compile Include="Savegame\Saveable.cs" />
-    <Compile Include="Savegame\SaveableComponentAttribute.cs" />
     <Compile Include="Savegame\SaveableFieldAttribute.cs" />
     <Compile Include="Savegame\SaveField.cs" />
     <Compile Include="Signals\InputFunc.cs" />
@@ -69,7 +67,12 @@
     <Compile Include="Signals\SignalHandler.cs" />
     <Compile Include="Signals\SignalHandlerTracker.cs" />
     <Compile Include="Signals\SimpleInputFunc.cs" />
-    <Compile Include="ThreadPool.cs" />
+    <Compile Include="ThreadManager.cs" />
+    <Compile Include="Savegame\SaveManager.cs" />
+    <Compile Include="Savegame\Model\ComponentDataBlock.cs" />
+    <Compile Include="Savegame\Model\GameObjectDataBlock.cs" />
+    <Compile Include="Savegame\Model\DataSerializer.cs" />
+    <Compile Include="Savegame\SaveableComponentAttribute.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />

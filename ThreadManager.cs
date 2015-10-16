@@ -2,14 +2,14 @@ using System;
 using UnityEngine;
 
 namespace Playblack {
-    public class ThreadPool : MonoBehaviour {
-        private static ThreadPool _instance;
+    public class ThreadManager : MonoBehaviour {
+        private static ThreadManager _instance;
         private static object _lock = new object();
         
-        public static ThreadPool Instance {
+        public static ThreadManager Instance {
             get {
                 if (applicationIsQuitting) {
-                    Debug.LogWarning("[Singleton] Instance " + typeof(ThreadPool) +
+                    Debug.LogWarning("[Singleton] Instance " + typeof(ThreadManager) +
                         " already destroyed on application quit." +
                         "Won't create again - returning null.");
                     return null;
@@ -17,16 +17,16 @@ namespace Playblack {
                 
                 lock (_lock) {
                     if (_instance == null) {
-                        _instance = (ThreadPool)FindObjectOfType(typeof(ThreadPool));
+                        _instance = (ThreadManager)FindObjectOfType(typeof(ThreadManager));
                         
                         if (_instance == null) {
                             GameObject singleton = new GameObject();
-                            _instance = singleton.AddComponent<ThreadPool>();
+                            _instance = singleton.AddComponent<ThreadManager>();
                             singleton.name = "ThreadPool";
                             
                             DontDestroyOnLoad(singleton);
                             
-                            Debug.Log("An instance of " + typeof(ThreadPool) + 
+                            Debug.Log("An instance of " + typeof(ThreadManager) + 
                                 " is needed in the scene, so '" + singleton +
                                 "' was created with DontDestroyOnLoad.");
                         }

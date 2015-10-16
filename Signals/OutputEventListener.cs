@@ -34,7 +34,7 @@ namespace Playblack.Signals {
                         Debug.LogWarning(method + " is not a declared input func on " + matchedHandlers[i].GetType().Name);
                     }
                     if (delay > 0) {
-                        ThreadPool.Instance.StartCoroutine(ExecuteDelayed(func));
+                        ThreadManager.Instance.StartCoroutine(ExecuteDelayed(func));
                     }
                     else {
                         Invoke(func);
