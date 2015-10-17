@@ -35,7 +35,7 @@ namespace Playblack.Savegame.Model {
             this.componentList = new List<ComponentDataBlock>();
         }
 
-        public void AddDataBlock(ComponentDataBlock block) {
+        public void AddComponentData(ComponentDataBlock block) {
             this.componentList.Add(block);
         }
 

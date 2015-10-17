@@ -27,6 +27,16 @@ namespace Playblack.Logic {
                 gameObject.name = value;
             }
         }
+
+        [SaveableField(SaveField.FIELD_VECTOR_POSITION)]
+        public Vector3 Position {
+            get {
+                return this.transform.position;
+            }
+            set {
+                this.transform.position = value;
+            }
+        }
     }
 }
 

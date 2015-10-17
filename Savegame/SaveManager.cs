@@ -1,8 +1,8 @@
 ﻿using UnityEngine;
-using System.Collections;
 using Playblack.Savegame.Model;
-using System.Reflection;
 using FastMember;
+using Playblack.EventSystem;
+using Playblack.EventSystem.Events;
 
 namespace Playblack.Savegame {
     /// <summary>
@@ -17,6 +17,7 @@ namespace Playblack.Savegame {
 
         [Tooltip("If non-empty the save manager will request this asset from the asset manager before restoring data.")]
         [SerializeField] private string assetPath;
+
         private string uuid;
         public string UUIDS {
             get {
@@ -25,7 +26,11 @@ namespace Playblack.Savegame {
         }
         void Awake() {
             this.uuid = ((GetInstanceID() + Time.time) * UnityEngine.Random.Range(1f, 1024f)).ToString();
-            // TODO: Register for save events (bring in the event system!)
+            EventDispatcher.Instance.Register<GameSavingEvent>(OnSave);
+        }
+
+        void OnDestroy() {
+            EventDispatcher.Instance.Unregister<GameSavingEvent>(OnSave);
         }
 
         /// <summary>
@@ -33,7 +38,7 @@ namespace Playblack.Savegame {
         /// This is the second-most level from the top.
         /// The GameObjectDataBlock will then go into a list which will finally represent the savegame of a scene.
         /// </summary>
-        public GameObjectDataBlock OnSave() {
+        public void OnSave(GameSavingEvent hook) {
             GameObjectDataBlock goBlock = new GameObjectDataBlock(uuid, assetBundle, assetPath);
             var components = GetComponents<Component>();
             for (int i = 0; i < components.Length; ++i) {
@@ -49,7 +54,7 @@ namespace Playblack.Savegame {
                     if (!memberSet[i].IsDefined(typeof(SaveableFieldAttribute))) {
                         continue;
                     }
-                    var attribs = memberSet[i].Type.GetCustomAttributes(typeof(SaveableFieldAttribute));
+                    var attribs = memberSet[i].Type.GetCustomAttributes(typeof(SaveableFieldAttribute), true);
                     SaveableFieldAttribute a = (SaveableFieldAttribute)attribs[0];
                     switch (a.fieldType) {
                         case SaveField.FIELD_COLOR:
@@ -75,9 +80,9 @@ namespace Playblack.Savegame {
                             break;
                     }
                 }
-                goBlock.AddDataBlock(componentBlock);
+                goBlock.AddComponentData(componentBlock);
             }
-            return goBlock;
+            hook.SceneData.AddGameObjectData(goBlock);
         }
     }
 }
