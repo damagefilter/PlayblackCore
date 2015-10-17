@@ -6,7 +6,7 @@
     <ProjectGuid>{5E7B8F9A-D911-4F06-936E-00ABF1D1C670}</ProjectGuid>
     <OutputType>Library</OutputType>
     <NoStandardLibraries>false</NoStandardLibraries>
-    <AssemblyName>ClassLibrary</AssemblyName>
+    <AssemblyName>PlayBlackGame</AssemblyName>
     <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <TargetFrameworkProfile />
@@ -39,24 +39,24 @@
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="System.Xml" />
     <Reference Include="System.Xml.Linq" />
-    <Reference Include="UnityEngine">
-      <HintPath>lib\Unity5.2\UnityEngine.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="UnityEngine.UI">
-      <HintPath>lib\Unity5.2\UnityEngine.UI.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
     <Reference Include="protobuf-net, Version=2.0.0.668, Culture=neutral, PublicKeyToken=257b51d87d2e4d67">
       <HintPath>packages\protobuf-net.2.0.0.668\lib\net40\protobuf-net.dll</HintPath>
     </Reference>
     <Reference Include="FastMember">
       <HintPath>packages\FastMember.1.0.0.11\lib\net40\FastMember.dll</HintPath>
     </Reference>
+    <Reference Include="UnityEngine">
+      <HintPath>..\lib\Unity5.2\UnityEngine.dll</HintPath>
+    </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="EventSystem\EventDispatcher.cs" />
+    <Compile Include="EventSystem\Events\GameSavingEvent.cs" />
+    <Compile Include="EventSystem\Event.cs" />
+    <Compile Include="EventSystem\IEvent.cs" />
     <Compile Include="Logic\Entity.cs" />
     <Compile Include="Savegame\Model\FieldDescription.cs" />
+    <Compile Include="Savegame\Model\SceneDataBlock.cs" />
     <Compile Include="Savegame\SaveableFieldAttribute.cs" />
     <Compile Include="Savegame\SaveField.cs" />
     <Compile Include="Signals\InputFunc.cs" />
@@ -77,6 +77,7 @@
   <ItemGroup>
     <None Include="packages.config" />
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSHARP.Targets" />
   <ProjectExtensions>
     <VisualStudio AllowExistingFolder="true" />

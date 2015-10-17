@@ -60,6 +60,10 @@ namespace Playblack.Signals {
         private List<SignalHandler> trackedHandlers;
         private List<SignalHandler> preTrackedHandlers;
 
+        private SignalHandlerTracker() {
+            trackedHandlers = new List<SignalHandler>();
+            preTrackedHandlers = new List<SignalHandler>();
+        }
         /// <summary>
         /// Starts tracking a signal handler.
         /// </summary>
