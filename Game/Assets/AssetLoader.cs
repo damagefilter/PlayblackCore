@@ -15,7 +15,7 @@ namespace Playblack.Assets {
         private AssetManager assetManager;
 
         public AssetLoader() {
-            AssetManager = new AssetManager();
+            assetManager = new AssetManager();
         }
 
         void Awake() {
@@ -33,7 +33,7 @@ namespace Playblack.Assets {
         private IEnumerator LoadAssetBundle(string assetPath, string assetBundle, AssetLoaded callback) {
             if (assetManager.HasAssetBundle(assetBundle)) {
                 StartCoroutine(LoadAssetFromBundle(assetPath, assetBundle, callback));
-                return null; // End this coroutine
+                yield break; // End this coroutine
             }
 
             WWW www = new WWW("file://" + Application.streamingAssetsPath + "/" + assetBundle + ".bundle");
@@ -41,7 +41,7 @@ namespace Playblack.Assets {
 
             assetManager.AddAssetBundle(assetBundle, www.assetBundle);
             StartCoroutine(LoadAssetFromBundle(assetPath, assetBundle, callback));
-            return null; // End this coroutine
+            yield break; // End this coroutine
         }
 
         private IEnumerator LoadAssetFromBundle(string assetPath, string assetBundle, AssetLoaded callback) {

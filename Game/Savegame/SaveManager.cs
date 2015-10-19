@@ -123,7 +123,7 @@ namespace Playblack.Savegame {
                             accessor[component, memberSet[j].Name] = data.ComponentList[i].ReadInt(memberSet[j].Name);
                             break;
                         case SaveField.FIELD_PROTOBUF_OBJECT:
-                            accessor[component, memberSet[j].Name] = data.ComponentList[i].ReadProtoObject(memberSet[j].Name);
+                            accessor[component, memberSet[j].Name] = data.ComponentList[i].ReadProtoObject(memberSet[j].Name, memberSet[j].Type);
                             break;
                         case SaveField.FIELD_SIMPLE_OBJECT:
                             accessor[component, memberSet[j].Name] = data.ComponentList[i].ReadSimpleObject(memberSet[j].Name);

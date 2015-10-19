@@ -50,6 +50,35 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="BehaviourTree\Exceptions\IllegalReturnStatusException.cs" />
+    <Compile Include="BehaviourTree\Exceptions\NotTickableException.cs" />
+    <Compile Include="BehaviourTree\Exceptions\SpawnException.cs" />
+    <Compile Include="BehaviourTree\Execution\Core\Events\ITaskListener.cs" />
+    <Compile Include="BehaviourTree\Execution\Core\Events\TaskEvent.cs" />
+    <Compile Include="BehaviourTree\Execution\Core\ExecutionTask.cs" />
+    <Compile Include="BehaviourTree\Execution\Core\GenericBTExecutor.cs" />
+    <Compile Include="BehaviourTree\Execution\Core\IBTExecutor.cs" />
+    <Compile Include="BehaviourTree\Execution\Core\TaskStatus.cs" />
+    <Compile Include="BehaviourTree\Execution\Task\Composite\ExecutionComposite.cs" />
+    <Compile Include="BehaviourTree\Execution\Task\Composite\ExecutionSelector.cs" />
+    <Compile Include="BehaviourTree\Execution\Task\Composite\ExecutionSequence.cs" />
+    <Compile Include="BehaviourTree\Execution\Task\Decorator\ExecutionDecorator.cs" />
+    <Compile Include="BehaviourTree\Execution\Task\Decorator\ExecutionInverter.cs" />
+    <Compile Include="BehaviourTree\Execution\Task\Decorator\ExecutionRepeat.cs" />
+    <Compile Include="BehaviourTree\Execution\Task\Decorator\ExecutionStatusResponder.cs" />
+    <Compile Include="BehaviourTree\Execution\Task\Leaf\ExecutionAction.cs" />
+    <Compile Include="BehaviourTree\Execution\Task\Leaf\ExecutionLeaf.cs" />
+    <Compile Include="BehaviourTree\Model\Core\ModelTask.cs" />
+    <Compile Include="BehaviourTree\Model\Core\Position.cs" />
+    <Compile Include="BehaviourTree\Model\Task\Composite\ModelComposite.cs" />
+    <Compile Include="BehaviourTree\Model\Task\Composite\ModelSelector.cs" />
+    <Compile Include="BehaviourTree\Model\Task\Composite\ModelSequence.cs" />
+    <Compile Include="BehaviourTree\Model\Task\Decorator\ModelDecorator.cs" />
+    <Compile Include="BehaviourTree\Model\Task\Decorator\ModelInverter.cs" />
+    <Compile Include="BehaviourTree\Model\Task\Decorator\ModelRepeat.cs" />
+    <Compile Include="BehaviourTree\Model\Task\Decorator\ModelStatusResponder.cs" />
+    <Compile Include="BehaviourTree\Model\Task\Leaf\ModelAction.cs" />
+    <Compile Include="BehaviourTree\Model\Task\Leaf\ModelLeaf.cs" />
     <Compile Include="EventSystem\EventDispatcher.cs" />
     <Compile Include="EventSystem\Events\GameSavingEvent.cs" />
     <Compile Include="EventSystem\Event.cs" />
