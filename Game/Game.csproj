@@ -73,6 +73,7 @@
     <Compile Include="Savegame\Model\GameObjectDataBlock.cs" />
     <Compile Include="Savegame\Model\DataSerializer.cs" />
     <Compile Include="Savegame\SaveableComponentAttribute.cs" />
+    <Compile Include="Savegame\SaveState.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
