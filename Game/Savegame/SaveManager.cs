@@ -46,37 +46,37 @@ namespace Playblack.Savegame {
                 if (!components[i].GetType().IsDefined(typeof(SaveableComponentAttribute), true)) {
                     continue;
                 }
-                var componentBlock = new ComponentDataBlock();
+                var componentBlock = new ComponentDataBlock(components[i].GetType().ToString());
                 // Find all fields and properties that need saving.
                 var accessor = TypeAccessor.Create(components[i].GetType());
                 var memberSet = accessor.GetMembers();
                 for (int j = 0; j < memberSet.Count; ++j) {
-                    if (!memberSet[i].IsDefined(typeof(SaveableFieldAttribute))) {
+                    if (!memberSet[j].IsDefined(typeof(SaveableFieldAttribute))) {
                         continue;
                     }
-                    var attribs = memberSet[i].Type.GetCustomAttributes(typeof(SaveableFieldAttribute), true);
+                    var attribs = memberSet[j].Type.GetCustomAttributes(typeof(SaveableFieldAttribute), true);
                     SaveableFieldAttribute a = (SaveableFieldAttribute)attribs[0];
                     switch (a.fieldType) {
                         case SaveField.FIELD_COLOR:
-                            componentBlock.AddColor(memberSet[i].Name, (Color)accessor[components[i], memberSet[i].Name]);
+                            componentBlock.AddColor(memberSet[j].Name, (Color)accessor[components[i], memberSet[j].Name]);
                             break;
                         case SaveField.FIELD_FLOAT:
-                            componentBlock.AddFloat(memberSet[i].Name, (float)accessor[components[i], memberSet[i].Name]);
+                            componentBlock.AddFloat(memberSet[j].Name, (float)accessor[components[i], memberSet[j].Name]);
                             break;
                         case SaveField.FIELD_INT:
-                            componentBlock.AddInt(memberSet[i].Name, (int)accessor[components[i], memberSet[i].Name]);
+                            componentBlock.AddInt(memberSet[j].Name, (int)accessor[components[i], memberSet[j].Name]);
                             break;
                         case SaveField.FIELD_PROTOBUF_OBJECT:
-                            componentBlock.AddProtoObject(memberSet[i].Name, accessor[components[i], memberSet[i].Name]);
+                            componentBlock.AddProtoObject(memberSet[j].Name, accessor[components[i], memberSet[j].Name]);
                             break;
                         case SaveField.FIELD_SIMPLE_OBJECT:
-                            componentBlock.AddSimpleObject(memberSet[i].Name, accessor[components[i], memberSet[i].Name]);
+                            componentBlock.AddSimpleObject(memberSet[j].Name, accessor[components[i], memberSet[j].Name]);
                             break;
                         case SaveField.FIELD_STRING:
-                            componentBlock.AddString(memberSet[i].Name, (string)accessor[components[i], memberSet[i].Name]);
+                            componentBlock.AddString(memberSet[j].Name, (string)accessor[components[i], memberSet[j].Name]);
                             break;
                         case SaveField.FIELD_VECTOR_POSITION:
-                            componentBlock.AddVector(memberSet[i].Name, (Vector3)accessor[components[i], memberSet[i].Name]);
+                            componentBlock.AddVector(memberSet[j].Name, (Vector3)accessor[components[i], memberSet[j].Name]);
                             break;
                     }
                 }
