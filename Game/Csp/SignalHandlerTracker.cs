@@ -2,7 +2,7 @@ using System;
 using UnityEngine;
 using System.Collections.Generic;
 
-namespace Playblack.Signals {
+namespace Playblack.Csp {
     /// <summary>
     /// Tracks all signal handlers in the scene so they can find each other
     /// for connecting their inputs.

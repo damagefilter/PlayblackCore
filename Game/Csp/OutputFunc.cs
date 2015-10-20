@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using ProtoBuf;
 using UnityEngine;
 
-namespace Playblack.Signals {
+namespace Playblack.Csp {
     /// <summary>
     /// Defines a signal output and registered listeners.
     /// 

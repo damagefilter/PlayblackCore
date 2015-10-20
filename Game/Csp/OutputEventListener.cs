@@ -5,7 +5,7 @@ using System.Collections;
 using System.Collections.Generic;
 using Playblack.Logic;
 
-namespace Playblack.Signals {
+namespace Playblack.Csp {
     [ProtoContract]
     [Serializable]
     public class OutputEventListener {

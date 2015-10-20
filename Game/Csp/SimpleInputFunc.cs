@@ -1,6 +1,6 @@
 using System;
 
-namespace Playblack.Signals {
+namespace Playblack.Csp {
     public class SimpleInputFunc : InputFunc {
 
         private SimpleSignal callback;

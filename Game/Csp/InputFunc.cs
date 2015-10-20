@@ -1,6 +1,6 @@
 using System;
 
-namespace Playblack.Signals {
+namespace Playblack.Csp {
     /// <summary>
     /// Represents an input function.
     /// </summary>

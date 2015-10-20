@@ -3,7 +3,7 @@ using UnityEngine;
 using System.Collections.Generic;
 using Playblack.Savegame;
 
-namespace Playblack.Signals {
+namespace Playblack.Csp {
 
     public delegate void SimpleSignal();
     public delegate void ParameterSignal(string param);

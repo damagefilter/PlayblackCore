@@ -1,6 +1,6 @@
 using System;
 
-namespace Playblack.Signals {
+namespace Playblack.Csp {
     /// <summary>
     /// Can be used to make fired output signals of any component known.
     /// </summary>

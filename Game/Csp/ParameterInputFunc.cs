@@ -1,6 +1,6 @@
 using System;
 
-namespace Playblack.Signals {
+namespace Playblack.Csp {
 	public class ParameterInputFunc : InputFunc {
 		private ParameterSignal callback;
 		public ParameterInputFunc(string name, ParameterSignal callback) : base(name) {
