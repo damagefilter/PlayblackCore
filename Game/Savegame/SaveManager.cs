@@ -3,6 +3,7 @@ using Playblack.Savegame.Model;
 using FastMember;
 using Playblack.EventSystem;
 using Playblack.EventSystem.Events;
+using System;
 
 namespace Playblack.Savegame {
     /// <summary>
@@ -89,6 +90,53 @@ namespace Playblack.Savegame {
             this.uuid = data.UUID;
             this.assetPath = data.AssetPath;
             this.assetBundle = data.AssetBundle;
+            for (int i = 0; i < data.ComponentList.Count; ++i) {
+                Component component = null;
+                var componentType = Type.GetType(data.ComponentList[i].ComponentName);
+                if (!typeof(Component).IsAssignableFrom(componentType)) {
+                    Debug.LogError("Restore error: " + componentType + " was expected to be a subtype of Component but isn't! Not restoring data.");
+                    continue; // Not a component :(
+                }
+                if (addComponents) {
+                    component = this.gameObject.AddComponent(componentType);
+                }
+                else {
+                    component = this.gameObject.GetComponent(componentType);
+                }
+
+                var accessor = TypeAccessor.Create(componentType);
+                var memberSet = accessor.GetMembers();
+                for (int j = 0; j < memberSet.Count; ++j) {
+                    if (!memberSet[j].IsDefined(typeof(SaveableFieldAttribute))) {
+                        continue;
+                    }
+                    var attribs = memberSet[j].Type.GetCustomAttributes(typeof(SaveableFieldAttribute), true);
+                    SaveableFieldAttribute a = (SaveableFieldAttribute)attribs[0];
+                    switch (a.fieldType) {
+                        case SaveField.FIELD_COLOR:
+                            accessor[component, memberSet[j].Name] = data.ComponentList[i].ReadColor(memberSet[j].Name);
+                            break;
+                        case SaveField.FIELD_FLOAT:
+                            accessor[component, memberSet[j].Name] = data.ComponentList[i].ReadFloat(memberSet[j].Name);
+                            break;
+                        case SaveField.FIELD_INT:
+                            accessor[component, memberSet[j].Name] = data.ComponentList[i].ReadInt(memberSet[j].Name);
+                            break;
+                        case SaveField.FIELD_PROTOBUF_OBJECT:
+                            accessor[component, memberSet[j].Name] = data.ComponentList[i].ReadProtoObject(memberSet[j].Name);
+                            break;
+                        case SaveField.FIELD_SIMPLE_OBJECT:
+                            accessor[component, memberSet[j].Name] = data.ComponentList[i].ReadSimpleObject(memberSet[j].Name);
+                            break;
+                        case SaveField.FIELD_STRING:
+                            accessor[component, memberSet[j].Name] = data.ComponentList[i].ReadString(memberSet[j].Name);
+                            break;
+                        case SaveField.FIELD_VECTOR_POSITION:
+                            accessor[component, memberSet[j].Name] = data.ComponentList[i].ReadVector(memberSet[j].Name);
+                            break;
+                    }
+                }
+            }
         }
     }
 }

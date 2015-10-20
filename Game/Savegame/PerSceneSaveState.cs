@@ -54,7 +54,7 @@ namespace Playblack.Savegame {
         public void CreateGameObjectFromAsset(GameObjectDataBlock dataBlock) {
             new RequestAssetEvent(dataBlock.AssetBundle, dataBlock.AssetPath, (UnityEngine.Object loadedAsset) => {
                 var go = (GameObject)UnityEngine.Object.Instantiate(loadedAsset);
-                go.GetComponent<SaveManager>().Restore(dataBlock);
+                go.GetComponent<SaveManager>().Restore(dataBlock, false);
             }).Call();
         }
     }
