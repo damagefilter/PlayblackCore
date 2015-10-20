@@ -19,7 +19,7 @@ namespace Playblack.Savegame {
         [SerializeField] private string assetPath;
 
         private string uuid;
-        public string UUIDS {
+        public string UUID {
             get {
                 return uuid;
             }
@@ -83,6 +83,12 @@ namespace Playblack.Savegame {
                 goBlock.AddComponentData(componentBlock);
             }
             hook.SceneData.AddGameObjectData(goBlock);
+        }
+
+        public void Restore(GameObjectDataBlock data, bool addComponents) {
+            this.uuid = data.UUID;
+            this.assetPath = data.AssetPath;
+            this.assetBundle = data.AssetBundle;
         }
     }
 }

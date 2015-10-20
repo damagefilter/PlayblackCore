@@ -13,18 +13,44 @@ namespace Playblack.Savegame.Model {
         #region data
         [ProtoMember(100)]
         private string uuid;
+        public string UUID {
+            get {
+                return uuid;
+            }
+        }
 
         [ProtoMember(200)]
         private string assetBundle;
+        public string AssetBundle {
+            get {
+                return assetBundle;
+            }
+        }
 
         [ProtoMember(300)]
         private string assetPath;
+        public string AssetPath {
+            get {
+                return assetPath;
+            }
+        }
 
         [ProtoMember(400)]
         private bool loadAsset;
+        public bool MustLoadAsset {
+            get {
+                return loadAsset;
+            }
+        }
 
         [ProtoMember(500)]
         private List<ComponentDataBlock> componentList;
+        public List<ComponentDataBlock> ComponentList {
+            get {
+                return componentList;
+            }
+        }
+
         #endregion
 
         public GameObjectDataBlock(string uuid, string assetBundle, string assetPath) {
@@ -37,10 +63,6 @@ namespace Playblack.Savegame.Model {
 
         public void AddComponentData(ComponentDataBlock block) {
             this.componentList.Add(block);
-        }
-
-        public byte[] ToBytes() {
-            return DataSerializer.SerializeProtoObject<GameObjectDataBlock>(this);
         }
     }
 }

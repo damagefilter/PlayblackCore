@@ -11,6 +11,11 @@ namespace Playblack.Savegame.Model {
         private string sceneName;
         [ProtoMember(200)]
         private List<GameObjectDataBlock> objects;
+        public List<GameObjectDataBlock> SceneObjects {
+            get {
+                return objects;
+            }
+        }
 
         public SceneDataBlock(string sceneName) {
             this.sceneName = sceneName;

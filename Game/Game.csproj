@@ -59,21 +59,27 @@
     <Compile Include="Savegame\Model\SceneDataBlock.cs" />
     <Compile Include="Savegame\SaveableFieldAttribute.cs" />
     <Compile Include="Savegame\SaveField.cs" />
-    <Compile Include="Signals\InputFunc.cs" />
-    <Compile Include="Signals\OutputEventListener.cs" />
-    <Compile Include="Signals\OutputFunc.cs" />
-    <Compile Include="Signals\OutputSignalsAttribute.cs" />
-    <Compile Include="Signals\ParameterInputFunc.cs" />
-    <Compile Include="Signals\SignalHandler.cs" />
-    <Compile Include="Signals\SignalHandlerTracker.cs" />
-    <Compile Include="Signals\SimpleInputFunc.cs" />
     <Compile Include="ThreadManager.cs" />
     <Compile Include="Savegame\SaveManager.cs" />
     <Compile Include="Savegame\Model\ComponentDataBlock.cs" />
     <Compile Include="Savegame\Model\GameObjectDataBlock.cs" />
     <Compile Include="Savegame\Model\DataSerializer.cs" />
     <Compile Include="Savegame\SaveableComponentAttribute.cs" />
-    <Compile Include="Savegame\SaveState.cs" />
+    <Compile Include="Savegame\ISaveState.cs" />
+    <Compile Include="Savegame\PerSceneSaveState.cs" />
+    <Compile Include="Savegame\Model\ZipTools.cs" />
+    <Compile Include="Csp\InputFunc.cs" />
+    <Compile Include="Csp\OutputEventListener.cs" />
+    <Compile Include="Csp\OutputFunc.cs" />
+    <Compile Include="Csp\OutputSignalsAttribute.cs" />
+    <Compile Include="Csp\ParameterInputFunc.cs" />
+    <Compile Include="Csp\SignalHandler.cs" />
+    <Compile Include="Csp\SignalHandlerTracker.cs" />
+    <Compile Include="Csp\SimpleInputFunc.cs" />
+    <Compile Include="Assets\AssetManager.cs" />
+    <Compile Include="Assets\AssetReference.cs" />
+    <Compile Include="Assets\AssetLoader.cs" />
+    <Compile Include="EventSystem\Events\RequestAssetEvent.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
@@ -83,4 +89,7 @@
   <ProjectExtensions>
     <VisualStudio AllowExistingFolder="true" />
   </ProjectExtensions>
+  <ItemGroup>
+    <Folder Include="Assets\" />
+  </ItemGroup>
 </Project>

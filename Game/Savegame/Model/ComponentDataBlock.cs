@@ -11,15 +11,28 @@ namespace Playblack.Savegame.Model {
     [ProtoContract]
     public class ComponentDataBlock {
         #region Data Section
+        [ProtoMember(100)]
+        private string componentName;
+        public string ComponentName {
+            get {
+                return componentName;
+            }
+        }
         /// <summary>
         /// List of fields to be saved and or restored.
         /// </summary>
-        [ProtoMember(100)]
-        List<FieldDescription> saveData;
+        [ProtoMember(200)]
+        private List<FieldDescription> saveData;
+        public List<FieldDescription> SaveData {
+            get {
+                return saveData;
+            }
+        }
         #endregion
 
-        public ComponentDataBlock() {
+        public ComponentDataBlock(string componentName) {
             saveData = new List<FieldDescription>();
+            this.componentName = componentName;
         }
 
         #region adding data
