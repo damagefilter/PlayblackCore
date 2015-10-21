@@ -7,15 +7,15 @@ namespace Playblack.Csp {
     /// Tracks all signal handlers in the scene so they can find each other
     /// for connecting their inputs.
     /// </summary>
-    public class SignalHandlerTracker : MonoBehaviour {
+    public class SignalProcessorTracker : MonoBehaviour {
         #region Singleton
-        private static SignalHandlerTracker _instance;
+        private static SignalProcessorTracker _instance;
         private static object _lock = new object();
 
-        public static SignalHandlerTracker Instance {
+        public static SignalProcessorTracker Instance {
             get {
                 if (applicationIsQuitting) {
-                    Debug.LogWarning("[Singleton] Instance " + typeof(SignalHandlerTracker) +
+                    Debug.LogWarning("[Singleton] Instance " + typeof(SignalProcessorTracker) +
                         " already destroyed on application quit." +
                         "Won't create again - returning null.");
                     return null;
@@ -23,16 +23,16 @@ namespace Playblack.Csp {
 
                 lock (_lock) {
                     if (_instance == null) {
-                        _instance = (SignalHandlerTracker)FindObjectOfType(typeof(SignalHandlerTracker));
+                        _instance = (SignalProcessorTracker)FindObjectOfType(typeof(SignalProcessorTracker));
 
                         if (_instance == null) {
                             GameObject singleton = new GameObject();
-                            _instance = singleton.AddComponent<SignalHandlerTracker>();
+                            _instance = singleton.AddComponent<SignalProcessorTracker>();
                             singleton.name = "SignalHandlerTracker";
 
                             DontDestroyOnLoad(singleton);
 
-                            Debug.Log("An instance of " + typeof(SignalHandlerTracker) +
+                            Debug.Log("An instance of " + typeof(SignalProcessorTracker) +
                                 " is needed in the scene, so '" + singleton +
                                 "' was created with DontDestroyOnLoad.");
                         }
@@ -57,18 +57,18 @@ namespace Playblack.Csp {
         }
         #endregion
 
-        private List<SignalHandler> trackedHandlers;
-        private List<SignalHandler> preTrackedHandlers;
+        private List<SignalProcessor> trackedHandlers;
+        private List<SignalProcessor> preTrackedHandlers;
 
-        private SignalHandlerTracker() {
-            trackedHandlers = new List<SignalHandler>();
-            preTrackedHandlers = new List<SignalHandler>();
+        private SignalProcessorTracker() {
+            trackedHandlers = new List<SignalProcessor>();
+            preTrackedHandlers = new List<SignalProcessor>();
         }
         /// <summary>
         /// Starts tracking a signal handler.
         /// </summary>
         /// <param name="handler"></param>
-        public void Track(SignalHandler handler) {
+        public void Track(SignalProcessor handler) {
             if (!trackedHandlers.Contains(handler)) {
                 this.trackedHandlers.Add(handler);
                 if (preTrackedHandlers.Contains(handler)) {
@@ -83,7 +83,7 @@ namespace Playblack.Csp {
         /// Once properly tracked a handler is auto-removed from the pre-tracking list.
         /// </summary>
         /// <param name="handler"></param>
-        public void PreTrack(SignalHandler handler) {
+        public void PreTrack(SignalProcessor handler) {
             this.preTrackedHandlers.Add(handler);
         }
 
@@ -93,7 +93,7 @@ namespace Playblack.Csp {
         /// If the handler was already destroyed, is null or is untracked, nothing will happen.
         /// </summary>
         /// <param name="handler"></param>
-        public void Untrack(SignalHandler handler) {
+        public void Untrack(SignalProcessor handler) {
             if (handler != null && trackedHandlers.Contains(handler)) {
                 trackedHandlers.Remove(handler);
             }
@@ -108,7 +108,7 @@ namespace Playblack.Csp {
         /// </summary>
         /// <param name="name"></param>
         /// <returns></returns>
-        public List<SignalHandler> GetByName(string name) {
+        public List<SignalProcessor> GetByName(string name) {
             return null;
         }
 

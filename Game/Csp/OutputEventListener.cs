@@ -12,7 +12,7 @@ namespace Playblack.Csp {
         // Only serializable via unity for scene defaults
         // otherwise this is re-written by the ConnectInputs method
         [SerializeField]
-        public List<SignalHandler> matchedHandlers;
+        public List<SignalProcessor> matchedHandlers;
 
         [ProtoMember(1)]
         public string method;
@@ -56,11 +56,11 @@ namespace Playblack.Csp {
         /// Called after savegame loading, to restore the entity reference.
         /// </summary>
         public void ConnectInputs() {
-            this.matchedHandlers = new List<SignalHandler>();
+            this.matchedHandlers = new List<SignalProcessor>();
             if (string.IsNullOrEmpty(this.handlerName)) {
                 return;
             }
-            matchedHandlers.AddRange(SignalHandlerTracker.Instance.GetByName(this.handlerName));
+            matchedHandlers.AddRange(SignalProcessorTracker.Instance.GetByName(this.handlerName));
         }
 
 

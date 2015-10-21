@@ -13,7 +13,7 @@ namespace Playblack.Csp {
     /// </summary>
     [DisallowMultipleComponent]
     [SaveableComponent]
-    public class SignalHandler : MonoBehaviour {
+    public class SignalProcessor : MonoBehaviour {
         /// <summary>
         /// Signals this Entity can receive and process.
         /// This list merely represents meta information.
@@ -132,11 +132,11 @@ namespace Playblack.Csp {
 
         #region Unity Related
         public void Awake() {
-            SignalHandlerTracker.Instance.Track(this);
+            SignalProcessorTracker.Instance.Track(this);
         }
 
         public void OnDestroy() {
-            SignalHandlerTracker.Instance.Untrack(this);
+            SignalProcessorTracker.Instance.Untrack(this);
         }
         #endregion
     }

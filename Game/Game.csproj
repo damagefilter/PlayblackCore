@@ -73,13 +73,13 @@
     <Compile Include="Csp\OutputFunc.cs" />
     <Compile Include="Csp\OutputSignalsAttribute.cs" />
     <Compile Include="Csp\ParameterInputFunc.cs" />
-    <Compile Include="Csp\SignalHandler.cs" />
-    <Compile Include="Csp\SignalHandlerTracker.cs" />
     <Compile Include="Csp\SimpleInputFunc.cs" />
     <Compile Include="Assets\AssetManager.cs" />
     <Compile Include="Assets\AssetReference.cs" />
     <Compile Include="Assets\AssetLoader.cs" />
     <Compile Include="EventSystem\Events\RequestAssetEvent.cs" />
+    <Compile Include="Csp\SignalProcessor.cs" />
+    <Compile Include="Csp\SignalProcessorTracker.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
