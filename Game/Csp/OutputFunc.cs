@@ -45,7 +45,7 @@ namespace Playblack.Csp {
                 return; // happens in a state after savegame load (deserialization)
             }
             for (int i = 0; i < registeredListeners.Count; ++i) {
-                if (registeredListeners[i].matchedHandlers == null) {
+                if (registeredListeners[i].matchedProcessors == null) {
                     continue; // happens in a state after savegame load (deserialization)
                 }
                 registeredListeners[i].Execute(component);
@@ -59,7 +59,7 @@ namespace Playblack.Csp {
                 param = parameter,
                 delay = executionDelay
             };
-            l.ConnectInputs();
+            l.ConnectSignalProcessors();
             registeredListeners.Add(l);
         }
 
