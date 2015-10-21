@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Playblack {
+namespace Playblack.Csp {
     /// <summary>
     /// What is this?
     /// This attribute marks a method as input function.

@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Playblack {
+namespace Playblack.Csp {
     /// <summary>
     /// What is this?
     /// This is an attribute to inform the signal processor that a component is capable of firing outputs.
@@ -19,4 +19,3 @@ namespace Playblack {
         }
     }
 }
-
