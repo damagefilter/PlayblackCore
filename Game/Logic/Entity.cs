@@ -12,7 +12,7 @@ namespace Playblack.Logic {
     [SaveableComponent]
     public class Entity : MonoBehaviour {
 
-        private string sceneName;
+        [SerializeField]private string sceneName;
 
         [SaveableField(SaveField.FIELD_STRING)]
         public string SceneName {

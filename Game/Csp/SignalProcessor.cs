@@ -1,10 +1,11 @@
 using System;
-using UnityEngine;
 using System.Collections.Generic;
-using Playblack.Savegame;
+using Fasterflect;
 using Playblack.EventSystem;
 using Playblack.EventSystem.Events;
 using Playblack.Pooling;
+using Playblack.Savegame;
+using UnityEngine;
 
 namespace Playblack.Csp {
 
@@ -78,20 +79,15 @@ namespace Playblack.Csp {
             var components = GetComponents<Component>();
             for (int i = 0; i < components.Length; ++i) {
                 var type = components[i].GetType();
-                var methods = type.GetMethods();
+                var methods = type.MethodsWith(Flags.InstancePublic, typeof(InputFuncAttribute));
                 InputFuncAttribute[] attribs = null;
                 if (inputFuncCache.Has(type)) {
                     attribs = inputFuncCache.Get(type);
                 }
                 else {
-                    var attribList = new List<InputFuncAttribute>(methods.Length / 2); // round about this number as init capacity
-                    for (int j = 0; j < methods.Length; ++j) {
-                        if (!methods[j].IsDefined(typeof(InputFuncAttribute), true)) {
-                            continue;
-                        }
-                        var attrib = (InputFuncAttribute)methods[j].GetCustomAttributes(typeof(InputFuncAttribute), true)[0];
-                        attribList.Add(attrib);
-
+                    var attribList = new List<InputFuncAttribute>(methods.Count / 2); // round about this number as init capacity
+                    for (int j = 0; j < methods.Count; ++j) {
+                        attribList.Add(methods[j].Attribute<InputFuncAttribute>());
                     }
                     attribs = attribList.ToArray();
                     inputFuncCache.Add(type, attribs); // next time a processor sees this component, all the lookup reflection will be spared
