@@ -4,6 +4,7 @@ using Playblack.EventSystem.Events;
 using System.IO;
 using Playblack.Savegame.Model;
 using System.IO.Compression;
+using System.Collections;
 
 namespace Playblack.Savegame {
     /// <summary>
@@ -27,22 +28,31 @@ namespace Playblack.Savegame {
             }
         }
 
-        public void RestoreSave() {
-            // TODO: Find all SaveManagers in scene and destroy them.
+        public IEnumerator RestoreSave() {
+            // Can use GO.Find here, this point in code has no requirement to be super fast.
+            // (That also means we don't need to track them all)
+            var managers = UnityEngine.Object.FindObjectsOfType<SaveManager>();
+            for (int i = 0; i < managers.Length; ++i) {
+                // Needs to be killed right away
+                UnityEngine.Object.DestroyImmediate(managers[i].gameObject);
+            }
             SceneDataBlock sceneData = null;
             using (MemoryStream ms = new MemoryStream(File.ReadAllBytes(Application.persistentDataPath + "/" + SaveName + ".save"))) {
                 ms.Position = 0;
                 sceneData = DataSerializer.DeserializeProtoObject<SceneDataBlock>(ZipTools.DecompressBytes(ms.ToArray()));
             }
-            // TODO: Do Scene Data restoring ...
+
             for (int i = 0; i < sceneData.SceneObjects.Count; ++i) {
                 if (sceneData.SceneObjects[i].MustLoadAsset) {
-                    CreateGameObjectFromAsset(sceneData.SceneObjects[i]);
+                    // load async, wait for finish, then continue
+                    yield return CreateGameObjectFromAsset(sceneData.SceneObjects[i]);
                 }
                 else {
                     CreateNewGameObject(sceneData.SceneObjects[i]);
                 }
             }
+            // because we're waiting for all async tasks to be done, we can savely fire the loading-done event here.
+            new SaveGameLoadedEvent(SaveName).Call();
         }
 
         public void CreateNewGameObject(GameObjectDataBlock dataBlock) {
@@ -51,11 +61,18 @@ namespace Playblack.Savegame {
             saveMan.Restore(dataBlock, true);
         }
 
-        public void CreateGameObjectFromAsset(GameObjectDataBlock dataBlock) {
-            new RequestAssetEvent(dataBlock.AssetBundle, dataBlock.AssetPath, (UnityEngine.Object loadedAsset) => {
+        /// <summary>
+        /// Creates the game object from asset.
+        /// This call may be async in which case it will return the coroutine it works on.
+        /// </summary>
+        /// <returns>The game object from asset.</returns>
+        /// <param name="dataBlock">Data block.</param>
+        public Coroutine CreateGameObjectFromAsset(GameObjectDataBlock dataBlock) {
+            var hook = (RequestAssetEvent)new RequestAssetEvent(dataBlock.AssetBundle, dataBlock.AssetPath, (UnityEngine.Object loadedAsset) => {
                 var go = (GameObject)UnityEngine.Object.Instantiate(loadedAsset);
                 go.GetComponent<SaveManager>().Restore(dataBlock, false);
             }).Call();
+            return hook.AssetLoadingProcess;
         }
     }
 }

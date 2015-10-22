@@ -86,6 +86,9 @@ namespace Playblack.Savegame {
             hook.SceneData.AddGameObjectData(goBlock);
         }
 
+        public void OnSaveGameLoaded(SaveGameLoadedEvent hook) {
+            
+        }
         public void Restore(GameObjectDataBlock data, bool addComponents) {
             this.uuid = data.UUID;
             this.assetPath = data.AssetPath;

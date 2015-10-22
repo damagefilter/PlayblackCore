@@ -38,14 +38,17 @@ namespace Playblack.Savegame.Model {
         #region adding data
         public void AddInt(string name, int value) {
             var fd = new FieldDescription((int)SaveField.FIELD_INT, name, DataSerializer.SerializeSimpleObject(value));
+            saveData.Add(fd);
         }
 
         public void AddFloat(string name, float value) {
             var fd = new FieldDescription((int)SaveField.FIELD_FLOAT, name, DataSerializer.SerializeSimpleObject(value));
+            saveData.Add(fd);
         }
 
         public void AddString(string name, string value) {
             var fd = new FieldDescription((int)SaveField.FIELD_STRING, name, DataSerializer.SerializeSimpleObject(value));
+            saveData.Add(fd);
         }
 
         public void AddColor(string name, Color value) {
@@ -55,6 +58,7 @@ namespace Playblack.Savegame.Model {
                 value.b,
                 value.a
             }));
+            saveData.Add(fd);
         }
 
         public void AddVector(string name, Vector3 value) {
@@ -63,14 +67,17 @@ namespace Playblack.Savegame.Model {
                 value.y,
                 value.z
             }));
+            saveData.Add(fd);
         }
 
         public void AddProtoObject(string name, object value) {
             var fd = new FieldDescription((int)SaveField.FIELD_PROTOBUF_OBJECT, name, DataSerializer.SerializeProtoObject(value));
+            saveData.Add(fd);
         }
 
         public void AddSimpleObject(string name, object value) {
             var fd = new FieldDescription((int)SaveField.FIELD_SIMPLE_OBJECT, name, DataSerializer.SerializeSimpleObject(value));
+            saveData.Add(fd);
         }
         #endregion
         #region reading data

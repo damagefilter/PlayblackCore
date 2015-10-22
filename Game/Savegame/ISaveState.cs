@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 
 namespace Playblack.Savegame {
     public interface ISaveState {
@@ -14,8 +15,11 @@ namespace Playblack.Savegame {
 
         /// <summary>
         /// Restores the game state that was stored in the save file specified by SaveName.
+        /// This task may be asynchronous, which is why it returns an IEnumerator.
+        /// If the task is running synchronous, IEnumerator may be null.
+        /// However, you should, merely by the nature of such tasks, always start it as coroutine.
         /// </summary>
-        void RestoreSave();
+        IEnumerator RestoreSave();
     }
 }
 

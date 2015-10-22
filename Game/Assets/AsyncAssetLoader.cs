@@ -5,7 +5,7 @@ using Playblack.EventSystem;
 using Playblack.EventSystem.Events;
 
 namespace Playblack.Assets {
-    public class AssetLoader : MonoBehaviour {
+    public class AsyncAssetLoader : MonoBehaviour {
         /// <summary>
         /// Used as callback for asynchronously loading assets.
         /// This will NOT instantiate the object!
@@ -14,7 +14,7 @@ namespace Playblack.Assets {
 
         private AssetManager assetManager;
 
-        public AssetLoader() {
+        public AsyncAssetLoader() {
             assetManager = new AssetManager();
         }
 
@@ -27,21 +27,21 @@ namespace Playblack.Assets {
         }
 
         private void OnAssetRequest(RequestAssetEvent hook) {
-            StartCoroutine(LoadAssetBundle(hook.AssetPath, hook.AssetBundle, hook.Callback));
+            var c = StartCoroutine(LoadAssetBundle(hook.AssetPath, hook.AssetBundle, hook.Callback));
+            hook.AssetLoadingProcess = c;
         }
 
         private IEnumerator LoadAssetBundle(string assetPath, string assetBundle, AssetLoaded callback) {
             if (assetManager.HasAssetBundle(assetBundle)) {
-                StartCoroutine(LoadAssetFromBundle(assetPath, assetBundle, callback));
-                yield break; // End this coroutine
+                yield return StartCoroutine(LoadAssetFromBundle(assetPath, assetBundle, callback));
+//                yield break; // End this coroutine
             }
 
             WWW www = new WWW("file://" + Application.streamingAssetsPath + "/" + assetBundle + ".bundle");
             yield return www;
 
             assetManager.AddAssetBundle(assetBundle, www.assetBundle);
-            StartCoroutine(LoadAssetFromBundle(assetPath, assetBundle, callback));
-            yield break; // End this coroutine
+            yield return StartCoroutine(LoadAssetFromBundle(assetPath, assetBundle, callback));
         }
 
         private IEnumerator LoadAssetFromBundle(string assetPath, string assetBundle, AssetLoaded callback) {
