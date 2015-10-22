@@ -39,11 +39,6 @@ namespace Playblack.BehaviourTree.Execution.Core {
         private ExecutionTask parent;
 
         private Position position;
-        public Position Position {
-            get {
-                return this.position;
-            }
-        }
 
         public ExecutionTask(ModelTask modelTask, IBTExecutor executor, ExecutionTask parent) {
             this.modelTask = modelTask;
@@ -59,6 +54,7 @@ namespace Playblack.BehaviourTree.Execution.Core {
             else {
                 this.position = new Position(parent.position);
                 this.position.AddMove(GetMove());
+                this.parent = parent;
             }
         }
 

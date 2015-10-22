@@ -107,7 +107,7 @@ namespace Playblack.BehaviourTree.Model.Core {
         /// Returns null if there are mo fields for proposal
         /// </summary>
         /// <returns>The proposed fields.</returns>
-        public virtual UnityValueField[] GetProposedFields() {
+        public virtual ValueField[] GetProposedFields() {
             return null;
         }
 
