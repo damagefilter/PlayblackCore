@@ -7,7 +7,7 @@
     <OutputType>Library</OutputType>
     <NoStandardLibraries>false</NoStandardLibraries>
     <AssemblyName>PlayBlackGame</AssemblyName>
-    <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <TargetFrameworkProfile />
   </PropertyGroup>
@@ -39,14 +39,15 @@
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="System.Xml" />
     <Reference Include="System.Xml.Linq" />
-    <Reference Include="protobuf-net, Version=2.0.0.668, Culture=neutral, PublicKeyToken=257b51d87d2e4d67">
-      <HintPath>packages\protobuf-net.2.0.0.668\lib\net40\protobuf-net.dll</HintPath>
-    </Reference>
-    <Reference Include="FastMember">
-      <HintPath>packages\FastMember.1.0.0.11\lib\net40\FastMember.dll</HintPath>
-    </Reference>
     <Reference Include="UnityEngine">
       <HintPath>..\lib\Unity5.2\UnityEngine.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="protobuf-net">
+      <HintPath>..\packages\protobuf-net.2.0.0.668\lib\net35\protobuf-net.dll</HintPath>
+    </Reference>
+    <Reference Include="FastMember">
+      <HintPath>..\packages\FastMember.1.0.0.11\lib\net40\FastMember.dll</HintPath>
     </Reference>
   </ItemGroup>
   <ItemGroup>
@@ -89,7 +90,6 @@
     <Compile Include="Savegame\SaveableFieldAttribute.cs" />
     <Compile Include="Savegame\SaveField.cs" />
     <Compile Include="ThreadManager.cs" />
-    <Compile Include="Savegame\SaveManager.cs" />
     <Compile Include="Savegame\Model\ComponentDataBlock.cs" />
     <Compile Include="Savegame\Model\GameObjectDataBlock.cs" />
     <Compile Include="Savegame\Model\DataSerializer.cs" />
@@ -100,20 +100,25 @@
     <Compile Include="Csp\InputFunc.cs" />
     <Compile Include="Csp\OutputEventListener.cs" />
     <Compile Include="Csp\OutputFunc.cs" />
-    <Compile Include="Csp\OutputSignalsAttribute.cs" />
     <Compile Include="Csp\ParameterInputFunc.cs" />
     <Compile Include="Csp\SimpleInputFunc.cs" />
     <Compile Include="Assets\AssetManager.cs" />
     <Compile Include="Assets\AssetReference.cs" />
-    <Compile Include="Assets\AssetLoader.cs" />
     <Compile Include="EventSystem\Events\RequestAssetEvent.cs" />
     <Compile Include="Csp\SignalProcessor.cs" />
     <Compile Include="Csp\SignalProcessorTracker.cs" />
     <Compile Include="Csp\OutputAwareAttribute.cs" />
     <Compile Include="Csp\InputFuncAttribute.cs" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="packages.config" />
+    <Compile Include="BehaviourTree\UnityBtModel.cs" />
+    <Compile Include="BehaviourTree\DataContext.cs" />
+    <Compile Include="BehaviourTree\ValueField.cs" />
+    <Compile Include="BehaviourTree\ValueType.cs" />
+    <Compile Include="Extensions\ListExtensions.cs" />
+    <Compile Include="Assets\AsyncAssetLoader.cs" />
+    <Compile Include="EventSystem\Events\SaveGameLoadedEvent.cs" />
+    <Compile Include="Savegame\SaveManager.cs" />
+    <Compile Include="Pooling\GenericObjectPoolMap.cs" />
+    <Compile Include="Pooling\PooledObject.cs" />
   </ItemGroup>
   <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSHARP.Targets" />
@@ -122,5 +127,10 @@
   </ProjectExtensions>
   <ItemGroup>
     <Folder Include="Assets\" />
+    <Folder Include="Extensions\" />
+    <Folder Include="Pooling\" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="packages.config" />
   </ItemGroup>
 </Project>
