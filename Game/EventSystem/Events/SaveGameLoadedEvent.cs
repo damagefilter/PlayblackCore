@@ -1,10 +1,4 @@
-﻿using Playblack.Savegame.Model;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-
-namespace Playblack.EventSystem.Events {
+﻿namespace Playblack.EventSystem.Events {
     public class SaveGameLoadedEvent : Event<SaveGameLoadedEvent> {
 
         /// <summary>

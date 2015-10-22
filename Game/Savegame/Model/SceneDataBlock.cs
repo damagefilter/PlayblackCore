@@ -6,7 +6,8 @@ using ProtoBuf;
 
 namespace Playblack.Savegame.Model {
     [ProtoContract]
-    public class SceneDataBlock {
+    public class SceneDataBlock : IDataBlock {
+        #region Data Block
         [ProtoMember(100)]
         private string sceneName;
         public string SceneName {
@@ -22,6 +23,17 @@ namespace Playblack.Savegame.Model {
                 return objects;
             }
         }
+        #endregion
+
+        #region IDataBlock implementation
+
+        public string DataId {
+            get {
+                return sceneName;
+            }
+        }
+
+        #endregion
 
         public SceneDataBlock(string sceneName) {
             this.sceneName = sceneName;

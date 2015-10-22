@@ -19,7 +19,8 @@ namespace Playblack.Savegame {
         /// If the task is running synchronous, IEnumerator may be null.
         /// However, you should, merely by the nature of such tasks, always start it as coroutine.
         /// </summary>
-        IEnumerator RestoreSave();
+        /// <param name="dataId">the identifier which part of the save file you want to load.</param>
+        IEnumerator RestoreSave(string dataId);
     }
 }
 

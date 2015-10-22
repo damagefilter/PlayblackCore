@@ -1,5 +1,4 @@
 ﻿using Playblack.Assets;
-using System.Collections;
 using UnityEngine;
 
 namespace Playblack.EventSystem.Events {

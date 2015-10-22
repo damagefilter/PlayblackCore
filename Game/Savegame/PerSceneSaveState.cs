@@ -21,14 +21,25 @@ namespace Playblack.Savegame {
         public void CreateSave() {
             var hook = new GameSavingEvent(Application.loadedLevelName);
             hook.Call();
-            // loads scene data
-            using (MemoryStream sceneDataStream = new MemoryStream(DataSerializer.SerializeProtoObject(hook.SceneData))) {
+            string fileName = Application.persistentDataPath + "/" + SaveName + ".save";
+            SaveFile sf = null;
+            // save file already exists.
+            if (File.Exists(fileName)) {
+                sf = DataSerializer.DeserializeProtoObject<SaveFile>(ZipTools.DecompressBytes(File.ReadAllBytes(fileName)));
+            }
+            else {
+                sf = new SaveFile(SaveName);
+            }
+
+            sf.Add(hook.SceneData);
+            using (MemoryStream saveFileData = new MemoryStream(DataSerializer.SerializeProtoObject(sf))) {
                 // Holds final zipped file data bytes.
-                File.WriteAllBytes(Application.persistentDataPath + "/" + SaveName + ".save", ZipTools.CompressBytes(sceneDataStream.ToArray()));
+                saveFileData.Position = 0;
+                File.WriteAllBytes(fileName, ZipTools.CompressBytes(saveFileData.ToArray()));
             }
         }
 
-        public IEnumerator RestoreSave() {
+        public IEnumerator RestoreSave(string dataId) {
             // Can use GO.Find here, this point in code has no requirement to be super fast.
             // (That also means we don't need to track them all)
             var managers = UnityEngine.Object.FindObjectsOfType<SaveManager>();
@@ -36,11 +47,12 @@ namespace Playblack.Savegame {
                 // Needs to be killed right away
                 UnityEngine.Object.DestroyImmediate(managers[i].gameObject);
             }
-            SceneDataBlock sceneData = null;
+            SaveFile file = null;
             using (MemoryStream ms = new MemoryStream(File.ReadAllBytes(Application.persistentDataPath + "/" + SaveName + ".save"))) {
                 ms.Position = 0;
-                sceneData = DataSerializer.DeserializeProtoObject<SceneDataBlock>(ZipTools.DecompressBytes(ms.ToArray()));
+                file = DataSerializer.DeserializeProtoObject<SaveFile>(ZipTools.DecompressBytes(ms.ToArray()));
             }
+            var sceneData = (SceneDataBlock)file.Get(dataId);
 
             for (int i = 0; i < sceneData.SceneObjects.Count; ++i) {
                 if (sceneData.SceneObjects[i].MustLoadAsset) {

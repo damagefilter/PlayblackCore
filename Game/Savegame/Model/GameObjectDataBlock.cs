@@ -9,7 +9,7 @@ namespace Playblack.Savegame.Model {
     /// This is a collection of ComponentDataBlock objects mapped by theor component name.
     /// </summary>
     [ProtoContract]
-    public class GameObjectDataBlock {
+    public class GameObjectDataBlock : IDataBlock {
         #region data
         [ProtoMember(100)]
         private string uuid;
@@ -48,6 +48,16 @@ namespace Playblack.Savegame.Model {
         public List<ComponentDataBlock> ComponentList {
             get {
                 return componentList;
+            }
+        }
+
+        #endregion
+
+        #region IDataBlock implementation
+
+        public string DataId {
+            get {
+                return uuid;
             }
         }
 

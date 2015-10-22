@@ -9,7 +9,7 @@ namespace Playblack.Savegame.Model {
     /// A bunch of these are added to a GameObjectDataBlock to represent the (relevant) state of a full gameobject.
     /// </summary>
     [ProtoContract]
-    public class ComponentDataBlock {
+    public class ComponentDataBlock : IDataBlock {
         #region Data Section
         [ProtoMember(100)]
         private string componentName;
@@ -28,6 +28,16 @@ namespace Playblack.Savegame.Model {
                 return saveData;
             }
         }
+        #endregion
+
+        #region IDataBlock implementation
+
+        public string DataId {
+            get {
+                return componentName;
+            }
+        }
+
         #endregion
 
         public ComponentDataBlock(string componentName) {
