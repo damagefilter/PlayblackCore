@@ -1,5 +1,3 @@
-using System;
-
 namespace Playblack.Csp {
     /// <summary>
     /// Represents an input function.

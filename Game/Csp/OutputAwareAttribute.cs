@@ -12,10 +12,10 @@ namespace Playblack.Csp {
     /// </summary>
     [AttributeUsage(AttributeTargets.Class, AllowMultiple = true, Inherited = true)]
     public class OutputAwareAttribute : System.Attribute {
-        public string[] OutputGetter;
+        public string[] Outputs;
 
         public OutputAwareAttribute(params string[] outputGetter) {
-            this.OutputGetter = outputGetter;
+            this.Outputs = outputGetter;
         }
     }
 }

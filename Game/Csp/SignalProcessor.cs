@@ -2,6 +2,11 @@ using System;
 using UnityEngine;
 using System.Collections.Generic;
 using Playblack.Savegame;
+using Playblack.EventSystem;
+using Playblack.EventSystem.Events;
+using System.Collections;
+using System.Linq;
+using Playblack.Pooling;
 
 namespace Playblack.Csp {
 
@@ -42,6 +47,12 @@ namespace Playblack.Csp {
             #endif
         }
 
+        /// <summary>
+        /// This cache is used to speed up the lookups for input funcs on components by remembering
+        /// their type and all attached attributes to it.
+        /// </summary>
+        private static GenericObjectPoolMap<Type, InputFuncAttribute[]> inputFuncCache = new GenericObjectPoolMap<Type, InputFuncAttribute[]>(10, 50);
+
 
         public InputFunc GetInputFunc(string name, string component) {
             if (inputFuncs == null) {
@@ -65,28 +76,42 @@ namespace Playblack.Csp {
         /// The data is used in OutputEvent. It will look in a SignalProcessors input-list
         /// for things to call when an output is fired.
         /// </summary>
-        public void RebuildInputs() {
+        private void RebuildInputs() {
             var components = GetComponents<Component>();
             for (int i = 0; i < components.Length; ++i) {
-                var methods = components[i].GetType().GetMethods();
-                for (int j = 0; j < methods.Length; ++j) {
-                    if (!methods[j].IsDefined(typeof(InputFuncAttribute), true)) {
-                        continue;
-                    }
-                    try {
+                var type = components[i].GetType();
+                var methods = type.GetMethods();
+                InputFuncAttribute[] attribs = null;
+                if (inputFuncCache.Has(type)) {
+                    attribs = inputFuncCache.Get(type);
+                }
+                else {
+                    var attribList = new List<InputFuncAttribute>(methods.Length / 2); // round about this number as init capacity
+                    for (int j = 0; j < methods.Length; ++j) {
+                        if (!methods[j].IsDefined(typeof(InputFuncAttribute), true)) {
+                            continue;
+                        }
                         var attrib = (InputFuncAttribute)methods[j].GetCustomAttributes(typeof(InputFuncAttribute), true)[0];
-                        if (attrib.WithParameter) {
-                            var del = (ParameterSignal)Delegate.CreateDelegate(typeof(ParameterSignal), methods[i], attrib.MethodName);
-                            DefineInputFunc(attrib.DisplayName, methods[j].GetType().ToString(), del);
+                        attribList.Add(attrib);
+
+                    }
+                    attribs = attribList.ToArray();
+                    inputFuncCache.Add(type, attribs); // next time a processor sees this component, all the lookup reflection will be spared
+                }
+                for (int j = 0; j < attribs.Length; ++j) {
+                    try {
+                        if (attribs[j].WithParameter) {
+                            var del = (ParameterSignal)Delegate.CreateDelegate(typeof(ParameterSignal), components[i], attribs[j].MethodName);
+                            DefineInputFunc(attribs[j].DisplayName, type.ToString(), del);
                         }
                         else {
-                            var del = (SimpleSignal)Delegate.CreateDelegate(typeof(SimpleSignal), methods[i], attrib.MethodName);
-                            DefineInputFunc(attrib.DisplayName, methods[j].GetType().ToString(), del);
+                            var del = (SimpleSignal)Delegate.CreateDelegate(typeof(SimpleSignal), components[i], attribs[j].MethodName);
+                            DefineInputFunc(attribs[j].DisplayName, type.ToString(), del);
                         }
                     }
                     catch (Exception e) {
                         Debug.LogError(
-                            "You defined an inputfunc on " + methods[j].GetType() + " that is not applicable to the CSP.\n" + 
+                            "You defined an inputfunc (" + attribs[j].MethodName + ") on " + type + " that is not applicable to the CSP.\n" + 
                             e.Message
                         );
                     }
@@ -97,6 +122,7 @@ namespace Playblack.Csp {
         /// <summary>
         /// Reads all known outputs from all components on the game object.
         /// Beware: Calling this causes data loss on outputs that got renamed!
+        /// Should be called from an editor only.
         /// </summary>
         public void ReadOutputs() {
             var newOutputList = new List<string>();
@@ -108,10 +134,10 @@ namespace Playblack.Csp {
                 if (!t.IsDefined(typeof(OutputAwareAttribute), true)) {
                     continue;
                 }
-                // Maybe find something that doesn't require 3 nested loops ...
+
                 var attribs = (OutputAwareAttribute[])t.GetCustomAttributes(typeof(OutputAwareAttribute), true);
                 for (int j = 0; j < attribs.Length; ++j) {
-                    newOutputList.AddRange(attribs[j].OutputGetter);
+                    newOutputList.AddRange(attribs[j].Outputs);
                 }
             }
             if (outputs != null) {
@@ -196,11 +222,11 @@ namespace Playblack.Csp {
         /// <summary>
         /// Runs through all known output signals and hooks up the linking information to real gameobjects in the scene.
         /// This usually must be called after loading a game or to clean up linking information.
-        /// TODO: In Savegames we need an event that is thrown after the scene is rebuilt completely.
-        /// Only then can we reliably re-connect all signals because there is not enough tracking information
-        /// before that point.
+        /// 
+        /// NOTE: On a clean / default scene this data gets fed in by unity and will be correct.
+        /// This is only required after loading a save game.
         /// </summary>
-        public void ConnectSignals() {
+        private void ConnectOutputSignals() {
             if (outputs == null) {
                 outputs = new List<OutputFunc>();
                 return;
@@ -216,14 +242,21 @@ namespace Playblack.Csp {
             }
         }
 
+        private void OnSaveGameLoaded(SaveGameLoadedEvent hook) {
+            RebuildInputs();
+            ConnectOutputSignals();
+        }
+
         #region Unity Related
         public void Awake() {
             SignalProcessorTracker.Instance.Track(this);
-            ReadOutputs(); //Must happen
+            EventDispatcher.Instance.Register<SaveGameLoadedEvent>(OnSaveGameLoaded);
+            RebuildInputs();
         }
 
         public void OnDestroy() {
             SignalProcessorTracker.Instance.Untrack(this);
+            EventDispatcher.Instance.Unregister<SaveGameLoadedEvent>(OnSaveGameLoaded);
         }
         #endregion
     }
