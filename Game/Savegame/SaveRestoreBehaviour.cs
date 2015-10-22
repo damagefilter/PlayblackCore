@@ -12,7 +12,7 @@ namespace Playblack.Savegame {
         private ISaveState saveStateInstance;
         void Awake() {
             var other = FindObjectOfType<SaveRestoreBehaviour>();
-            if (other != null) {
+            if (other != null && other != this) {
                 Debug.LogWarning("Second SaveRestoreBehaviour was created. Destroying it. Only one allowed");
                 Destroy(this); // not the go. might be something else, important on it.
                 return;
