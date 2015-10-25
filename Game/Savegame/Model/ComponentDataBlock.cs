@@ -28,6 +28,19 @@ namespace Playblack.Savegame.Model {
                 return saveData;
             }
         }
+
+        /// <summary>
+        /// Returns the name of the assembly this component comes from.
+        /// That is very important because otherwise we cannot
+        /// re-create objects that didn't come from a prefab.
+        /// </summary>
+        [ProtoMember(300)]
+        private string assemblyName;
+        public string AssemblyName {
+            get {
+                return assemblyName;
+            }
+        }
         #endregion
 
         #region IDataBlock implementation
@@ -40,9 +53,14 @@ namespace Playblack.Savegame.Model {
 
         #endregion
 
-        public ComponentDataBlock(string componentName) {
+        public ComponentDataBlock() {
+            // Protobuf ctor
+        }
+
+        public ComponentDataBlock(string componentName, string componentAssembly) {
             saveData = new List<FieldDescription>();
             this.componentName = componentName;
+            this.assemblyName = componentAssembly;
         }
 
         #region adding data

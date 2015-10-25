@@ -9,7 +9,7 @@ namespace Playblack.Savegame.Model {
     /// Describes the contents of a field inside a save structure.
     /// </summary>
     [ProtoContract]
-    public struct FieldDescription {
+    public class FieldDescription {
         /// <summary>
         /// Field type info must be cast to the SaveField enum in order to make sense.
         /// Conversely, to correctly store this you must pass the int representation of a SaveField.
@@ -30,6 +30,10 @@ namespace Playblack.Savegame.Model {
         /// </summary>
         [ProtoMember(300)]
         public byte[] fieldContent;
+
+        public FieldDescription() {
+            // Protobuf ctor
+        }
 
         public FieldDescription(int type, string name, byte[] contents) {
             fieldType = type;

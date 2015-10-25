@@ -35,6 +35,10 @@ namespace Playblack.Savegame.Model {
 
         #endregion
 
+        public SceneDataBlock() {
+            // Protobuf ctor
+        }
+
         public SceneDataBlock(string sceneName) {
             this.sceneName = sceneName;
             this.objects = new List<GameObjectDataBlock>();

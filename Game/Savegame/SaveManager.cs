@@ -40,14 +40,14 @@ namespace Playblack.Savegame {
         /// The GameObjectDataBlock will then go into a list which will finally represent the savegame of a scene.
         /// </summary>
         public void OnSave(GameSavingEvent hook) {
-            GameObjectDataBlock goBlock = new GameObjectDataBlock(uuid, assetBundle, assetPath);
+            GameObjectDataBlock goBlock = new GameObjectDataBlock(uuid, gameObject.name, assetBundle, assetPath);
             var components = GetComponents<Component>();
             for (int i = 0; i < components.Length; ++i) {
                 // Ignore components that are not to be saved.
                 if (!components[i].GetType().IsDefined(typeof(SaveableComponentAttribute), true)) {
                     continue;
                 }
-                var componentBlock = new ComponentDataBlock(components[i].GetType().ToString());
+                var componentBlock = new ComponentDataBlock(components[i].GetType().ToString(), components[i].GetType().Assembly.GetName().Name);
                 // Find all fields and properties that need saving.
                 var type = components[i].GetType();
                 var memberSet = type.FieldsAndPropertiesWith(typeof(SaveableFieldAttribute));
@@ -84,11 +84,13 @@ namespace Playblack.Savegame {
 
         public void Restore(GameObjectDataBlock data, bool addComponents) {
             this.uuid = data.UUID;
+            gameObject.name = data.SceneName;
             this.assetPath = data.AssetPath;
             this.assetBundle = data.AssetBundle;
             for (int i = 0; i < data.ComponentList.Count; ++i) {
                 Component component = null;
-                var componentType = Type.GetType(data.ComponentList[i].ComponentName);
+                var componentType = Type.GetType(data.ComponentList[i].ComponentName + "," + data.ComponentList[i].AssemblyName);
+                Debug.Log("Restoring component type " + data.ComponentList[i].ComponentName + " from assembly " + data.ComponentList[i].AssemblyName);
                 if (!typeof(Component).IsAssignableFrom(componentType)) {
                     Debug.LogError("Restore error: " + componentType + " was expected to be a subtype of Component but isn't! Not restoring data.");
                     continue; // Not a component :(

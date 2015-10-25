@@ -1,7 +1,5 @@
-﻿using System;
-using System.IO;
-using System.IO.Compression;
-
+﻿// FIXME: Find a library that can compress byte arrays that is not Gzip because
+// it requires a native zip library (zlib) which unity doesn't ship.
 namespace Playblack.Savegame.Model {
     public static class ZipTools {
         /// <summary>
@@ -10,13 +8,16 @@ namespace Playblack.Savegame.Model {
         /// <returns>The bytes.</returns>
         /// <param name="input">Input.</param>
         public static byte[] CompressBytes(byte[] input) {
-            using (MemoryStream compressedDataStream = new MemoryStream()) {
-                using (GZipStream zip = new GZipStream(compressedDataStream, CompressionMode.Compress)) {
+            return input;
+            /*using (MemoryStream compressedDataStream = new MemoryStream()) {
+                using (var zip = new GZipOutputStream(compressedDataStream)) {
                     zip.Write(input, 0, input.Length);
                     compressedDataStream.Position = 0;
-                    return compressedDataStream.ToArray();
+                    var bytes = compressedDataStream.ToArray();
+                    UnityEngine.Debug.Log("Writing " + bytes.Length + " bytes.");
+                    return bytes;
                 }
-            }
+            }*/
         }
 
         /// <summary>
@@ -25,9 +26,11 @@ namespace Playblack.Savegame.Model {
         /// <returns>The bytes.</returns>
         /// <param name="input">Input.</param>
         public static byte[] DecompressBytes(byte[] input) {
+            return input;
+            /*UnityEngine.Debug.Log("Reading " + input.Length + " bytes.");
             // First read back the zipped stuff
             using (MemoryStream ms = new MemoryStream(input)) {
-                using (GZipStream zippedData = new GZipStream(ms, CompressionMode.Decompress)) {
+                using (var zippedData = new GZipInputStream(ms)) {
                     const int size = 4096;
                     byte[] buffer = new byte[size];
                     using (MemoryStream targetStream = new MemoryStream()) {
@@ -41,7 +44,7 @@ namespace Playblack.Savegame.Model {
                         return targetStream.ToArray();
                     }
                 }
-            }
+            }*/
         }
     }
 }

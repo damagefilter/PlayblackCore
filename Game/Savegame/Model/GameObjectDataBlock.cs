@@ -19,6 +19,14 @@ namespace Playblack.Savegame.Model {
             }
         }
 
+        [ProtoMember(150)]
+        private string sceneName;
+        public string SceneName {
+            get {
+                return sceneName;
+            }
+        }
+
         [ProtoMember(200)]
         private string assetBundle;
         public string AssetBundle {
@@ -62,9 +70,13 @@ namespace Playblack.Savegame.Model {
         }
 
         #endregion
+        public GameObjectDataBlock() {
+            // protobuf ctor
+        }
 
-        public GameObjectDataBlock(string uuid, string assetBundle, string assetPath) {
+        public GameObjectDataBlock(string uuid, string sceneName, string assetBundle, string assetPath) {
             this.uuid = uuid;
+            this.sceneName = sceneName;
             this.assetBundle = assetBundle;
             this.assetPath = assetPath;
             this.loadAsset = !string.IsNullOrEmpty(assetBundle) && !string.IsNullOrEmpty(assetPath);
