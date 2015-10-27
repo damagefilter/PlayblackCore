@@ -56,7 +56,6 @@
     <Compile Include="BehaviourTree\Execution\Core\Events\ITaskListener.cs" />
     <Compile Include="BehaviourTree\Execution\Core\Events\TaskEvent.cs" />
     <Compile Include="BehaviourTree\Execution\Core\ExecutionTask.cs" />
-    <Compile Include="BehaviourTree\Execution\Core\GenericBTExecutor.cs" />
     <Compile Include="BehaviourTree\Execution\Core\IBTExecutor.cs" />
     <Compile Include="BehaviourTree\Execution\Core\TaskStatus.cs" />
     <Compile Include="BehaviourTree\Execution\Task\Composite\ExecutionComposite.cs" />
@@ -123,6 +122,8 @@
     <Compile Include="EventSystem\Events\RequestSaveEvent.cs" />
     <Compile Include="Savegame\SaveRestoreBehaviour.cs" />
     <Compile Include="EventSystem\Events\RequestSaveLoadEvent.cs" />
+    <Compile Include="BehaviourTree\Execution\Core\CachingBtExecutor.cs" />
+    <Compile Include="Mods\IMod.cs" />
   </ItemGroup>
   <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSHARP.Targets" />
@@ -132,5 +133,8 @@
   <ItemGroup />
   <ItemGroup>
     <None Include="packages.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Mods\" />
   </ItemGroup>
 </Project>

@@ -3,7 +3,11 @@ using System;
 using System.Collections.Generic;
 
 namespace Playblack.BehaviourTree.Execution.Core {
-    public class GenericBTExecutor : IBTExecutor {
+    /// <summary>
+    /// Executes a tree structure by caching all active execution tasks.
+    /// This way we don't need to traverse the whole tree on each tick.
+    /// </summary>
+    public class CachingBtExecutor : IBTExecutor {
 
         private ModelTask modelBT;
 
@@ -29,12 +33,12 @@ namespace Playblack.BehaviourTree.Execution.Core {
 
         private bool isInitialised;
 
-        public GenericBTExecutor(ModelTask modelBT, DataContext context) {
+        public CachingBtExecutor(ModelTask modelBT, DataContext context) {
             if (modelBT == null) {
-                throw new NullReferenceException("Input ModelTask is null, but can not!");
+                throw new NullReferenceException("Input ModelTask is null, but must not!");
             }
             if (context == null) {
-                throw new NullReferenceException("Input DataContext is null but can not!");
+                throw new NullReferenceException("Input DataContext is null but must not!");
             }
             this.modelBT = modelBT;
             this.modelBT.ComputePositions();
@@ -45,9 +49,9 @@ namespace Playblack.BehaviourTree.Execution.Core {
             this.taskStates = new Dictionary<Position, DataContext>();
         }
 
-        public GenericBTExecutor(ModelTask modelBT) {
+        public CachingBtExecutor(ModelTask modelBT) {
             if (modelBT == null) {
-                throw new NullReferenceException("Input ModelTask is null, but can not!");
+                throw new NullReferenceException("Input ModelTask is null, but must not!");
             }
 
             this.modelBT = modelBT;
@@ -123,7 +127,7 @@ namespace Playblack.BehaviourTree.Execution.Core {
             tickableTasksDeletionQueue.Add(task);
         }
 
-        public void CopyTaskStates(GenericBTExecutor executor) {
+        public void CopyTaskStates(CachingBtExecutor executor) {
             this.taskStates = executor.taskStates;
         }
 
