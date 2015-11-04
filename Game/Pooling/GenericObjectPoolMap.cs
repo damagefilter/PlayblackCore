@@ -34,6 +34,10 @@ namespace Playblack.Pooling {
             pooledObjects.Add(key, new PooledObject<TValue>(val, 1 / (maxCapacity * pooledObjects.Count)));
         }
 
+        public void Remove(TKey key) {
+            pooledObjects.Remove(key);
+        }
+
         private void TrimPool() {
             // the init value of the last insertion
             float threshold = 1 / (maxCapacity * (pooledObjects.Count-1));
