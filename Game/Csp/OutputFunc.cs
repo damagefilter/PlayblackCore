@@ -40,7 +40,7 @@ namespace Playblack.Csp {
             this.outputName = outputName;
         }
 
-        public void Invoke(string component) {
+        public void Invoke() {
             if (registeredListeners == null) {
                 return; // happens in a state after savegame load (deserialization)
             }
@@ -48,13 +48,13 @@ namespace Playblack.Csp {
                 if (registeredListeners[i].matchedProcessors == null) {
                     continue; // happens in a state after savegame load (deserialization)
                 }
-                registeredListeners[i].Execute(component);
+                registeredListeners[i].Execute();
             }
         }
 
         public void AttachInput(string sceneName, string inputMethod, string parameter, float executionDelay) {
             var l = new OutputEventListener() {
-                handlerName = sceneName,
+                processorName = sceneName,
                 method = inputMethod,
                 param = parameter,
                 delay = executionDelay

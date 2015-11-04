@@ -11,6 +11,7 @@ namespace Playblack.Csp {
     public class OutputEventListener {
         // Only serializable via unity for scene defaults
         // otherwise this is re-written by the ConnectInputs method
+        // This keeps a list of processors matching the given processor name
         [SerializeField]
         public List<SignalProcessor> matchedProcessors;
 
@@ -23,10 +24,16 @@ namespace Playblack.Csp {
         [ProtoMember(3)]
         public float delay;
 
+        /// <summary>
+        /// Name of the processor which is supposed to be our target.
+        /// </summary>
         [ProtoMember(4)]
-        public string handlerName;
+        public string processorName;
 
-        public void Execute(string component) {
+        [ProtoMember(5)]
+        public string component;
+
+        public void Execute() {
             if (matchedProcessors != null) {
                 for (int i = 0; i < matchedProcessors.Count; ++i) {
                     var func = matchedProcessors[i].GetInputFunc(method, component);
@@ -57,10 +64,10 @@ namespace Playblack.Csp {
         /// </summary>
         public void ConnectSignalProcessors() {
             this.matchedProcessors = new List<SignalProcessor>();
-            if (string.IsNullOrEmpty(this.handlerName)) {
+            if (string.IsNullOrEmpty(this.processorName)) {
                 return;
             }
-            matchedProcessors.AddRange(SignalProcessorTracker.Instance.GetByName(this.handlerName));
+            matchedProcessors.AddRange(SignalProcessorTracker.Instance.GetByName(this.processorName));
         }
 
 

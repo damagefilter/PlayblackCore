@@ -200,14 +200,14 @@ namespace Playblack.Csp {
         }
         
         /// <summary>
-        /// Makes the signal handler fire an output with the given name and the given component.
+        /// Makes the signal handler fire an output with the given name.
+        /// This will trigger all outputs in all components filed under this name.
         /// </summary>
         /// <param name="name">Name.</param>
-        /// <param name = "component"></param>
-        protected void FireOutput(string name, string component) {
+        protected void FireOutput(string name) {
             foreach (OutputFunc output in outputs) {
                 if (output.Name == name) {
-                    output.Invoke(component);
+                    output.Invoke();
                     return;
                 }
             }

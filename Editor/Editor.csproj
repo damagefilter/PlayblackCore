@@ -52,12 +52,15 @@
   <ItemGroup>
     <Folder Include="Properties\" />
     <Folder Include="Mods\" />
+    <Folder Include="Csp\" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Test.cs" />
     <Compile Include="Mods\ModConfig.cs" />
     <Compile Include="Mods\ModToolsToolbar.cs" />
     <Compile Include="Mods\BuildTools.cs" />
+    <Compile Include="Csp\CspConnectorWindowOverview.cs" />
+    <Compile Include="Csp\SignalDataCache.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
