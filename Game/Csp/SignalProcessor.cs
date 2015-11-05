@@ -27,6 +27,9 @@ namespace Playblack.Csp {
 
         public Dictionary<string, List<InputFunc>> InputFuncs {
             get {
+                if (this.inputFuncs == null) {
+                    this.RebuildInputs();
+                }
                 return this.inputFuncs;
             }
         }
@@ -37,6 +40,9 @@ namespace Playblack.Csp {
         protected List<OutputFunc> outputs;
         public List<OutputFunc> Outputs {
             get {
+                if (this.outputs == null) {
+                    this.ReadOutputs();
+                }
                 return this.outputs;
             }
             #if UNITY_EDITOR
@@ -77,12 +83,20 @@ namespace Playblack.Csp {
         /// </summary>
         private void RebuildInputs() {
             var components = GetComponents<Component>();
+            if (inputFuncs == null) {
+                inputFuncs = new Dictionary<string, List<InputFunc>>();
+            }
+            else {
+                inputFuncs.Clear();
+            }
+
             for (int i = 0; i < components.Length; ++i) {
                 var type = components[i].GetType();
                 var methods = type.MethodsWith(Flags.InstancePublic, typeof(InputFuncAttribute));
                 InputFuncAttribute[] attribs = null;
                 if (inputFuncCache.Has(type)) {
                     attribs = inputFuncCache.Get(type);
+
                 }
                 else {
                     var attribList = new List<InputFuncAttribute>(methods.Count / 2); // round about this number as init capacity
@@ -106,7 +120,8 @@ namespace Playblack.Csp {
                     catch (Exception e) {
                         Debug.LogError(
                             "You defined an inputfunc (" + attribs[j].MethodName + ") on " + type + " that is not applicable to the CSP.\n" + 
-                            e.Message
+                            e.Message + "\n" +
+                            e.StackTrace
                         );
                     }
                 }

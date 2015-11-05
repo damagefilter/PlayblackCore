@@ -1,4 +1,5 @@
 using System;
+using System.Linq;
 using UnityEngine;
 using System.Collections.Generic;
 
@@ -109,7 +110,9 @@ namespace Playblack.Csp {
         /// <param name="name"></param>
         /// <returns></returns>
         public List<SignalProcessor> GetByName(string name) {
-            return null;
+            return trackedHandlers.Where((proc) => {
+                return proc.name.StartsWith(name);
+            }).ToList();
         }
 
         /// <summary>

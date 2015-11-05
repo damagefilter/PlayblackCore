@@ -17,8 +17,6 @@ namespace Playblack.Editor.Csp {
             // Generates data.
             // This is a more or lesss expensive task which is why the results are stored for later re-use.
             listener.matchedProcessors.Clear();
-            List<string> inputs = new List<string>();
-            List<string> outputs = new List<string>();
             var hits = UnityEngine.Object.FindObjectsOfType<SignalProcessor>(); // expensive but it's not used THAT often
             Dictionary<string, List<string>> inputMap = new Dictionary<string, List<string>>();
             if (!string.IsNullOrEmpty(listener.processorName)) { // check if target processor name is okay

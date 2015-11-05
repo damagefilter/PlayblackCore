@@ -18,6 +18,10 @@ namespace Playblack.Csp {
 
         public bool WithParameter;
 
+        /// <summary>
+        /// Passing in the method name in ctor because that way we don't actually need to reference the MethodInfo later.
+        /// </summary>
+        /// <param name="methodName">Method name.</param>
         public InputFuncAttribute(string methodName) {
             this.MethodName = methodName;
             this.DisplayName = methodName;

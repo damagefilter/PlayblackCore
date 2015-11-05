@@ -27,11 +27,6 @@ namespace Playblack.BehaviourTree {
             }
         }
 
-#if UNITY_EDITOR
-        [SerializeField]
-        [ProtoMember(2)]
-        public string unityValue;
-#else
         [SerializeField]
         [ProtoMember(2)]
         private string unityValue;
@@ -40,7 +35,6 @@ namespace Playblack.BehaviourTree {
                 return unityValue;
             }
         }
-#endif
 
         public object Value {
             get {

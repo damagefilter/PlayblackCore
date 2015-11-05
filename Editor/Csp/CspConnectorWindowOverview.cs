@@ -36,6 +36,7 @@ namespace Playblack.Editor.Csp {
                 return;
             }
             this.processor = processor;
+
             this.outputs = new string[processor.Outputs.Count];
             for (int i = 0; i < processor.Outputs.Count; ++i) {
                 this.outputs[i] = processor.Outputs[i].Name;
@@ -155,10 +156,17 @@ namespace Playblack.Editor.Csp {
                 if (newOutputIndex != outputCfg.outputIndex) {
                     outputCfg.outputIndex = newOutputIndex;
                 }
+
                 outputCfg.targetName = EditorGUILayout.TextField("Target Name", outputCfg.targetName);
                 if (GUILayout.Button("Add")) {
+                    string outputName = GetOutputName(outputCfg.outputIndex);
                     for (int i = 0; i < processor.Outputs.Count; ++i) {
-                        processor.Outputs[i].AttachInput(outputCfg.targetName, null, null, 0f);
+                        if (processor.Outputs[i].Name == outputName) {
+                            processor.Outputs[i].AttachInput(outputCfg.targetName, null, null, 0f);
+                            outputCfg = new OutputConfig(); // reset stuffs
+                            break;
+                        }
+
                     }
                 }
             }
