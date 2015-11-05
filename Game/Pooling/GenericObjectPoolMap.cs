@@ -31,7 +31,7 @@ namespace Playblack.Pooling {
             if (pooledObjects.Count+1 > maxCapacity) {
                 TrimPool();
             }
-            pooledObjects.Add(key, new PooledObject<TValue>(val, 1 / (maxCapacity * pooledObjects.Count)));
+            pooledObjects.Add(key, new PooledObject<TValue>(val, 1 / (maxCapacity * Math.Max(1, pooledObjects.Count))));
         }
 
         public void Remove(TKey key) {
@@ -40,7 +40,7 @@ namespace Playblack.Pooling {
 
         private void TrimPool() {
             // the init value of the last insertion
-            float threshold = 1 / (maxCapacity * (pooledObjects.Count-1));
+            float threshold = 1 / (maxCapacity * (Math.Max(1, pooledObjects.Count - 1)));
             while (pooledObjects.Count+1 > maxCapacity) {
                 var toRemove = new List<TKey>();
                 foreach (var kvp in pooledObjects) {

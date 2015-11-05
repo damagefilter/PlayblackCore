@@ -3,7 +3,7 @@ using System.IO;
 using System.Diagnostics;
 using UnityEditor;
 
-namespace PlayBlack.Editor.Mods {
+namespace Playblack.Editor.Mods {
     /// <summary>
     /// A set of methods that help with building a mod bundle.
     /// </summary>

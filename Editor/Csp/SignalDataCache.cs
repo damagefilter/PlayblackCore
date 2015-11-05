@@ -2,7 +2,7 @@
 using Playblack.Csp;
 using System.Collections.Generic;
 
-namespace PlayBlack.Editor.Csp {
+namespace Playblack.Editor.Csp {
     /// <summary>
     /// Helper object to cache signal data for a handler.
     /// Used to speed up the signal editor and make it less inefficient.
@@ -12,9 +12,7 @@ namespace PlayBlack.Editor.Csp {
         private string[] componentList;
 
         public SignalDataCache(SignalProcessor localProcessor, OutputEventListener listener) {
-            if (string.IsNullOrEmpty(listener.processorName)) { // check if target processor name is okay
-                return;
-            }
+            
 
             // Generates data.
             // This is a more or lesss expensive task which is why the results are stored for later re-use.
@@ -23,21 +21,23 @@ namespace PlayBlack.Editor.Csp {
             List<string> outputs = new List<string>();
             var hits = UnityEngine.Object.FindObjectsOfType<SignalProcessor>(); // expensive but it's not used THAT often
             Dictionary<string, List<string>> inputMap = new Dictionary<string, List<string>>();
-
-            for (int i= 0; i < hits.Length; ++i) {
-                if (!hits[i].name.StartsWith(listener.processorName, StringComparison.InvariantCulture)) {
-                    continue;
-                }
-                listener.matchedProcessors.Add(hits[i]);
-                foreach (var kvp in hits[i].InputFuncs) {
-                    if (!inputMap.ContainsKey(kvp.Key)) {
-                        inputMap.Add(kvp.Key, new List<string>());
+            if (!string.IsNullOrEmpty(listener.processorName)) { // check if target processor name is okay
+                for (int i = 0; i < hits.Length; ++i) {
+                    if (!hits[i].name.StartsWith(listener.processorName, StringComparison.InvariantCulture)) {
+                        continue;
                     }
-                    for (int j = 0; j < kvp.Value.Count; ++j) {
-                        inputMap[kvp.Key].Add(kvp.Value[j].Name);
+                    listener.matchedProcessors.Add(hits[i]);
+                    foreach (var kvp in hits[i].InputFuncs) {
+                        if (!inputMap.ContainsKey(kvp.Key)) {
+                            inputMap.Add(kvp.Key, new List<string>());
+                        }
+                        for (int j = 0; j < kvp.Value.Count; ++j) {
+                            inputMap[kvp.Key].Add(kvp.Value[j].Name);
+                        }
                     }
                 }
             }
+            
 
             this.inputMapping = new Dictionary<string, string[]>(inputMap.Count);
             componentList = new string[inputMap.Count];
@@ -59,7 +59,7 @@ namespace PlayBlack.Editor.Csp {
         /// <param name="component">Component.</param>
         /// <param name="inputName">Input name.</param>
         public int GetInputIndex(string component, string inputName) {
-            return !inputMapping.ContainsKey(component) ? 0 : Array.IndexOf(inputMapping[component], inputName);
+            return (component == null || !inputMapping.ContainsKey(component) || inputName == null) ? 0 : Array.IndexOf(inputMapping[component], inputName);
         }
 
         /// <summary>
@@ -69,7 +69,7 @@ namespace PlayBlack.Editor.Csp {
         /// <param name="component">Component.</param>
         /// <param name="inputIndex">Input index.</param>
         public string GetInputName(string component, int inputIndex) {
-            if (!inputMapping.ContainsKey(component)) {
+            if (component == null || !inputMapping.ContainsKey(component)) {
                 return null;
             }
             if (inputIndex < inputMapping[component].Length && inputIndex >= 0) {
@@ -85,12 +85,12 @@ namespace PlayBlack.Editor.Csp {
         /// <returns>The input list.</returns>
         /// <param name="component">Component.</param>
         public string[] GetInputList(string component) {
-            return !inputMapping.ContainsKey(component) ? null : inputMapping[component];
+            return (component == null || !inputMapping.ContainsKey(component)) ? null : inputMapping[component];
         }
         #endregion
         #region Components
         public int GetComponentIndex(string component) {
-            return Array.IndexOf(this.componentList, component);
+            return component == null ? 0 : Array.IndexOf(this.componentList, component);
         }
 
         public string GetComponentName(int componentIndex) {

@@ -4,12 +4,13 @@ using UnityEditor;
 using Playblack.Csp;
 using Playblack.Pooling;
 
-namespace PlayBlack.Editor.Csp {
+namespace Playblack.Editor.Csp {
     /// <summary>
     /// Shows a list of existing  connections outgoing from the given signal processor.
     /// Also offers functionality to create new connections, edit / remove existing ones.
     /// </summary>
     public class CspConnectorWindowOverview : EditorWindow {
+
         private static GenericObjectPoolMap<string, SignalDataCache> dataCache = new GenericObjectPoolMap<string, SignalDataCache>(5, 8);
         private const int listFieldSize = 150;
 
@@ -30,6 +31,10 @@ namespace PlayBlack.Editor.Csp {
         }
 
         public void Prepare(SignalProcessor processor) {
+            if (processor == null) {
+                Debug.Log("Passed SignalProcessor was null or empty...");
+                return;
+            }
             this.processor = processor;
             this.outputs = new string[processor.Outputs.Count];
             for (int i = 0; i < processor.Outputs.Count; ++i) {
@@ -38,7 +43,12 @@ namespace PlayBlack.Editor.Csp {
         }
 
         public void OnGUI() {
-            
+            if (processor == null) {
+                EditorGUILayout.HelpBox("No Signal Processor is selected.", MessageType.Info);
+            }
+            else {
+                DrawExistingConnections();
+            }
         }
 
         private void DrawExistingConnections() {
@@ -73,9 +83,11 @@ namespace PlayBlack.Editor.Csp {
                     EditorGUILayout.LabelField("Delete", GUILayout.Width(listFieldSize));
                 }
                 EditorGUILayout.EndHorizontal();
-                for (int i = 0; i < processor.Outputs; ++i) {
-                    DrawOutput(ref processor.Outputs[i]);
+                for (int i = 0; i < processor.Outputs.Count; ++i) {
+                    var outp = processor.Outputs[i];
+                    DrawOutput(ref outp); // TODO: Will that do or must we re-assign shit?
                 }
+                DrawAddForm();
             }
             EditorGUILayout.EndVertical();
         }
@@ -113,7 +125,7 @@ namespace PlayBlack.Editor.Csp {
                         }
 
                         // Input on processors: Input Method selection
-                        int inputIndex = EditorGUILayout.Popup(data.GetInputIndex(output.Listeners[i].method), data.GetInputList(componentName), GUILayout.Width(listFieldSize));
+                        int inputIndex = EditorGUILayout.Popup(data.GetInputIndex(componentName, output.Listeners[i].method), data.GetInputList(componentName), GUILayout.Width(listFieldSize));
                         string inputName = data.GetInputName(componentName, inputIndex);
                         if (inputName != output.Listeners[i].method) {
                             output.Listeners[i].method = inputName;
@@ -134,6 +146,39 @@ namespace PlayBlack.Editor.Csp {
                 EditorGUILayout.EndHorizontal();
             }
         }
+
+        private OutputConfig outputCfg;
+        private void DrawAddForm() {
+            EditorGUILayout.BeginVertical();
+            {
+                int newOutputIndex = EditorGUILayout.Popup("On Output", outputCfg.outputIndex, this.outputs);
+                if (newOutputIndex != outputCfg.outputIndex) {
+                    outputCfg.outputIndex = newOutputIndex;
+                }
+                outputCfg.targetName = EditorGUILayout.TextField("Target Name", outputCfg.targetName);
+                if (GUILayout.Button("Add")) {
+                    for (int i = 0; i < processor.Outputs.Count; ++i) {
+                        processor.Outputs[i].AttachInput(outputCfg.targetName, null, null, 0f);
+                    }
+                }
+            }
+            EditorGUILayout.EndVertical();
+
+        }
+
+        
     }
+
+    struct OutputConfig {
+        public int outputIndex, componentIndex, inputIndex;
+        public string targetName;
+        public SignalDataCache cache;
+
+        public void GenerateCacheData(SignalProcessor localProcessor, OutputEventListener l) {
+            cache = new SignalDataCache(localProcessor, l);
+        }
+    }
+
+
 }
 

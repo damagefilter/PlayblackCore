@@ -3,7 +3,7 @@ using UnityEngine;
 using System.IO;
 using UnityEditor;
 
-namespace PlayBlack.Editor.Mods {
+namespace Playblack.Editor.Mods {
     /// <summary>
     /// Editor Configuration for the mod in development.
     /// This describes how your mod is built against the core code

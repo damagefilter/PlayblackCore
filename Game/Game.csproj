@@ -134,7 +134,8 @@
   <ItemGroup>
     <None Include="packages.config" />
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Mods\" />
-  </ItemGroup>
+  <ItemGroup />
+  <PropertyGroup>
+    <PostBuildEvent>xcopy "$(ProjectDir)$(OutDir)*" "$(SolutionDir)build\" /F /R /Y /I</PostBuildEvent>
+  </PropertyGroup>
 </Project>

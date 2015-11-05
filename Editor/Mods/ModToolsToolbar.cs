@@ -3,7 +3,7 @@ using UnityEditor;
 using UnityEngine;
 using System.IO;
 
-namespace PlayBlack.Editor.Mods {
+namespace Playblack.Editor.Mods {
     public static class ModToolsToolbar {
         #region Config
         [MenuItem("Mod Tools/Config/Init Config")]
