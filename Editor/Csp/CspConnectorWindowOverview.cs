@@ -111,14 +111,19 @@ namespace Playblack.Editor.Csp {
                     string oldTarget = output.Listeners[i].processorName;
                     string newTarget = EditorGUILayout.TextField(output.Listeners[i].processorName, GUILayout.Width(listFieldSize));
                     if (oldTarget != newTarget) {
-                        dataCache.Remove(oldTarget); // uncache junk.
+                        dataCache.Remove(cacheKey); // uncache junk.
                         output.Listeners[i].processorName = newTarget; // will be re-cached and processed next time
                     }
-                    // Select which input. needs 2 dropdowns because of component selection.
-                    EditorGUILayout.BeginVertical();
-                    {
+                    if (data.GetComponentList() == null || data.GetComponentList().Length == 0) {
+                        EditorGUILayout.LabelField("No input on target", GUILayout.Width(listFieldSize));
+                        EditorGUILayout.LabelField("No parameter on input", GUILayout.Width(listFieldSize));
+                        EditorGUILayout.LabelField("No target, no delay", GUILayout.Width(listFieldSize));
+                    }
+                    else {
+                        // Select which input. needs 2 dropdowns because of component selection.
+                        
                         // Input on processors: Component selection
-                        int componentIndex = EditorGUILayout.Popup(data.GetComponentIndex(output.Listeners[i].component), data.GetComponentList(), GUILayout.Width(listFieldSize));
+                        int componentIndex = EditorGUILayout.Popup(data.GetComponentIndex(output.Listeners[i].component), data.GetComponentList(), GUILayout.Width(listFieldSize/2.05f));
                         string componentName = data.GetComponentName(componentIndex);
                         if (componentName != output.Listeners[i].component) {
                             output.Listeners[i].component = componentName;
@@ -126,16 +131,21 @@ namespace Playblack.Editor.Csp {
                         }
 
                         // Input on processors: Input Method selection
-                        int inputIndex = EditorGUILayout.Popup(data.GetInputIndex(componentName, output.Listeners[i].method), data.GetInputList(componentName), GUILayout.Width(listFieldSize));
+                        int inputIndex = EditorGUILayout.Popup(data.GetInputIndex(componentName, output.Listeners[i].method), data.GetInputList(componentName), GUILayout.Width(listFieldSize / 2.05f));
                         string inputName = data.GetInputName(componentName, inputIndex);
                         if (inputName != output.Listeners[i].method) {
                             output.Listeners[i].method = inputName;
                         }
-                    }
-                    EditorGUILayout.EndVertical();
 
-                    output.Listeners[i].param = EditorGUILayout.TextField(output.Listeners[i].param, GUILayout.Width(listFieldSize));
-                    output.Listeners[i].delay = EditorGUILayout.FloatField(output.Listeners[i].delay, GUILayout.Width(listFieldSize));
+                        if (output.Listeners[i].HasParameter(componentName)) {
+                            output.Listeners[i].param = EditorGUILayout.TextField(output.Listeners[i].param, GUILayout.Width(listFieldSize));
+                        }
+                        else {
+                            EditorGUILayout.LabelField("No parameter on input", GUILayout.Width(listFieldSize));
+                        }
+                        output.Listeners[i].delay = EditorGUILayout.FloatField(output.Listeners[i].delay, GUILayout.Width(listFieldSize));
+                    }
+                    
                     if (GUILayout.Button("Edit", GUILayout.Width(listFieldSize))) {
                         // Open Edit popup
                     }
