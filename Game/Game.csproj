@@ -128,6 +128,9 @@
     <Compile Include="BehaviourTree\Execution\Core\CachingBtExecutor.cs" />
     <Compile Include="Mods\IMod.cs" />
     <Compile Include="MonoBehaviourExtensions.cs" />
+    <Compile Include="BehaviourTree\Sequencer.cs" />
+    <Compile Include="BehaviourTree\BtContainer.cs" />
+    <Compile Include="BehaviourTree\SequenceExecutionType.cs" />
   </ItemGroup>
   <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSHARP.Targets" />
