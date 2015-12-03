@@ -127,6 +127,7 @@
     <Compile Include="EventSystem\Events\RequestSaveLoadEvent.cs" />
     <Compile Include="BehaviourTree\Execution\Core\CachingBtExecutor.cs" />
     <Compile Include="Mods\IMod.cs" />
+    <Compile Include="MonoBehaviourExtensions.cs" />
   </ItemGroup>
   <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSHARP.Targets" />

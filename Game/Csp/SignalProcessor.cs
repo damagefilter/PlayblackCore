@@ -223,12 +223,13 @@ namespace Playblack.Csp {
         /// <summary>
         /// Makes the signal handler fire an output with the given name.
         /// This will trigger all outputs in all components filed under this name.
+        /// This will also reach deactivated game objects.
         /// </summary>
         /// <param name="name">Name.</param>
-        protected void FireOutput(string name) {
-            foreach (OutputFunc output in outputs) {
-                if (output.Name == name) {
-                    output.Invoke();
+        protected void InternalFireOutput(string name) {
+            for (int i = 0; i < outputs.Count; ++i) {
+                if (outputs[i].Name == name) {
+                    outputs[i].Invoke();
                     return;
                 }
             }
