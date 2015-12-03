@@ -54,12 +54,12 @@ namespace Playblack.Csp {
 
         public void AttachInput(string sceneName, string inputMethod, string parameter, float executionDelay) {
             var l = new OutputEventListener() {
-                processorName = sceneName,
+                targetProcessorName = sceneName,
                 method = inputMethod,
                 param = parameter,
                 delay = executionDelay
             };
-            l.ConnectSignalProcessors();
+            l.FindTargetProcessors();
             registeredListeners.Add(l);
         }
 

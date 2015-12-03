@@ -12,16 +12,14 @@ namespace Playblack.Editor.Csp {
         private string[] componentList;
 
         public SignalDataCache(SignalProcessor localProcessor, OutputEventListener listener) {
-            
-
             // Generates data.
             // This is a more or lesss expensive task which is why the results are stored for later re-use.
             listener.matchedProcessors.Clear();
             var hits = UnityEngine.Object.FindObjectsOfType<SignalProcessor>(); // expensive but it's not used THAT often
             Dictionary<string, List<string>> inputMap = new Dictionary<string, List<string>>();
-            if (!string.IsNullOrEmpty(listener.processorName)) { // check if target processor name is okay
+            if (!string.IsNullOrEmpty(listener.targetProcessorName)) { // check if target processor name is okay
                 for (int i = 0; i < hits.Length; ++i) {
-                    if (!hits[i].name.StartsWith(listener.processorName, StringComparison.InvariantCulture)) {
+                    if (!hits[i].name.StartsWith(listener.targetProcessorName, StringComparison.InvariantCulture)) {
                         continue;
                     }
                     listener.matchedProcessors.Add(hits[i]);

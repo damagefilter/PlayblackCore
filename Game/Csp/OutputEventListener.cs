@@ -28,7 +28,7 @@ namespace Playblack.Csp {
         /// Name of the processor which is supposed to be our target.
         /// </summary>
         [ProtoMember(4)]
-        public string processorName;
+        public string targetProcessorName;
 
         [ProtoMember(5)]
         public string component;
@@ -62,16 +62,16 @@ namespace Playblack.Csp {
         /// <summary>
         /// Called after savegame loading, to restore the entity reference.
         /// </summary>
-        public void ConnectSignalProcessors() {
+        public void FindTargetProcessors() {
             this.matchedProcessors = new List<SignalProcessor>();
-            if (string.IsNullOrEmpty(this.processorName)) {
+            if (string.IsNullOrEmpty(this.targetProcessorName)) {
                 return;
             }
             // TODO: Check what kind of performance hit this thing has when instantiating loads of objects and how to mitigate
             // without writing a custom tracker. Seems rather redundant
             var hits = UnityEngine.Object.FindObjectsOfType<SignalProcessor>();
             for (int i = 0; i < hits.Length; ++i) {
-                if (!hits[i].name.StartsWith(this.processorName, StringComparison.InvariantCulture)) {
+                if (!hits[i].name.StartsWith(this.targetProcessorName, StringComparison.InvariantCulture)) {
                     continue;
                 }
                 this.matchedProcessors.Add(hits[i]);

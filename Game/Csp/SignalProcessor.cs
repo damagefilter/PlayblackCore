@@ -246,7 +246,7 @@ namespace Playblack.Csp {
                 }
                 for (int j = 0; j < outputs[i].Listeners.Count; ++j) {
                     // Finds and re-connects the inputs for signal handlers in the scene
-                    outputs[i].Listeners[j].ConnectSignalProcessors();
+                    outputs[i].Listeners[j].FindTargetProcessors();
                 }
             }
         }
