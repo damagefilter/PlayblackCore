@@ -32,14 +32,14 @@ namespace Playblack.BehaviourTree {
         private UnityEngine.Object actor;
 
         [SerializeField]
-        private SequenceExecutionType _executionType;
+        private SequenceExecutionType executionType;
 
-        public SequenceExecutionType executionType {
+        public SequenceExecutionType ExecutionType {
             get {
-                return _executionType;
+                return executionType;
             }
             set {
-                _executionType = value;
+                executionType = value;
             }
         }
 
@@ -53,15 +53,15 @@ namespace Playblack.BehaviourTree {
             return _commands.GetExecutor(new DataContext(contextData), actor);
         }
 
-        public override void Start() {
+        public void Start() {
             this.executor = this.GetExecutor();
-            if (executionType == SequenceExecutionType.ON_START_ONCE || executionType == SequenceExecutionType.ON_START_PARALLEL) {
+            if (ExecutionType == SequenceExecutionType.ON_START_ONCE || ExecutionType == SequenceExecutionType.ON_START_PARALLEL) {
                 this.executor.Tick();
             }
         }
 
         public void Update() {
-            if ((executionType == SequenceExecutionType.ON_START_PARALLEL) || (executionType == SequenceExecutionType.TRIGGER_PARALLEL && wasTriggered)) {
+            if ((ExecutionType == SequenceExecutionType.ON_START_PARALLEL) || (ExecutionType == SequenceExecutionType.TRIGGER_PARALLEL && wasTriggered)) {
                 if (this.executor == null) {
                     this.executor = this.GetExecutor();
                 }
@@ -75,9 +75,10 @@ namespace Playblack.BehaviourTree {
             }
         }
 
+        [InputFunc("TriggerExecution")]
         private void TriggerExecution() {
             this.wasTriggered = true;
-            if (executionType == SequenceExecutionType.TRIGGER_ONCE) {
+            if (ExecutionType == SequenceExecutionType.TRIGGER_ONCE) {
                 if (this.executor == null) {
                     this.executor = this.GetExecutor();
                 }
@@ -87,7 +88,8 @@ namespace Playblack.BehaviourTree {
             this.FireOutput("OnExecutionTrigger");
         }
 
-        private void ResetSequencer() {
+        [InputFunc("ResetSequencer")]
+        public void ResetSequencer() {
             if (this.executor == null) {
                 return; // nothing to reset
             }

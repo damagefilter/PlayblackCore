@@ -131,6 +131,7 @@
     <Compile Include="BehaviourTree\Sequencer.cs" />
     <Compile Include="BehaviourTree\BtContainer.cs" />
     <Compile Include="BehaviourTree\SequenceExecutionType.cs" />
+    <Compile Include="BehaviourTree\BtModelRegister.cs" />
   </ItemGroup>
   <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSHARP.Targets" />
