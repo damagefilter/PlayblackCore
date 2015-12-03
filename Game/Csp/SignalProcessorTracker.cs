@@ -4,12 +4,15 @@ using UnityEngine;
 using System.Collections.Generic;
 
 namespace Playblack.Csp {
+    // TODO: Currently this is obsolete as we're using unities object graph.
+    // However, if this turns out to be too expensive, we'll need the tracker again.
     /// <summary>
     /// Tracks all signal handlers in the scene so they can find each other
     /// for connecting their inputs.
     /// </summary>
     public class SignalProcessorTracker : MonoBehaviour {
         #region Singleton
+
         private static SignalProcessorTracker _instance;
         private static object _lock = new object();
 
@@ -17,8 +20,8 @@ namespace Playblack.Csp {
             get {
                 if (applicationIsQuitting) {
                     Debug.LogWarning("[Singleton] Instance " + typeof(SignalProcessorTracker) +
-                        " already destroyed on application quit." +
-                        "Won't create again - returning null.");
+                    " already destroyed on application quit." +
+                    "Won't create again - returning null.");
                     return null;
                 }
 
@@ -34,8 +37,8 @@ namespace Playblack.Csp {
                             DontDestroyOnLoad(singleton);
 
                             Debug.Log("An instance of " + typeof(SignalProcessorTracker) +
-                                " is needed in the scene, so '" + singleton +
-                                "' was created with DontDestroyOnLoad.");
+                            " is needed in the scene, so '" + singleton +
+                            "' was created with DontDestroyOnLoad.");
                         }
                     }
 
@@ -45,6 +48,7 @@ namespace Playblack.Csp {
         }
 
         private static bool applicationIsQuitting = false;
+
         /// <summary>
         /// When unity quits, it destroys objects in a random order.
         /// In principle, a Singleton is only destroyed when application quits.
@@ -56,6 +60,7 @@ namespace Playblack.Csp {
         public void OnDestroy() {
             applicationIsQuitting = true;
         }
+
         #endregion
 
         private List<SignalProcessor> trackedHandlers;
@@ -65,6 +70,7 @@ namespace Playblack.Csp {
             trackedHandlers = new List<SignalProcessor>();
             preTrackedHandlers = new List<SignalProcessor>();
         }
+
         /// <summary>
         /// Starts tracking a signal handler.
         /// </summary>

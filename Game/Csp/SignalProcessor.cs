@@ -7,6 +7,11 @@ using Playblack.Pooling;
 using Playblack.Savegame;
 using UnityEngine;
 
+//#if UNITY_EDITOR
+using UnityEditor;
+
+//#endif
+
 namespace Playblack.Csp {
 
     public delegate void SimpleSignal();
@@ -33,11 +38,12 @@ namespace Playblack.Csp {
                 return this.inputFuncs;
             }
         }
-        
+
         [HideInInspector]
         [SerializeField]
         [SaveableField(SaveField.FIELD_PROTOBUF_OBJECT)]
         protected List<OutputFunc> outputs;
+
         public List<OutputFunc> Outputs {
             get {
                 if (this.outputs == null) {
@@ -119,7 +125,7 @@ namespace Playblack.Csp {
                     }
                     catch (Exception e) {
                         Debug.LogError(
-                            "You defined an inputfunc (" + attribs[j].MethodName + ") on " + type + " that is not applicable to the CSP.\n" + 
+                            "You defined an inputfunc (" + attribs[j].MethodName + ") on " + type + " that is not applicable to the CSP.\n" +
                             e.Message + "\n" +
                             e.StackTrace
                         );
@@ -169,7 +175,7 @@ namespace Playblack.Csp {
                 DefineOutput(newOutputList[i]);
             }
         }
-        
+
         /// <summary>
         /// Links an editor callback name to a method inside this entity.
         /// This data is exposed for the I/O system.
@@ -181,9 +187,9 @@ namespace Playblack.Csp {
             if (!inputFuncs.ContainsKey(component)) {
                 inputFuncs.Add(component, new List<InputFunc>(5));
             }
-            this.inputFuncs[component].Add(new SimpleInputFunc (name, callback));
+            this.inputFuncs[component].Add(new SimpleInputFunc(name, callback));
         }
-        
+
         /// <summary>
         /// Links an editor callback name to a method inside this entity.
         /// This data is exposed for the I/O system.
@@ -197,7 +203,7 @@ namespace Playblack.Csp {
             }
             this.inputFuncs[component].Add(new ParameterInputFunc(name, callback));
         }
-        
+
         /// <summary>
         /// Declares an output event.
         /// InputFunc objects get attached to these events. They are identified by their names.
@@ -213,7 +219,7 @@ namespace Playblack.Csp {
             }
             this.outputs.Add(new OutputFunc(name));
         }
-        
+
         /// <summary>
         /// Makes the signal handler fire an output with the given name.
         /// This will trigger all outputs in all components filed under this name.
@@ -257,17 +263,84 @@ namespace Playblack.Csp {
         }
 
         #region Unity Related
+
         public void Awake() {
-            SignalProcessorTracker.Instance.Track(this);
+            // SignalProcessorTracker.Instance.Track(this);
             EventDispatcher.Instance.Register<SaveGameLoadedEvent>(OnSaveGameLoaded);
             RebuildInputs();
         }
 
         public void OnDestroy() {
-            SignalProcessorTracker.Instance.Untrack(this);
+            // SignalProcessorTracker.Instance.Untrack(this);
             EventDispatcher.Instance.Unregister<SaveGameLoadedEvent>(OnSaveGameLoaded);
         }
+
         #endregion
+
+        #if UNITY_EDITOR
+        public virtual void OnDrawGizmos() {
+            if (outputs == null || outputs.Count <= 0) {
+                return;
+            }
+
+            Handles.color = (Color)new Color32(240, 40, 16, 255);
+            Gizmos.color = (Color)new Color32(240, 40, 16, 255);
+            var labelPos = this.transform.position;
+
+            labelPos.y += 1f;
+
+            Handles.Label(labelPos, this.name);
+            for (int i = 0; i < outputs.Count; ++i) {
+                if (outputs[i].Listeners == null) {
+                    continue; // can be null after deserialization
+                }
+//                foreach (var listener in output.Listeners) {
+                for (int j = 0; j < outputs[i].Listeners.Count; ++j) {
+                    bool needsEntityCleaning = false;
+                    if (outputs[i].Listeners[j] == null || outputs[i].Listeners[j].matchedProcessors == null) {
+                        continue;
+                    }
+                    for (int k = 0; k < outputs[i].Listeners[j].matchedProcessors.Count; ++k) {
+                        if (outputs[i].Listeners[j].matchedProcessors[k] == null) {
+                            needsEntityCleaning = true;
+                            continue;
+                        }
+                        Gizmos.color = (Color)new Color32(240, 40, 16, 255);
+                        // Draw a connection line
+                        var targetPos = outputs[i].Listeners[j].matchedProcessors[k].transform.position;
+                        Gizmos.DrawLine(this.transform.position, targetPos);
+
+                        // Prepare the orientation for a cone cap 
+                        // to display in which direction the connection goes
+                        var direction = targetPos - this.transform.position;
+                        // This may or may not work
+                        if (UnityEditor.EditorSettings.defaultBehaviorMode == UnityEditor.EditorBehaviorMode.Mode2D) {
+                            direction.z = 0f; // this is only needed for 2D where z is just confusing the direction
+                        }
+
+                        var rot = Quaternion.LookRotation(direction);
+
+                        Ray r = new Ray(this.transform.position, direction);
+                        var pos = r.GetPoint(direction.magnitude - 0.5f);
+                        Handles.ConeCap(0, pos, rot, 0.3f);
+
+                    }
+                    if (needsEntityCleaning) {
+                        var list = new List<SignalProcessor>();
+                        // TODO: Better way to clean null refs?
+                        for (int k = 0; k < outputs[i].Listeners[j].matchedProcessors.Count; k++) {
+                            if (outputs[i].Listeners[j].matchedProcessors[k] == null) {
+                                continue;
+                            }
+                            list.Add(outputs[i].Listeners[j].matchedProcessors[k]);
+                        }
+
+                        outputs[i].Listeners[j].matchedProcessors = list;
+                    }
+                }
+            }
+        }
+        #endif
     }
 }
 

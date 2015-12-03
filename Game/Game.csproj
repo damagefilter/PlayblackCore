@@ -48,6 +48,9 @@
     <Reference Include="Fasterflect">
       <HintPath>..\packages\fasterflect.2.1.3\lib\net35\Fasterflect.dll</HintPath>
     </Reference>
+    <Reference Include="UnityEditor">
+      <HintPath>..\lib\Unity5.2\UnityEditor.dll</HintPath>
+    </Reference>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="BehaviourTree\Exceptions\IllegalReturnStatusException.cs" />
