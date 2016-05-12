@@ -80,9 +80,10 @@ namespace Playblack.BehaviourTree {
         /// </summary>
         /// <returns>The model types.</returns>
         public Type[] GetModelTypes() {
+            var ns = this.namespaceRoot;
             var tmp = AppDomain.CurrentDomain.GetAssemblies()
                 .SelectMany(t => t.GetTypes())
-                .Where(t => t.IsClass && !t.IsAbstract && t.FullName.StartsWith(namespaceRoot) && t.IsSubclassOf(typeof(ModelTask)));
+                .Where(t => t.IsClass && !t.IsAbstract && t.FullName.StartsWith(ns) && t.IsSubclassOf(typeof(ModelTask)));
             return tmp.ToArray();
         }
 
@@ -91,7 +92,7 @@ namespace Playblack.BehaviourTree {
         /// </summary>
         /// <returns>The type.</returns>
         /// <param name="typeName">Type name.</param>
-        protected static Type GetModelType(string typeName) {
+        private static Type GetModelType(string typeName) {
             var type = Type.GetType(typeName);
             if (type != null) {
                 return type;

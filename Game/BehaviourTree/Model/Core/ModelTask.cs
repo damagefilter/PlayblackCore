@@ -101,16 +101,6 @@ namespace Playblack.BehaviourTree.Model.Core {
             }
         }
 
-        /// <summary>
-        /// Get an array with proposed fields for the corresponding execution.
-        /// These are used for setting defaults in the Sequence editor windows.
-        /// Returns null if there are mo fields for proposal
-        /// </summary>
-        /// <returns>The proposed fields.</returns>
-        public virtual ValueField[] GetProposedFields() {
-            return null;
-        }
-
         private void RecursiveComputePositions(ModelTask t) {
 
             for (int i = 0; i < t.children.Count; ++i) {

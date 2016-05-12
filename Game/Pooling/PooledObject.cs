@@ -11,7 +11,7 @@ namespace Playblack.Pooling {
     /// 
     /// </summary>
     public class PooledObject<T> {
-        public float UsageValue {
+        public bool IsInUse {
             get;
             set;
         }
@@ -23,12 +23,12 @@ namespace Playblack.Pooling {
 
         public PooledObject(T obj) {
             Object = obj;
-            UsageValue = 0f;
+            IsInUse = false;
         }
 
-        public PooledObject(T obj, float initUsageValue) {
+        public PooledObject(T obj, bool isInUse) {
             Object = obj;
-            UsageValue = initUsageValue;
+            IsInUse = isInUse;
         }
     }
 }

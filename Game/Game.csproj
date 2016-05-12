@@ -53,6 +53,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="BehaviourTree\EditableFieldAttribute.cs" />
     <Compile Include="BehaviourTree\Exceptions\IllegalReturnStatusException.cs" />
     <Compile Include="BehaviourTree\Exceptions\NotTickableException.cs" />
     <Compile Include="BehaviourTree\Exceptions\SpawnException.cs" />
@@ -86,6 +87,9 @@
     <Compile Include="EventSystem\Event.cs" />
     <Compile Include="EventSystem\IEvent.cs" />
     <Compile Include="Logic\Entity.cs" />
+    <Compile Include="Pooling\GameObjectPool.cs" />
+    <Compile Include="Pooling\PutbackFailureException.cs" />
+    <Compile Include="Pooling\MaxCapacityReachedException.cs" />
     <Compile Include="Savegame\Model\FieldDescription.cs" />
     <Compile Include="Savegame\Model\SceneDataBlock.cs" />
     <Compile Include="Savegame\SaveableFieldAttribute.cs" />

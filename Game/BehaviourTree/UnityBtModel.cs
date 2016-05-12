@@ -1,9 +1,11 @@
 ﻿using System;
+using System.Reflection;
 using System.Collections.Generic;
 using Playblack.BehaviourTree.Model.Core;
 using Playblack.Extensions;
 using ProtoBuf;
 using UnityEngine;
+using Fasterflect;
 
 namespace Playblack.BehaviourTree {
 
@@ -36,6 +38,22 @@ namespace Playblack.BehaviourTree {
             }
             set {
                 this.modelClassName = value;
+            }
+        }
+
+        public Type ModelType {
+            get {
+                var type = Type.GetType(this.modelClassName);
+                if (type != null) {
+                    return type;
+                }
+                foreach (var a in AppDomain.CurrentDomain.GetAssemblies()) {
+                    type = a.GetType(this.modelClassName);
+                    if (type != null) {
+                        return type;
+                    }
+                }
+                return null;
             }
         }
 
@@ -173,6 +191,43 @@ namespace Playblack.BehaviourTree {
                 this.children.Insert(kvp.Value, kvp.Key);
             }
             scheduledReorders.Clear();
+        }
+
+
+        /// <summary>
+        /// Get an array with proposed fields for the underlying Model.
+        /// These are used for setting defaults in the Sequence editor windows.
+        /// This is a list of fields annotated with the EditableFieldAttribute.
+        /// If there is no such attribute on any field, an empty array is returned.
+        /// </summary>
+        /// <returns>The proposed fields.</returns>
+        public ValueField[] GetProposedFields() {
+            var proposedFields = ModelType.FieldsWith(Flags.AnyVisibility, typeof(EditableFieldAttribute));
+            var valueFields = new ValueField[proposedFields.Count];
+            for (int i = 0; i < proposedFields.Count; ++i) {
+                var newValueField = new ValueField();
+                if (proposedFields[i].FieldType == typeof(int)) {
+                    newValueField.Type = ValueType.INT;
+                }
+                else if (proposedFields[i].FieldType == typeof(float)) {
+                    newValueField.Type = ValueType.FLOAT;
+                }
+                else if (proposedFields[i].FieldType == typeof(string)) {
+                    newValueField.Type = ValueType.STRING;
+                }
+                else if (proposedFields[i].FieldType == typeof(bool)) {
+                    newValueField.Type = ValueType.BOOL;
+                }
+                
+                newValueField.Name = proposedFields[i].Name;
+
+                var attrib = proposedFields[i].Attribute<EditableFieldAttribute>();
+                if (attrib != null && attrib.DefaultUnityValue != null) {
+                    newValueField.Value = attrib.DefaultUnityValue;
+                }
+                valueFields[i] = newValueField;
+            }
+            return valueFields;
         }
     }
 }

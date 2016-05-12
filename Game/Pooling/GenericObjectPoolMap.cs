@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using System.Collections.Generic;
 
 namespace Playblack.Pooling {
@@ -17,7 +18,10 @@ namespace Playblack.Pooling {
         public TValue Get(TKey key) {
             if (pooledObjects.ContainsKey(key)) {
                 var ob = pooledObjects[key];
-                ob.UsageValue += 1 / (maxCapacity * pooledObjects.Count);
+                if (ob.IsInUse) {
+                    return default(TValue);
+                }
+                ob.IsInUse = true;
                 return ob.Object;
             }
             return default(TValue);
@@ -28,31 +32,22 @@ namespace Playblack.Pooling {
         }
 
         public void Add(TKey key, TValue val) {
-            if (pooledObjects.Count+1 > maxCapacity) {
-                TrimPool();
+            if (pooledObjects.Count >= maxCapacity) {
+                // remove from the end of the dictionary.
+                pooledObjects.Remove(pooledObjects.Keys.Last());
             }
-            pooledObjects.Add(key, new PooledObject<TValue>(val, 1 / (maxCapacity * Math.Max(1, pooledObjects.Count))));
+            pooledObjects.Add(key, new PooledObject<TValue>(val));
+        }
+
+        public void PuBack(TKey key) {
+            if (!Has(key)) {
+                throw new PutbackFailureException("The thing to put back does not exist in this dictionary");
+            }
+            pooledObjects[key].IsInUse = false;
         }
 
         public void Remove(TKey key) {
             pooledObjects.Remove(key);
-        }
-
-        private void TrimPool() {
-            // the init value of the last insertion
-            float threshold = 1 / (maxCapacity * (Math.Max(1, pooledObjects.Count - 1)));
-            while (pooledObjects.Count+1 > maxCapacity) {
-                var toRemove = new List<TKey>();
-                foreach (var kvp in pooledObjects) {
-                    if (kvp.Value.UsageValue <= threshold) {
-                        toRemove.Add(kvp.Key);
-                    }
-                }
-                for (int i = 0; i < toRemove.Count; ++i) {
-                    pooledObjects.Remove(toRemove[i]);
-                }
-                threshold *= 2; // increase in case we need to run again (nothign was removed)
-            }
         }
     }
 }
