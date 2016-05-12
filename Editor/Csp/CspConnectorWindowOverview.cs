@@ -10,7 +10,6 @@ namespace Playblack.Editor.Csp {
     /// Also offers functionality to create new connections, edit / remove existing ones.
     /// </summary>
     public class CspConnectorWindowOverview : EditorWindow {
-
         private static GenericObjectPoolMap<string, SignalDataCache> dataCache = new GenericObjectPoolMap<string, SignalDataCache>(5, 8);
         private const int listFieldSize = 150;
 

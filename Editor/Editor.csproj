@@ -30,6 +30,10 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="Fasterflect, Version=2.1.3.0, Culture=neutral, PublicKeyToken=38d18473284c1ca7, processorArchitecture=MSIL">
+      <HintPath>..\packages\fasterflect.2.1.3\lib\net35\Fasterflect.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Xml.Linq" />
@@ -54,12 +58,23 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Csp\SignalProcessorInspector.cs" />
+    <Compile Include="Sequencer\OperatorEditorWindow.cs" />
+    <Compile Include="Sequencer\Renderers\Bt\BtSequencerRenderer.cs" />
+    <Compile Include="Sequencer\Renderers\Bt\DefaultRenderer.cs" />
+    <Compile Include="Sequencer\Renderers\IOperatorRenderer.cs" />
+    <Compile Include="Sequencer\Renderers\ISequencerRenderer.cs" />
+    <Compile Include="Sequencer\OperatorNamespaceRegister.cs" />
+    <Compile Include="Sequencer\OperatorSelector.cs" />
     <Compile Include="Test.cs" />
     <Compile Include="Mods\ModConfig.cs" />
     <Compile Include="Mods\ModToolsToolbar.cs" />
     <Compile Include="Mods\BuildTools.cs" />
     <Compile Include="Csp\CspConnectorWindowOverview.cs" />
     <Compile Include="Csp\SignalDataCache.cs" />
+    <Compile Include="Windows\GenericPopupWindow.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="packages.config" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
