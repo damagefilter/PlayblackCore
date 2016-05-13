@@ -1,3 +1,4 @@
+using Fasterflect;
 using Playblack.BehaviourTree.Exceptions;
 using Playblack.BehaviourTree.Execution.Core.Events;
 using Playblack.BehaviourTree.Model.Core;
@@ -18,8 +19,6 @@ namespace Playblack.BehaviourTree.Execution.Core {
             }
         }
         private DataContext globalContext;
-
-        private DataContext localContext;
 
         private ICollection<ITaskListener> listeners;
 
@@ -67,14 +66,12 @@ namespace Playblack.BehaviourTree.Execution.Core {
             if (!this.spawnable) {
                 throw new SpawnException("The task cannot be spawned. It already was spawned.");
             }
-            this.localContext = this.modelTask.Context;
             this.globalContext = context;
             this.spawnable = false;
             this.tickable = true;
             this.status = TaskStatus.RUNNING;
-            // TODO: Request to insert this into the tickables now?
-            // the original states that it should go into the openTasks list but it's never used and probably leaking
-            //this.executor.
+
+            this.RestoreStateFromContext(this.modelTask.Context);
             DataContext previousState = this.executor.GetTaskState(this.position);
             this.RestoreState(previousState);
             this.executor.RequestTickableInsertion(this);
@@ -111,16 +108,38 @@ namespace Playblack.BehaviourTree.Execution.Core {
             return newStatus;
         }
 
+        /// <summary>
+        /// Takes the models descriptor information and the stored local context and
+        /// populates the fields of this task automatically.
+        /// 
+        /// Does not work for children of course as they are not context data.
+        /// 
+        /// Gets the context passed since it should be re-usable by RestoreState so some plumbing of
+        /// fetching fields and assigning / casting values is done automatically.
+        /// Works only on fields decoreted with FieldDefinitionAttribute ofc
+        /// </summary>
+        protected void RestoreStateFromContext(DataContext context) {
+
+            // Kinda copied from UnityBtModel as the logic is always getting stuff from the ModelDataDescriptor
+            // which contains code to retrieve the described fields.
+            // This avoids most of the dupe code
+            var dataDescriptor = this.modelTask.GetType().Attribute<ModelDataDescriptorAttribute>();
+            if (dataDescriptor.DataContextDescription != null && dataDescriptor.DataContextDescription.Count > 0) {
+                var proposedFields = dataDescriptor.DataContextDescription;
+                foreach (var kvp in proposedFields) {
+                    if (context[kvp.Value.DisplayName] != null) {
+                        this.SetFieldValue(kvp.Key, context[kvp.Value.DisplayName]);
+                    }
+                }
+            }
+        }
+
         public TaskStatus GetStatus() {
             return this.status;
         }
 
         public DataContext GetGlobalContext() {
             return this.globalContext;
-        }
-
-        public DataContext GetLocalContext() {
-            return this.localContext;
         }
 
         public void AddTaskListener(ITaskListener listener) {
