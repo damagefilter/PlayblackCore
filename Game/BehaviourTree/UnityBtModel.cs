@@ -40,34 +40,10 @@ namespace Playblack.BehaviourTree {
             }
             set {
                 this.modelClassName = value;
-
                 // Update context data if empty
                 if (this.contextData == null || this.contextData.Count == 0) {
                     this.contextData = new List<ValueField>(this.GetProposedFields());
                 }
-
-                // FIXME: In case a model gets re-assigned at some point, we'd have to
-                // either scan context data to avoid data loss or just not allow multiple setting of model class names.
-                // Would also need to remove fields not in the new proposed fields list.
-                // Seems wasteful.
-                /*if (contextData != null || contextData.Count > 0) {
-                    for (int i = 0; i < fields.Length; ++i) {
-                        var fieldExists = false;
-                        for (int j = 0; j < contextData.Count; ++j) {
-                            if (contextData[j].Name == fields[i].Name) {
-                                fieldExists = true;
-                                break;
-                            }
-                        }
-                        if (!fieldExists) {
-                            this.contextData.Add(fields[i]);
-                        }
-                    }
-                }
-                else {
-                    // Nothing there, just dump in all the new data
-                    this.contextData = new List<ValueField>(fields);
-                }*/
             }
         }
 
@@ -89,6 +65,21 @@ namespace Playblack.BehaviourTree {
 
         [ProtoMember(5)]
         private int numChildren = 0;
+
+        [ProtoMember(6)]
+        private string displayName;
+
+        /// <summary>
+        /// This is set with the ModelClass and defines what name is displayed on the operator selector
+        /// and the sequence editor tree.
+        /// The value is defined on each relevant modeltask class via the DataDescriptor attribute.
+        /// </summary>
+        public string DisplayName {
+            get {
+                return displayName;
+            }
+        }
+
         /// <summary>
         /// Used to register certain children within for re-ordering inside the child-list.
         /// This is required in order to avoid concurrent modifications to the child list.
@@ -118,7 +109,7 @@ namespace Playblack.BehaviourTree {
                 return mt;
             }
         }
-
+        
         public static UnityBtModel NewInstance(UnityBtModel parent) {
             var model = new UnityBtModel();
             model.children = new List<UnityBtModel>();
@@ -236,31 +227,27 @@ namespace Playblack.BehaviourTree {
         /// </summary>
         /// <returns>The proposed fields.</returns>
         public ValueField[] GetProposedFields() {
-            var proposedFields = ModelType.FieldsWith(Flags.AnyVisibility, typeof(EditableFieldAttribute));
-            var valueFields = new ValueField[proposedFields.Count];
-            for (int i = 0; i < proposedFields.Count; ++i) {
-                var newValueField = new ValueField();
-                if (proposedFields[i].FieldType == typeof(int)) {
-                    newValueField.Type = ValueType.INT;
-                }
-                else if (proposedFields[i].FieldType == typeof(float)) {
-                    newValueField.Type = ValueType.FLOAT;
-                }
-                else if (proposedFields[i].FieldType == typeof(string)) {
-                    newValueField.Type = ValueType.STRING;
-                }
-                else if (proposedFields[i].FieldType == typeof(bool)) {
-                    newValueField.Type = ValueType.BOOL;
-                }
-                var attrib = proposedFields[i].Attribute<EditableFieldAttribute>();
-                newValueField.Name = attrib.FieldName;
+            var dataDescriptor = ModelType.Attribute<ModelDataDescriptorAttribute>();
+            this.displayName = dataDescriptor.OperatorName;
+            if (dataDescriptor.DataContextDescription != null && dataDescriptor.DataContextDescription.Count > 0) {
+                var proposedFields = dataDescriptor.DataContextDescription;
+                var valueFields = new ValueField[proposedFields.Count];
+                int i = 0;
+                foreach (var kvp in proposedFields) {
+                    var newValueField = new ValueField();
+                    newValueField.Type = kvp.Value.FieldValueType;
+                    // Since this is used to map back to the actual field on the executor class, it must be unique.
+                    // Uniqueness is enfored in the datadescriptor constructor.
+                    newValueField.Name = kvp.Value.DisplayName;
 
-                if (attrib.DefaultUnityValue != null) {
-                    newValueField.Value = attrib.DefaultUnityValue;
+                    if (kvp.Value.DefaultUnityValue != null) {
+                        newValueField.Value = kvp.Value.DefaultUnityValue;
+                    }
+                    valueFields[i++] = newValueField;
                 }
-                valueFields[i] = newValueField;
+                return valueFields;
             }
-            return valueFields;
+            return new ValueField[0];
         }
     }
 }

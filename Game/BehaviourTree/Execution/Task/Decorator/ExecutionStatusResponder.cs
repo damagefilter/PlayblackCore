@@ -41,11 +41,13 @@ namespace Playblack.BehaviourTree.Execution.Task.Decorator {
             if (doNotTick) {
                 return TaskStatus.FAILURE;
             }
+            // While the decorated executor is still running, do nothing.
             var childStatus = this.decoratedExecutor.GetStatus();
             if (childStatus == TaskStatus.RUNNING) {
                 return TaskStatus.RUNNING;
             }
             else {
+                // Once the decorated executor is finished, analyse the result and assign the fail or success model and return for now
                 if (executingCondition == null) {
                     if (childStatus == TaskStatus.FAILURE || childStatus == TaskStatus.TERMINATED) {
                         if (failModel == null) {
@@ -64,6 +66,7 @@ namespace Playblack.BehaviourTree.Execution.Task.Decorator {
                     return TaskStatus.RUNNING;
                 }
                 else {
+                    // the fail or success model was assigned, return its status
                     return this.executingCondition.GetStatus();
                 }
             }

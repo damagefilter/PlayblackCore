@@ -65,7 +65,6 @@
     <Compile Include="Sequencer\Renderers\ISequencerRenderer.cs" />
     <Compile Include="Sequencer\OperatorNamespaceRegister.cs" />
     <Compile Include="Sequencer\OperatorSelector.cs" />
-    <Compile Include="Test.cs" />
     <Compile Include="Mods\ModConfig.cs" />
     <Compile Include="Mods\ModToolsToolbar.cs" />
     <Compile Include="Mods\BuildTools.cs" />

@@ -4,6 +4,8 @@ using Playblack.BehaviourTree.Execution.Task.Decorator;
 using Playblack.BehaviourTree.Model.Core;
 
 namespace Playblack.BehaviourTree.Model.Task.Decorator {
+
+    [ModelDataDescriptor("Invert Result", DescriptorType.LOGIC, typeof(ExecutionInverter))]
     public class ModelInverter : ModelDecorator {
 
         public ModelInverter(ModelTask guard, ModelTask child) : base(guard, child) { }

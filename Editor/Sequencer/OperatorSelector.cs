@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEditor;
 using UnityEngine;
+using Fasterflect;
 
 namespace PlayBlack.Editor.Sequencer {
     public class OperatorSelector : GenericPopupWindow {
@@ -33,17 +34,15 @@ namespace PlayBlack.Editor.Sequencer {
         }
 
         public override void InternalInit() {
-            var m2r = OperatorNamespaceRegister.Instance;
+            // var m2r = OperatorNamespaceRegister.Instance;
             // This properly reads all the model types from everything in and below the Assets.src.ai.behaviourtree namespace
             var aiTypes = AppDomain.CurrentDomain.GetAssemblies()
                 .SelectMany(t => t.GetTypes())
                     .Where(t => {
                         bool typeValid = t.IsClass && !t.IsAbstract;
-                        bool nameValid = false;
-                        for (int i = 0; i < m2r.AiNamespaces.Count; ++i) {
-                            nameValid |= t.FullName.StartsWith(m2r.AiNamespaces[i]);
-                        }
-                        return typeValid && nameValid && t.IsSubclassOf(typeof(ModelTask));
+                        var attr = t.Attribute<ModelDataDescriptorAttribute>();
+                        bool hasDescriptor = attr != null && attr.DescriptorType == DescriptorType.AI;
+                        return typeValid && hasDescriptor && t.IsSubclassOf(typeof(ModelTask));
                     });
             this.knownAiModels = aiTypes.ToList();
 
@@ -51,11 +50,9 @@ namespace PlayBlack.Editor.Sequencer {
                 .SelectMany(t => t.GetTypes())
                     .Where(t => {
                         bool typeValid = t.IsClass && !t.IsAbstract;
-                        bool nameValid = false;
-                        for (int i = 0; i < m2r.SequenceNamespaces.Count; ++i) {
-                            nameValid |= t.FullName.StartsWith(m2r.SequenceNamespaces[i]);
-                        }
-                        return typeValid && nameValid && t.IsSubclassOf(typeof(ModelTask));
+                        var attr = t.Attribute<ModelDataDescriptorAttribute>();
+                        bool hasDescriptor = attr != null && attr.DescriptorType == DescriptorType.LOGIC;
+                        return typeValid && hasDescriptor && t.IsSubclassOf(typeof(ModelTask));
                     });
             this.knownSequenceModels = sequenceTypes.ToList();
         }

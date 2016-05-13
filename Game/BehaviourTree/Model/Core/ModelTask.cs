@@ -113,6 +113,14 @@ namespace Playblack.BehaviourTree.Model.Core {
         }
 
         /// <summary>
+        /// Takes the internal data context values and populates the fields of this
+        /// ModelTask with them...
+        /// </summary>
+        protected void SetValuesFromContext() {
+
+        }
+
+        /// <summary>
         /// Creates a suitable ExecutionTask that will be able to run this ModelTask
         /// through the management of a BTExecutor.
         /// </summary>

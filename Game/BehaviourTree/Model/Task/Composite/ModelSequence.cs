@@ -3,6 +3,7 @@ using Playblack.BehaviourTree.Execution.Task.Composite;
 using Playblack.BehaviourTree.Model.Core;
 
 namespace Playblack.BehaviourTree.Model.Task.Composite {
+    [ModelDataDescriptor("Run until FAILURE or end", DescriptorType.LOGIC, typeof(ExecutionSequence))]
     public class ModelSequence : ModelComposite {
 
         public ModelSequence(ModelTask guard, params ModelTask[] children) : base(guard, children) { }
