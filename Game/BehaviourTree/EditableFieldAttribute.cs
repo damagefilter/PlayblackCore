@@ -1,7 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 
 namespace Playblack.BehaviourTree {
 
@@ -11,10 +8,21 @@ namespace Playblack.BehaviourTree {
     [AttributeUsage(AttributeTargets.Field)]
     public class EditableFieldAttribute : System.Attribute {
         private string defaultUnityValue = null;
+        private string fieldName;
+
+        public EditableFieldAttribute(string fieldName) {
+            this.fieldName = fieldName;
+        }
 
         public string DefaultUnityValue {
             get {
                 return defaultUnityValue;
+            }
+        }
+
+        public string FieldName {
+            get {
+                return fieldName;
             }
         }
     }

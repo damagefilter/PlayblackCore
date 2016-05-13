@@ -23,8 +23,10 @@ namespace Playblack.BehaviourTree {
     public class UnityBtModel {
         [ProtoMember(1)]
         public bool enable = false;
+
         [ProtoMember(2)]
         public List<ValueField> contextData;
+
         [ProtoMember(3, OverwriteList = true)]
         public List<UnityBtModel> children = new List<UnityBtModel>();
 
@@ -38,6 +40,34 @@ namespace Playblack.BehaviourTree {
             }
             set {
                 this.modelClassName = value;
+
+                // Update context data if empty
+                if (this.contextData == null || this.contextData.Count == 0) {
+                    this.contextData = new List<ValueField>(this.GetProposedFields());
+                }
+
+                // FIXME: In case a model gets re-assigned at some point, we'd have to
+                // either scan context data to avoid data loss or just not allow multiple setting of model class names.
+                // Would also need to remove fields not in the new proposed fields list.
+                // Seems wasteful.
+                /*if (contextData != null || contextData.Count > 0) {
+                    for (int i = 0; i < fields.Length; ++i) {
+                        var fieldExists = false;
+                        for (int j = 0; j < contextData.Count; ++j) {
+                            if (contextData[j].Name == fields[i].Name) {
+                                fieldExists = true;
+                                break;
+                            }
+                        }
+                        if (!fieldExists) {
+                            this.contextData.Add(fields[i]);
+                        }
+                    }
+                }
+                else {
+                    // Nothing there, just dump in all the new data
+                    this.contextData = new List<ValueField>(fields);
+                }*/
             }
         }
 
@@ -98,17 +128,18 @@ namespace Playblack.BehaviourTree {
             return model;
         }
 
-        public static UnityBtModel NewInstance(UnityBtModel parent, UnityBtModel model) {
+        public static UnityBtModel NewInstance(UnityBtModel parent, UnityBtModel model, string modelClassName) {
             model.children = new List<UnityBtModel>();
             model.contextData = new List<ValueField>();
             model.enable = true;
             if (parent != null) {
                 parent.children.Add(model);
             }
+            model.ModelClassName = modelClassName;
             return model;
         }
 
-        public static UnityBtModel NewInstance(UnityBtModel parent, UnityBtModel model, int insertIndex) {
+        public static UnityBtModel NewInstance(UnityBtModel parent, UnityBtModel model, string modelClassName, int insertIndex) {
             model.children = new List<UnityBtModel>();
             model.contextData = new List<ValueField>();
             model.enable = true;
@@ -119,8 +150,11 @@ namespace Playblack.BehaviourTree {
                 }
                 parent.children[insertIndex] = model;
             }
+            model.ModelClassName = modelClassName;
             return model;
         }
+
+
 
         public bool RemoveChild(UnityBtModel model) {
             int index = this.children.IndexOf(model);            
@@ -218,11 +252,10 @@ namespace Playblack.BehaviourTree {
                 else if (proposedFields[i].FieldType == typeof(bool)) {
                     newValueField.Type = ValueType.BOOL;
                 }
-                
-                newValueField.Name = proposedFields[i].Name;
-
                 var attrib = proposedFields[i].Attribute<EditableFieldAttribute>();
-                if (attrib != null && attrib.DefaultUnityValue != null) {
+                newValueField.Name = attrib.FieldName;
+
+                if (attrib.DefaultUnityValue != null) {
                     newValueField.Value = attrib.DefaultUnityValue;
                 }
                 valueFields[i] = newValueField;

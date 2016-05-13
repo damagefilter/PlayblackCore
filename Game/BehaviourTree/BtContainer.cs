@@ -25,8 +25,7 @@ namespace Playblack.BehaviourTree {
         }
 
         public BtContainer() {
-            this.rootModel = UnityBtModel.NewInstance(null, new UnityBtModel());
-            this.rootModel.ModelClassName = typeof(ModelSequence).ToString();
+            this.rootModel = UnityBtModel.NewInstance(null, new UnityBtModel(), typeof(ModelSequence).ToString());
         }
 
         public void OnAfterDeserialize() {

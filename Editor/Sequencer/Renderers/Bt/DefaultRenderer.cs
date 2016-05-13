@@ -26,25 +26,42 @@ namespace PlayBlack.Editor.Sequencer.Renderers.Bt {
                 // Draw the Header Information
                 EditorGUILayout.BeginHorizontal();
                 {
-                    EditorGUILayout.LabelField("Value Type", GUILayout.Width(100));
-                    EditorGUILayout.LabelField("Var Name", GUILayout.Width(100));
-                    EditorGUILayout.LabelField("Var Value", GUILayout.Width(100));
+                    // EditorGUILayout.LabelField("Value Type", GUILayout.Width(100));
+                    EditorGUILayout.LabelField("Var Name", GUILayout.Width(150));
+                    EditorGUILayout.LabelField("Var Value", GUILayout.Width(150));
                 }
                 EditorGUILayout.EndHorizontal();
 
+                // Iterate over data fields on context
                 for (int i = 0; i < modelToRender.contextData.Count; ++i) {
-                    // Make sure we have no nulls
+                    // Skip junk (really shouldn't be happening
                     if (modelToRender.contextData[i] == null) {
-                        modelToRender.contextData[i] = new ValueField();
+                        Debug.LogWarning("Found null Value in operator context at index " + i);
+                        continue;
                     }
                     var data = modelToRender.contextData[i];
 
                     // Draw the given item
                     EditorGUILayout.BeginHorizontal();
                     {
-                        data.Type = (Playblack.BehaviourTree.ValueType)EditorGUILayout.EnumPopup(data.Type, GUILayout.Width(100));
-                        data.Name = EditorGUILayout.TextField(data.Name, GUILayout.Width(100));
-                        data.Value = EditorGUILayout.TextField(data.UnityValue, GUILayout.Width(100));
+                        EditorGUILayout.LabelField(data.Name, GUILayout.Width(150)); // read only information
+                        switch (data.Type) {
+                            case Playblack.BehaviourTree.ValueType.BOOL:
+                                bool boolVal = (bool)data.Value;
+                                data.Value = EditorGUILayout.Toggle(boolVal, GUILayout.Width(150));
+                                break;
+                            case Playblack.BehaviourTree.ValueType.FLOAT:
+                                float floatVal = (float)data.Value;
+                                data.Value = EditorGUILayout.FloatField(floatVal, GUILayout.Width(150));
+                                break;
+                            case Playblack.BehaviourTree.ValueType.INT:
+                                int intVal = (int)data.Value;
+                                data.Value = EditorGUILayout.IntField(intVal, GUILayout.Width(150));
+                                break;
+                            case Playblack.BehaviourTree.ValueType.STRING:
+                                data.Value = EditorGUILayout.TextField(data.UnityValue, GUILayout.Width(150), GUILayout.Height(150));
+                                break;
+                        }
                     }
                     EditorGUILayout.EndHorizontal();
                     EditorGUILayout.Space();

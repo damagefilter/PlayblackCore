@@ -13,7 +13,7 @@ namespace PlayBlack.Editor.Sequencer {
         /// <summary>
         /// The model to add a new child (behaviour) to
         /// </summary>
-        private UnityBtModel model;
+        private UnityBtModel rootModel;
 
         /// <summary>
         /// Used to indicate where in the model the children should go, at which index
@@ -77,29 +77,24 @@ namespace PlayBlack.Editor.Sequencer {
                 {
                     foreach (var t in models) {
                         if (GUILayout.Button(t.Name)) {
-                            var newModel = CreateNewModel();
-                            newModel.ModelClassName = t.ToString();
-                            var proposedFields = newModel.GetProposedFields();
-                            if (proposedFields != null) {
-                                newModel.contextData.AddRange(proposedFields);
-                            }
+                            CreateNewModel(t.ToString()); // Also takes care of parenting child objects and setting context field data etc etc
                             Close();
                         }
                     }
-
                 }
                 EditorGUILayout.EndVertical();
             }
             EditorGUILayout.EndScrollView();
         }
 
-        private UnityBtModel CreateNewModel() {
+        private UnityBtModel CreateNewModel(string className) {
             UnityBtModel newModel = null;
+            // NewInstance does all the things we need to ensure data integrity
             if (insertIndex >= 0) {
-                newModel = UnityBtModel.NewInstance(model, new UnityBtModel(), insertIndex);
+                newModel = UnityBtModel.NewInstance(rootModel, new UnityBtModel(), className, insertIndex);
             }
             else {
-                newModel = UnityBtModel.NewInstance(model, new UnityBtModel());
+                newModel = UnityBtModel.NewInstance(rootModel, new UnityBtModel(), className);
             }
             return newModel;
         }
@@ -110,7 +105,7 @@ namespace PlayBlack.Editor.Sequencer {
         /// </summary>
         /// <param name="model"></param>
         public void SetRelativeRootModel(UnityBtModel model) {
-            this.model = model;
+            this.rootModel = model;
             this.InternalInit();
         }
 
@@ -122,7 +117,7 @@ namespace PlayBlack.Editor.Sequencer {
         /// <param name="model"></param>
         /// <param name="insertIndex"></param>
         public void SetRelativeRootModel(UnityBtModel model, int insertIndex) {
-            this.model = model;
+            this.rootModel = model;
             this.insertIndex = insertIndex;
             this.InternalInit();
         }
