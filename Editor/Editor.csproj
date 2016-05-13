@@ -63,7 +63,6 @@
     <Compile Include="Sequencer\Renderers\Bt\DefaultRenderer.cs" />
     <Compile Include="Sequencer\Renderers\IOperatorRenderer.cs" />
     <Compile Include="Sequencer\Renderers\ISequencerRenderer.cs" />
-    <Compile Include="Sequencer\OperatorNamespaceRegister.cs" />
     <Compile Include="Sequencer\OperatorSelector.cs" />
     <Compile Include="Mods\ModConfig.cs" />
     <Compile Include="Mods\ModToolsToolbar.cs" />
