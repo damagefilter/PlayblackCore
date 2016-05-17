@@ -14,6 +14,7 @@ namespace PlayBlack.Editor.Windows {
         public static TWindow Popup<TWindow>() where TWindow : GenericPopupWindow {
             TWindow window = EditorWindow.GetWindow<TWindow>();
             window.titleContent = new GUIContent(window.GetTitle());
+            window.InternalInit();
             //window.skin = AssetDatabase.LoadAssetAtPath<GUISkin>("Assets/materials/CodeEditorSkin.guiskin");
             return window;
         }

@@ -3,27 +3,27 @@ using UnityEngine;
 using System.Collections.Generic;
 using Playblack.BehaviourTree.Execution.Core;
 using Playblack.Csp;
+using Playblack.BehaviourTree;
 
-namespace Playblack.BehaviourTree {
+namespace Playblack.Sequencer {
     /// <summary>
-    /// Contains information about a behaviour tree that is to be executed.
-    /// Also knows how to work on that tree.
+    /// Executes a behaviour tree of some description.
     /// </summary>
     [OutputAware("OnExecutionFinish", "OnExecutionTrigger")]
-    public class Sequencer : MonoBehaviour {
+    public class SequenceExecutor : MonoBehaviour {
         [SerializeField]
-        private List<ValueField> contextData;
+        private List<ValueField> globalDataContext;
 
         // Should work with savegame and unity serializer
         [SerializeField]
-        private BtContainer _commands;
+        private SequenceContainer sequenceContainer;
 
-        public BtContainer commands {
+        public SequenceContainer commands {
             get {
-                return _commands;
+                return sequenceContainer;
             }
             set {
-                _commands = value;
+                sequenceContainer = value;
             }
         }
 
@@ -32,9 +32,9 @@ namespace Playblack.BehaviourTree {
         private UnityEngine.Object actor;
 
         [SerializeField]
-        private SequenceExecutionType executionType;
+        private ExecutionType executionType;
 
-        public SequenceExecutionType ExecutionType {
+        public ExecutionType ExecutionType {
             get {
                 return executionType;
             }
@@ -50,18 +50,18 @@ namespace Playblack.BehaviourTree {
         private bool ranOnce;
 
         public IBTExecutor GetExecutor() {
-            return _commands.GetExecutor(new DataContext(contextData), actor);
+            return sequenceContainer.GetExecutor(new DataContext(globalDataContext), actor);
         }
 
         public void Start() {
             this.executor = this.GetExecutor();
-            if (ExecutionType == SequenceExecutionType.ON_START_ONCE || ExecutionType == SequenceExecutionType.ON_START_PARALLEL) {
+            if (ExecutionType == ExecutionType.ON_START_ONCE || ExecutionType == ExecutionType.ON_START_PARALLEL) {
                 this.executor.Tick();
             }
         }
 
         public void Update() {
-            if ((ExecutionType == SequenceExecutionType.ON_START_PARALLEL) || (ExecutionType == SequenceExecutionType.TRIGGER_PARALLEL && wasTriggered)) {
+            if ((ExecutionType == ExecutionType.ON_START_PARALLEL) || (ExecutionType == ExecutionType.TRIGGER_PARALLEL && wasTriggered)) {
                 if (this.executor == null) {
                     this.executor = this.GetExecutor();
                 }
@@ -78,7 +78,7 @@ namespace Playblack.BehaviourTree {
         [InputFunc("TriggerExecution")]
         private void TriggerExecution() {
             this.wasTriggered = true;
-            if (ExecutionType == SequenceExecutionType.TRIGGER_ONCE) {
+            if (ExecutionType == ExecutionType.TRIGGER_ONCE) {
                 if (this.executor == null) {
                     this.executor = this.GetExecutor();
                 }

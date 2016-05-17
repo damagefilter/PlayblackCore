@@ -1,46 +1,61 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
+﻿using Playblack.BehaviourTree;
+using Playblack.BehaviourTree.Execution.Core;
 using Playblack.BehaviourTree.Model.Core;
 using Playblack.BehaviourTree.Model.Task.Composite;
+using Playblack.Savegame.Model;
+using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
+using System.Text;
 using UnityEngine;
-using Playblack.BehaviourTree.Execution.Core;
 
-namespace Playblack.BehaviourTree {
-    /// <summary>
-    /// Contains a prepared behaviour tree and can generate instances from it
-    /// for any given operator
-    /// </summary>
+namespace Playblack.Sequencer {
+
     [Serializable]
-    public class BtContainer : ISerializationCallbackReceiver {
+    public class SequenceContainer : ISerializationCallbackReceiver {
+
+        /// <summary>
+        /// The actual data.
+        /// Since unity cannot serialize deep tree structures,
+        /// we let protobuf handle that, see serializedModelTree.
+        /// </summary>
         private UnityBtModel rootModel;
 
         [SerializeField]
-        private byte[] serializedData;
+        private byte[] serializedModelTree;
 
-        public UnityBtModel Root {
+        [SerializeField]
+        private ExecutionType executionType;
+
+        public ExecutionType TypeOfExecution {
             get {
-                return this.rootModel;
+                return executionType;
+            }
+            set {
+                executionType = value;
             }
         }
 
-        public BtContainer() {
+        public UnityBtModel RootModel {
+            get {
+                return rootModel;
+            }
+        }
+
+        public SequenceContainer() {
             this.rootModel = UnityBtModel.NewInstance(null, new UnityBtModel(), typeof(ModelSequence).ToString());
         }
 
         public void OnAfterDeserialize() {
-            using (var ms = new MemoryStream(serializedData)) {
+            using (var ms = new MemoryStream(serializedModelTree)) {
                 ms.Position = 0;
-                this.rootModel = ProtoBuf.Serializer.Deserialize<UnityBtModel>(ms);
+                this.rootModel = DataSerializer.DeserializeProtoObject<UnityBtModel>(ms.ToArray());
             }
         }
 
         public void OnBeforeSerialize() {
-            using (var ms = new MemoryStream()) {
-                ProtoBuf.Serializer.Serialize<UnityBtModel>(ms, rootModel);
-                ms.Position = 0;
-                serializedData = ms.ToArray();
-            }
+            this.serializedModelTree = DataSerializer.SerializeProtoObject(this.rootModel);
         }
 
         public IBTExecutor GetExecutor(DataContext context, UnityEngine.Object actor) {
@@ -73,4 +88,3 @@ namespace Playblack.BehaviourTree {
         }
     }
 }
-

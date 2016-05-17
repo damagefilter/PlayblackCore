@@ -23,11 +23,16 @@ namespace PlayBlack.Editor.Sequencer {
 
         private Vector2 scrollPos;
 
-        private bool showAi = false;
+        /// <summary>
+        /// The descriptor type (or operator type) that should be displayed.
+        /// </summary>
+        private DescriptorType displayedOperators;
 
-        private List<Type> knownAiModels;
+        private List<Type> knownAiOperators;
 
-        private List<Type> knownSequenceModels;
+        private List<Type> knownLogicOperators;
+
+        private List<Type> knownGameplayOperators;
 
         public override string GetTitle() {
             return "Operator Selector";
@@ -44,7 +49,7 @@ namespace PlayBlack.Editor.Sequencer {
                         bool hasDescriptor = attr != null && attr.DescriptorType == DescriptorType.AI;
                         return typeValid && hasDescriptor && t.IsSubclassOf(typeof(ModelTask));
                     });
-            this.knownAiModels = aiTypes.ToList();
+            this.knownAiOperators = aiTypes.ToList();
 
             var sequenceTypes = AppDomain.CurrentDomain.GetAssemblies()
                 .SelectMany(t => t.GetTypes())
@@ -54,20 +59,55 @@ namespace PlayBlack.Editor.Sequencer {
                         bool hasDescriptor = attr != null && attr.DescriptorType == DescriptorType.LOGIC;
                         return typeValid && hasDescriptor && t.IsSubclassOf(typeof(ModelTask));
                     });
-            this.knownSequenceModels = sequenceTypes.ToList();
+            this.knownLogicOperators = sequenceTypes.ToList();
+
+            var gameplayType = AppDomain.CurrentDomain.GetAssemblies()
+                .SelectMany(t => t.GetTypes())
+                    .Where(t => {
+                        bool typeValid = t.IsClass && !t.IsAbstract;
+                        var attr = t.Attribute<ModelDataDescriptorAttribute>();
+                        bool hasDescriptor = attr != null && attr.DescriptorType == DescriptorType.GAMEPLAY;
+                        return typeValid && hasDescriptor && t.IsSubclassOf(typeof(ModelTask));
+                    });
+            this.knownGameplayOperators = gameplayType.ToList();
         }
 
         public void OnGUI() {
-            showAi = EditorGUILayout.Toggle("Show AI Operators", showAi);
-            ShowOptions(showAi);
+            EditorGUILayout.BeginHorizontal();
+            {
+                foreach (DescriptorType t in Enum.GetValues(typeof(DescriptorType))) {
+                    if (GUILayout.Button("Show " + t.ToString() + " Operators")) {
+                        this.displayedOperators = t;
+                    }
+                }
+            }
+            EditorGUILayout.EndHorizontal();
+            ShowOptions();
         }
 
-        private void ShowOptions(bool showAi) {
-            if (this.knownAiModels == null || this.knownSequenceModels == null) {
+        private void ShowOptions() {
+            if (this.knownAiOperators == null || this.knownLogicOperators == null) {
                 EditorGUILayout.HelpBox("Window wasn't initialised. Reopen it ...?", MessageType.Error);
                 return;
             }
-            var models = (showAi ? this.knownAiModels : this.knownSequenceModels);
+
+            List<Type> models = null;// = (showAi ? this.knownAiOperators : this.knownLogicOperators);
+            switch (displayedOperators) {
+                case DescriptorType.AI:
+                    models = knownAiOperators;
+                    break;
+                case DescriptorType.LOGIC:
+                    models = knownLogicOperators;
+                    break;
+                case DescriptorType.GAMEPLAY:
+                    models = knownGameplayOperators;
+                    break;
+            }
+            if (models == null) {
+                EditorGUILayout.HelpBox("No operators to display ...", MessageType.Warning);
+                return;
+            }
+            EditorGUILayout.LabelField("Showing operators for: " + this.displayedOperators.ToString());
             scrollPos = EditorGUILayout.BeginScrollView(scrollPos);
             {
                 EditorGUILayout.BeginVertical();

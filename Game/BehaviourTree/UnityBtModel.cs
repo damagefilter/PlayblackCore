@@ -44,6 +44,13 @@ namespace Playblack.BehaviourTree {
                 if (this.contextData == null || this.contextData.Count == 0) {
                     this.contextData = new List<ValueField>(this.GetProposedFields());
                 }
+                int proposedNumChildren = this.GetProposedNumChildren();
+                if (children == null) {
+                    children = new List<UnityBtModel>();
+                }
+                if (children.Count == 0 || children.Count < proposedNumChildren) {
+                    this.ResizeChildren(true);
+                }
             }
         }
 
@@ -173,17 +180,25 @@ namespace Playblack.BehaviourTree {
             return true;
         }
 
+        public void ResizeChildren() {
+            ResizeChildren(false);
+        }
         /// <summary>
         /// Resize the children array to the currently set numChildren
         /// </summary>
-        public void ResizeChildren() {
+        public void ResizeChildren(bool useNulls) {
 
             bool needsRefill = children.Count < numChildren;
 
             if (needsRefill) {
                 var diff = numChildren - children.Count;
                 for (int i = 0; i < diff; ++i) {
-                    UnityBtModel.NewInstance(this);
+                    if (useNulls) {
+                        this.children.Add(null);
+                    }
+                    else {
+                        UnityBtModel.NewInstance(this);
+                    }
                 }
             }
             else {
@@ -192,7 +207,7 @@ namespace Playblack.BehaviourTree {
                     var child = children[children.Count - 1];
                     children.RemoveAt(children.Count - 1);
                     // Make sure the now inaccessible children get pruged properly
-                    child.ResizeChildren();
+                    child.ResizeChildren(useNulls);
                     child = null;
                 }
             }
@@ -226,7 +241,7 @@ namespace Playblack.BehaviourTree {
         /// If there is no such attribute on any field, an empty array is returned.
         /// </summary>
         /// <returns>The proposed fields.</returns>
-        public ValueField[] GetProposedFields() {
+        private ValueField[] GetProposedFields() {
             var dataDescriptor = ModelType.Attribute<ModelDataDescriptorAttribute>();
             this.displayName = dataDescriptor.OperatorName;
             if (dataDescriptor.DataContextDescription != null && dataDescriptor.DataContextDescription.Count > 0) {
@@ -248,6 +263,20 @@ namespace Playblack.BehaviourTree {
                 return valueFields;
             }
             return new ValueField[0];
+        }
+
+        private int GetProposedNumChildren() {
+            return ModelType.Attribute<ModelDataDescriptorAttribute>().NumChildren;
+        }
+
+        public IList<ChildDescriptorAttribute> GetChildStructure() {
+            List<ChildDescriptorAttribute> structure = new List<ChildDescriptorAttribute>();
+            var childDescriptors = ModelType.Attributes<ChildDescriptorAttribute>();
+            for (int i = 0; i < childDescriptors.Count; ++i) {
+                structure.Add(childDescriptors[i]);
+            }
+            structure.Sort((a, b) => { return a.DisplayDelta > b.DisplayDelta ? 1 : -1; });
+            return structure;
         }
     }
 }

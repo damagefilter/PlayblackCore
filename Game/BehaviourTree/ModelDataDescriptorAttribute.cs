@@ -11,18 +11,20 @@ namespace Playblack.BehaviourTree {
     public class ModelDataDescriptorAttribute : System.Attribute {
         private string operatorName;
         private DescriptorType descriptorType;
+        private int numChildren;
         private Dictionary<string, FieldDefinitionAttribute> dataContextDescription;
 
         /// <summary>
-        /// Constructor for full data description of stuffs.
-        /// Yes stuffs.
+        /// Hello
         /// </summary>
-        /// <param name="operatorName"></param>
-        /// <param name="type"></param>
-        /// <param name="dataContextDescription"></param>
-        public ModelDataDescriptorAttribute(string operatorName, DescriptorType type, Type executorType) {
+        /// <param name="operatorName">Display name of operator</param>
+        /// <param name="type">The descriptor type, or operator type</param>
+        /// <param name="acceptChildren">Does the described model use children? -1 says infinite, 0 = 0 etc etc</param>
+        /// <param name="executorType">The ExecutionTask type on which to look for data fields</param>
+        public ModelDataDescriptorAttribute(string operatorName, DescriptorType type, int numChildren, Type executorType) {
             this.operatorName = operatorName;
             this.descriptorType = type;
+            this.numChildren = numChildren;
             // because we cannot pass nested attributes in c#, we'll just reflect the stuff to get hold of relevant context information.
             // Maybe it's for the better, I don't know ...
             var contextRelevantFields = executorType.FieldsWith(Flags.AnyVisibility, typeof(FieldDefinitionAttribute));
@@ -58,6 +60,12 @@ namespace Playblack.BehaviourTree {
         public DescriptorType DescriptorType {
             get {
                 return descriptorType;
+            }
+        }
+
+        public int NumChildren {
+            get {
+                return numChildren;
             }
         }
     }

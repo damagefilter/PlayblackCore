@@ -8,6 +8,10 @@ using System.Text;
 
 namespace PlayBlack.Editor.Sequencer {
 
+    /// <summary>
+    /// Renders the window where you can edit one operaot in the sequence.
+    /// Called from within peusocode editor when user presses a button.
+    /// </summary>
     public class OperatorEditorWindow : GenericPopupWindow {
 
         public IOperatorRenderer<UnityBtModel> Renderer {
@@ -19,7 +23,7 @@ namespace PlayBlack.Editor.Sequencer {
         }
 
         public override void InternalInit() {
-            throw new NotImplementedException();
+            // otImplementedException();
         }
     }
 }

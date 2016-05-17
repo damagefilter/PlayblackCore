@@ -14,29 +14,32 @@ namespace PlayBlack.Editor.Sequencer.Renderers {
     /// </summary>
     public interface ISequencerRenderer<TRenderType> {
 
-        /// <summary>
-        /// Simply renders an TRenderType with the current indent level +1
-        /// </summary>
-        /// <param name="sequencerPart"></param>
-        void RenderSingle(TRenderType sequencerPart);
-
-
-        /// <summary>
-        /// Renders a whole list of sequencer parts one after the other.
-        /// Useful if you want to render a child list
-        /// </summary>
-        /// <param name="sequencerList"></param>
-        void RenderList(IList<TRenderType> sequencerList);
+        int IndentLevel {
+            get;
+            set;
+        }
 
         void RenderAddOperatorButton(TRenderType referenceObject);
+
+        void RenderAddOperatorButton(TRenderType referenceObject, int insertIndex);
 
         /// <summary>
         /// Draws the set of buttons for one operator that should be displayed
         /// in the pseudo code view (the sequence)
         /// </summary>
-        /// <param name="referenceObject"></param>
         /// <param name="label"></param>
-        void RenderEditOperatorButton(TRenderType referenceObject, TRenderType referenceParentObject, IOperatorRenderer<TRenderType> operatorRenderer, string label);
+        /// <param name="referenceObject"></param>
+        /// <param name="referenceParentObject"></param>
+        /// <param name="operatorRenderer"></param>
+        /// <param name="indenLevel"></param>
+        void RenderEditOperatorButton(string label, TRenderType referenceObject, TRenderType referenceParentObject, IOperatorRenderer<TRenderType> operatorRenderer);
+
+        /// <summary>
+        /// Draws a dummy button with a label.
+        /// Use for structuring the pseudo code window.
+        /// </summary>
+        /// <param name="label"></param>
+        void RenderOperatorDummyButton(string label);
 
     }
 }
