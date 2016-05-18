@@ -24,8 +24,10 @@ namespace PlayBlack.Editor.Sequencer {
         }
 
         public void SetSequencer(SequenceContainer sequenceContainer) {
-            this.sequencerWindow = new BtSequencerRenderer();
             this.sequenceContainer = sequenceContainer;
+            this.sequencerWindow = new BtSequencerRenderer();
+            this.sequencerWindow.OperatorRenderer = new DefaultRenderer();
+            this.sequencerWindow.OperatorRenderer.SetSubjects(this.sequenceContainer.RootModel);
 
         }
 
@@ -44,7 +46,7 @@ namespace PlayBlack.Editor.Sequencer {
                     this.DrawSequenceSettings();
                     EditorGUILayout.BeginVertical();
                     {
-                        sequencerWindow.DoRenderLoop(this.sequenceContainer.RootModel);
+                        sequencerWindow.DoRenderLoop();
                     }
                     EditorGUILayout.EndVertical();
                 }

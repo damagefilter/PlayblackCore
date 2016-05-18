@@ -14,7 +14,11 @@ namespace PlayBlack.Editor.Sequencer {
     /// </summary>
     public class OperatorEditorWindow : GenericPopupWindow {
 
-        public IOperatorRenderer<UnityBtModel> Renderer {
+        public IOperatorRenderer<UnityBtModel> OperatorRenderer {
+            get; set;
+        }
+
+        public ISequencerRenderer<UnityBtModel> SequencerRenderer {
             get; set;
         }
 
@@ -24,6 +28,10 @@ namespace PlayBlack.Editor.Sequencer {
 
         public override void InternalInit() {
             // otImplementedException();
+        }
+
+        public void OnGUI() {
+            this.OperatorRenderer.RenderEditorWindowView(SequencerRenderer);
         }
     }
 }

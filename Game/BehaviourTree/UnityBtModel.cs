@@ -42,7 +42,8 @@ namespace Playblack.BehaviourTree {
                 this.modelClassName = value;
                 // Update context data if empty
                 if (this.contextData == null || this.contextData.Count == 0) {
-                    this.contextData = new List<ValueField>(this.GetProposedFields());
+                    this.contextData = new List<ValueField>();
+                    this.contextData.AddRange(this.GetProposedFields());
                 }
                 int proposedNumChildren = this.GetProposedNumChildren();
                 if (children == null) {
@@ -127,20 +128,26 @@ namespace Playblack.BehaviourTree {
         }
 
         public static UnityBtModel NewInstance(UnityBtModel parent, UnityBtModel model, string modelClassName) {
-            model.children = new List<UnityBtModel>();
-            model.contextData = new List<ValueField>();
-            model.enable = true;
+            if (model != null) { // We can explicitly set null values you see
+                model.children = new List<UnityBtModel>();
+                model.contextData = new List<ValueField>();
+                model.enable = true;
+                model.ModelClassName = modelClassName;
+            }
             if (parent != null) {
                 parent.children.Add(model);
             }
-            model.ModelClassName = modelClassName;
+            
             return model;
         }
 
         public static UnityBtModel NewInstance(UnityBtModel parent, UnityBtModel model, string modelClassName, int insertIndex) {
-            model.children = new List<UnityBtModel>();
-            model.contextData = new List<ValueField>();
-            model.enable = true;
+            if (model != null) { // We can explicitly set null values you see
+                model.children = new List<UnityBtModel>();
+                model.contextData = new List<ValueField>();
+                model.enable = true;
+                model.ModelClassName = modelClassName;
+            }
             if (parent != null) {
                 // NOTE: This means the children list must be populated already, at least with nulls!
                 if (insertIndex >= parent.children.Count) {
@@ -148,18 +155,16 @@ namespace Playblack.BehaviourTree {
                 }
                 parent.children[insertIndex] = model;
             }
-            model.ModelClassName = modelClassName;
+            
             return model;
         }
-
-
 
         public bool RemoveChild(UnityBtModel model) {
             int index = this.children.IndexOf(model);            
             if (index >= 0) {
                 var child = children[index];
                 children.RemoveAt(index);
-                child.ResizeChildren();
+                // child.ResizeChildren(); // why do this?
                 return true;
             }
             return false;
@@ -265,19 +270,46 @@ namespace Playblack.BehaviourTree {
             return new ValueField[0];
         }
 
-        private int GetProposedNumChildren() {
-            return ModelType.Attribute<ModelDataDescriptorAttribute>().NumChildren;
+        // Counter-act the fact that empty lists deserialize as null
+        [ProtoAfterDeserialization]
+        private void OnDeserialize() {
+            if (this.children == null) {
+                this.children = new List<UnityBtModel>();
+            }
+            if (this.contextData == null) {
+                this.contextData = new List<ValueField>();
+            }
         }
 
-        public IList<ChildDescriptorAttribute> GetChildStructure() {
-            List<ChildDescriptorAttribute> structure = new List<ChildDescriptorAttribute>();
-            var childDescriptors = ModelType.Attributes<ChildDescriptorAttribute>();
-            for (int i = 0; i < childDescriptors.Count; ++i) {
-                structure.Add(childDescriptors[i]);
-            }
-            structure.Sort((a, b) => { return a.DisplayDelta > b.DisplayDelta ? 1 : -1; });
-            return structure;
+        /// <summary>
+        /// Returns the proposed number of children.
+        /// Negative values indicate an undefined amount of children.
+        /// </summary>
+        /// <returns></returns>
+        public int GetProposedNumChildren() {
+            return ModelType.Attribute<ModelDataDescriptorAttribute>().NumChildren;
         }
+#if UNITY_EDITOR
+        private List<ChildDescriptorAttribute> childStructure;
+        public IList<ChildDescriptorAttribute> GetChildStructure() {
+            if (childStructure != null) {
+                return childStructure;
+            }
+            Debug.Log("Generating child structure ...");
+            if (this.ModelClassName == null) {
+                Debug.LogError("No classname specified ... Much error!");
+                return new List<ChildDescriptorAttribute>(0); // FIXME: This situation possibly happens with deserialized lists that previously had null values.
+            }
+            this.childStructure = new List<ChildDescriptorAttribute>();
+            // unity doesn't want the type argument version so we gotta do this instead ...
+            var childDescriptors = ModelType.Attributes(typeof(ChildDescriptorAttribute));
+            for (int i = 0; i < childDescriptors.Count; ++i) {
+                this.childStructure.Add((ChildDescriptorAttribute)childDescriptors[i]);
+            }
+            this.childStructure.Sort((a, b) => { return a.DisplayDelta > b.DisplayDelta ? 1 : -1; });
+            return this.childStructure;
+        }
+#endif
     }
 }
 

@@ -5,7 +5,8 @@ namespace Playblack.BehaviourTree {
     public enum ValueType {
         FLOAT,
         INT,
-        STRING,
+        STRING, // one-liners
+        TEXT, // long texts
         BOOL
     }
 }

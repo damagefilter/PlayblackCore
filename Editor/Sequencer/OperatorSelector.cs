@@ -39,6 +39,9 @@ namespace PlayBlack.Editor.Sequencer {
         }
 
         public override void InternalInit() {
+            // TODO: These should go into static variables, it doesn't change that much
+            // and should only be generated on change or if they are not generated yet
+            // Very expensive this.
             // var m2r = OperatorNamespaceRegister.Instance;
             // This properly reads all the model types from everything in and below the Assets.src.ai.behaviourtree namespace
             var aiTypes = AppDomain.CurrentDomain.GetAssemblies()
@@ -113,7 +116,7 @@ namespace PlayBlack.Editor.Sequencer {
                 EditorGUILayout.BeginVertical();
                 {
                     foreach (var t in models) {
-                        if (GUILayout.Button(t.Name)) {
+                        if (GUILayout.Button(t.Attribute<ModelDataDescriptorAttribute>().OperatorName)) {
                             CreateNewModel(t.ToString()); // Also takes care of parenting child objects and setting context field data etc etc
                             Close();
                         }

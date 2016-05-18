@@ -47,6 +47,7 @@ namespace Playblack.BehaviourTree {
                         case ValueType.INT:
                             return int.Parse(unityValue);
                         case ValueType.STRING:
+                        case ValueType.TEXT:
                             return unityValue;
                     }
                 }

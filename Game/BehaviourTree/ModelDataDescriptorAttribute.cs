@@ -27,7 +27,7 @@ namespace Playblack.BehaviourTree {
             this.numChildren = numChildren;
             // because we cannot pass nested attributes in c#, we'll just reflect the stuff to get hold of relevant context information.
             // Maybe it's for the better, I don't know ...
-            var contextRelevantFields = executorType.FieldsWith(Flags.AnyVisibility, typeof(FieldDefinitionAttribute));
+            var contextRelevantFields = executorType.FieldsWith(Flags.InstanceAnyVisibility, typeof(FieldDefinitionAttribute));
             var knownNames = new List<string>(contextRelevantFields.Count);
 
             this.dataContextDescription = new Dictionary<string, FieldDefinitionAttribute>(contextRelevantFields.Count);

@@ -28,18 +28,29 @@ namespace PlayBlack.Editor.Sequencer.Renderers.Bt {
             set;
         }
 
+        public DefaultRenderer OperatorRenderer {
+            get {
+                return operatorRenderer;
+            }
+
+            set {
+                this.operatorRenderer = value;
+            }
+        }
+
         private DefaultRenderer operatorRenderer = new DefaultRenderer();
         /// <summary>
         /// Handles rendering of all the things and cleans up messes and rearrangements
         /// of senquence parts and all that good stuff
         /// </summary>
-        public void DoRenderLoop(UnityBtModel rootModel) {
+        public void DoRenderLoop() {
             // Important note: We don't render the root model as it is always a sequence.
             // we're just adding to it if appropriate
-            operatorRenderer.SetSubjects(rootModel);
+            var mr = operatorRenderer.GetModelToRender();
+            operatorRenderer.SetSubjects(mr);
             operatorRenderer.RenderCodeView(this);
-            ProcessCorruptedModels(rootModel);
-            DoScheduledReorders(rootModel);
+            ProcessCorruptedModels(mr);
+            DoScheduledReorders(mr);
         }
 
         private void ProcessCorruptedModels(UnityBtModel rootModel) {
@@ -76,7 +87,7 @@ namespace PlayBlack.Editor.Sequencer.Renderers.Bt {
             EditorGUI.indentLevel = this.IndentLevel;
             if (GUILayout.Button("<>")) {
                 var window = GenericPopupWindow.Popup<OperatorSelector>();
-                window.SetRelativeRootModel(referenceObject, 0);
+                window.SetRelativeRootModel(referenceObject);
             }
             EditorGUI.indentLevel = indent;
         }
@@ -99,7 +110,8 @@ namespace PlayBlack.Editor.Sequencer.Renderers.Bt {
                 if (referenceParentObject != null) {
                     if (GUILayout.Button(label)) {
                         var window = GenericPopupWindow.Popup<OperatorEditorWindow>();
-                        window.Renderer = operatorRenderer;
+                        window.OperatorRenderer = operatorRenderer;
+                        window.SequencerRenderer = this;
                     }
                     if (GUILayout.Button("up", GUILayout.Width(25))) {
                         int newIndex = referenceParentObject.children.IndexOf(referenceObject) - 1;
