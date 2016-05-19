@@ -83,23 +83,17 @@ namespace PlayBlack.Editor.Sequencer.Renderers.Bt {
         #region API
 
         public void RenderAddOperatorButton(UnityBtModel referenceObject) {
-            var indent = EditorGUI.indentLevel;
-            EditorGUI.indentLevel = this.IndentLevel;
-            if (GUILayout.Button("<>")) {
+            DrawButton("<>", () => {
                 var window = GenericPopupWindow.Popup<OperatorSelector>();
                 window.SetRelativeRootModel(referenceObject);
-            }
-            EditorGUI.indentLevel = indent;
+            });
         }
 
         public void RenderAddOperatorButton(UnityBtModel referenceObject, int insertIndex) {
-            var indent = EditorGUI.indentLevel;
-            EditorGUI.indentLevel = this.IndentLevel;
-            if (GUILayout.Button("<>")) {
+            DrawButton("<>", () => {
                 var window = GenericPopupWindow.Popup<OperatorSelector>();
                 window.SetRelativeRootModel(referenceObject, insertIndex);
-            }
-            EditorGUI.indentLevel = indent;
+            });
         }
 
         public void RenderEditOperatorButton(string label, UnityBtModel referenceObject, UnityBtModel referenceParentObject, IOperatorRenderer<UnityBtModel> operatorRenderer) {
@@ -108,11 +102,13 @@ namespace PlayBlack.Editor.Sequencer.Renderers.Bt {
                 var indent = EditorGUI.indentLevel;
                 EditorGUI.indentLevel = this.IndentLevel;
                 if (referenceParentObject != null) {
-                    if (GUILayout.Button(label)) {
+                    // Draw first button with indent
+                    DrawButton(label, () => {
                         var window = GenericPopupWindow.Popup<OperatorEditorWindow>();
                         window.OperatorRenderer = operatorRenderer;
                         window.SequencerRenderer = this;
-                    }
+                    });
+                    // Followup buttons come directly after, without extra indents
                     if (GUILayout.Button("up", GUILayout.Width(25))) {
                         int newIndex = referenceParentObject.children.IndexOf(referenceObject) - 1;
                         referenceParentObject.ScheduleChildReorder(referenceObject, newIndex);
@@ -138,11 +134,27 @@ namespace PlayBlack.Editor.Sequencer.Renderers.Bt {
         }
 
         public void RenderOperatorDummyButton(string label) {
-            var indent = EditorGUI.indentLevel;
-            EditorGUI.indentLevel = this.IndentLevel;
-            GUILayout.Button(label);
-            EditorGUI.indentLevel = indent;
+            DrawButton(label, null);
         }
         #endregion
+
+        /// <summary>
+        /// Internally draws buttons to achieve proper indenting,
+        /// apparently the normal indenting thing doesn't work on GUILayout elements.
+        /// </summary>
+        /// <param name="label"></param>
+        /// <param name="onClick"></param>
+        private void DrawButton(string label, Action onClick) {
+            GUILayout.BeginHorizontal();
+            {
+                GUILayout.Space(this.IndentLevel);
+                if (GUILayout.Button(label)) {
+                    if (onClick != null) {
+                        onClick();
+                    }
+                }
+            }
+            GUILayout.EndHorizontal();
+        }
     }
 }

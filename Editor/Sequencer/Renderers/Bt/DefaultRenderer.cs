@@ -13,15 +13,27 @@ namespace PlayBlack.Editor.Sequencer.Renderers.Bt {
         protected UnityBtModel parentModel;
         private IList<ChildDescriptorAttribute> childStructure;
         private Vector2 scrollPos;
+        private int insertIndex; // used when the model to render is null and we need to add-operator on the correct index
 
         private void ResetToDefaults() {
             scrollPos = Vector2.zero;
+            this.insertIndex = -1;
         }
         public virtual void RenderCodeView(ISequencerRenderer<UnityBtModel> sequenceRenderer) {
-            if (modelToRender == null || modelToRender.ModelClassName == null) {
-                // This is invalid and happens somehow and I should figure this out at some point.
-                parentModel.NullChild(modelToRender); // Do nothing, wait for next frame
-                Debug.LogError("modelToRender or ModelClassName is null. Much error!");
+            // Happens in the best families.
+            // That's when we're processing an empty child slot, which means we wanna add the add-operator button and get out.
+            if (modelToRender == null) {
+                if (parentModel == null) {
+                    // Well that should really not be happening
+                    Debug.LogError("Parent model is null, cannot add the add-operator-button");
+                    return;
+                }
+                if (this.insertIndex >= 0) {
+                    sequenceRenderer.RenderAddOperatorButton(parentModel, this.insertIndex);
+                }
+                else {
+                    sequenceRenderer.RenderAddOperatorButton(parentModel);
+                }
                 return;
             }
             int indent = sequenceRenderer.IndentLevel;
@@ -31,11 +43,15 @@ namespace PlayBlack.Editor.Sequencer.Renderers.Bt {
             foreach (var kvp in childStructure) {
                 // in the default list we ignore insert indexes and just render the whole list then cancel any further rendering
                 if (kvp.Name == "default") {
-                    for (int i = 0; i < modelToRender.children.Count; ++i) {
+                    for (int i = 0; i < modelToRender.children.Count; i++) {
                         if (modelToRender.children[i] == null) {
+                            // Debug.LogWarning("Found null child element in sequence list. Fixing.");
                             // This is absolutely invalid and we need to address it.
+                            // Because in a sequence of things none of these things ought to be null
                             modelToRender.children.RemoveAt(i);
-                            return; // exit early, wait for next frame to display stuff properly
+                            // Stuff is shifted down when removing at index, so count from that index again
+                            i--;
+                            continue;
                         }
                         else {
                             // If child already exists, just draw it
@@ -54,11 +70,6 @@ namespace PlayBlack.Editor.Sequencer.Renderers.Bt {
                 // Displays a name for structuring purposes.
                 sequenceRenderer.RenderOperatorDummyButton(kvp.Name);
                 sequenceRenderer.IndentLevel += 10;
-                
-                /*if ((modelToRender.children.Count == 0 && (modelToRender.GetProposedNumChildren() > 0 || modelToRender.GetProposedNumChildren() == -1)) && kvp.InsertIndex >= 0) {
-                    UnityBtModel.NewInstance(modelToRender, null, null, kvp.InsertIndex);
-                }*/
-
                 // Make sure the index we want to access exists at all.
                 if (modelToRender.children.Count < kvp.InsertIndex + 1) { // index is 0-based, count is not, so add one. Just sayin.
                     UnityBtModel.NewInstance(modelToRender, null, null, kvp.InsertIndex);
@@ -72,11 +83,18 @@ namespace PlayBlack.Editor.Sequencer.Renderers.Bt {
                     // Operator already exists, draw that one
                     r.SetSubjects(modelToRender.children[kvp.InsertIndex], modelToRender);
                     r.ResetToDefaults(); // Reset scrollpos and folded stuff to avoid confusion
+                    r.SetInsertIndex(kvp.InsertIndex);
                     r.RenderCodeView(sequenceRenderer);
                 }
+                // Set back indent level
+                sequenceRenderer.IndentLevel -= 10;
             }
-            // Set back indent level
             sequenceRenderer.IndentLevel = indent;
+        }
+
+        
+        private void SetInsertIndex(int insertIndex) {
+            this.insertIndex = insertIndex;
         }
 
         public virtual void RenderEditorWindowView(ISequencerRenderer<UnityBtModel> sequenceRenderer) {
@@ -89,7 +107,7 @@ namespace PlayBlack.Editor.Sequencer.Renderers.Bt {
             }
             EditorGUILayout.EndHorizontal();
 
-            scrollPos = EditorGUILayout.BeginScrollView(scrollPos, GUILayout.Width(300), GUILayout.Height(460));
+            scrollPos = EditorGUILayout.BeginScrollView(scrollPos, GUILayout.Width(320), GUILayout.Height(460));
             {
                 // Iterate over data fields on context
                 for (int i = 0; i < modelToRender.contextData.Count; ++i) {
@@ -152,8 +170,16 @@ namespace PlayBlack.Editor.Sequencer.Renderers.Bt {
         public void SetSubjects(params UnityBtModel[] subjects) {
             var model = subjects[0];
             if (this.modelToRender != model) {
-                if (model != null) { // For deleted models to retain indexes this can be null. Intended
-                    this.childStructure = model.GetChildStructure();
+                if (model != null) {
+                    if (model.ModelClassName != null) {
+                        this.childStructure = model.GetChildStructure();
+                    }
+                    else {
+                        // When ModelClassName is null, means we're having a deserialized default element here
+                        // which is due to specification limitations in protobuf (it doesn't know null references)
+                        // Anyhow, in such case this means what we actually want to render is a null value (empty slot in parent object)
+                        model = null;
+                    }
                 }
                 this.modelToRender = model;
             }

@@ -17,7 +17,7 @@ namespace PlayBlack.Editor.Sequencer {
             SequenceExecutor trigger = target as SequenceExecutor;
             if (GUILayout.Button("Open Sequencer Settings")) {
                 var window = GenericPopupWindow.Popup<SequencerEditorWindow>();
-                window.SetSequencer(trigger.commands);
+                window.SetSequencer(trigger.SequenceCommands);
             }
         }
     }

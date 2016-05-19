@@ -18,7 +18,7 @@ namespace Playblack.Sequencer {
         [SerializeField]
         private SequenceContainer sequenceContainer;
 
-        public SequenceContainer commands {
+        public SequenceContainer SequenceCommands {
             get {
                 return sequenceContainer;
             }
@@ -30,18 +30,6 @@ namespace Playblack.Sequencer {
         [SerializeField]
         [Tooltip("The object on which this sequencer is acting (for instance the object that handles AI movement or such thing.")]
         private UnityEngine.Object actor;
-
-        [SerializeField]
-        private ExecutionType executionType;
-
-        public ExecutionType ExecutionType {
-            get {
-                return executionType;
-            }
-            set {
-                executionType = value;
-            }
-        }
 
         private IBTExecutor executor;
 
@@ -55,13 +43,13 @@ namespace Playblack.Sequencer {
 
         public void Start() {
             this.executor = this.GetExecutor();
-            if (ExecutionType == ExecutionType.ON_START_ONCE || ExecutionType == ExecutionType.ON_START_PARALLEL) {
+            if (sequenceContainer.TypeOfExecution == ExecutionType.ON_START_ONCE || sequenceContainer.TypeOfExecution == ExecutionType.ON_START_PARALLEL) {
                 this.executor.Tick();
             }
         }
 
         public void Update() {
-            if ((ExecutionType == ExecutionType.ON_START_PARALLEL) || (ExecutionType == ExecutionType.TRIGGER_PARALLEL && wasTriggered)) {
+            if ((sequenceContainer.TypeOfExecution == ExecutionType.ON_START_PARALLEL) || (sequenceContainer.TypeOfExecution == ExecutionType.TRIGGER_PARALLEL && wasTriggered)) {
                 if (this.executor == null) {
                     this.executor = this.GetExecutor();
                 }
@@ -78,7 +66,7 @@ namespace Playblack.Sequencer {
         [InputFunc("TriggerExecution")]
         private void TriggerExecution() {
             this.wasTriggered = true;
-            if (ExecutionType == ExecutionType.TRIGGER_ONCE) {
+            if (sequenceContainer.TypeOfExecution == ExecutionType.TRIGGER_ONCE) {
                 if (this.executor == null) {
                     this.executor = this.GetExecutor();
                 }

@@ -21,17 +21,14 @@ namespace Playblack.BehaviourTree {
     /// </summary>
     [ProtoContract]
     public class UnityBtModel {
-        [ProtoMember(1)]
-        public bool enable = false;
-
-        [ProtoMember(2)]
+        [ProtoMember(10)]
         public List<ValueField> contextData;
 
-        [ProtoMember(3, OverwriteList = true)]
+        [ProtoMember(20, OverwriteList = true)]
         public List<UnityBtModel> children = new List<UnityBtModel>();
 
         // requirement here is that a class may have a 0-args constructor
-        [ProtoMember(4)]
+        [ProtoMember(30)]
         private string modelClassName;
 
         public string ModelClassName {
@@ -49,7 +46,7 @@ namespace Playblack.BehaviourTree {
                 if (children == null) {
                     children = new List<UnityBtModel>();
                 }
-                if (children.Count == 0 || children.Count < proposedNumChildren) {
+                if ((children.Count == 0 || children.Count < proposedNumChildren) && proposedNumChildren != -1) {
                     this.ResizeChildren(true);
                 }
             }
@@ -71,10 +68,10 @@ namespace Playblack.BehaviourTree {
             }
         }
 
-        [ProtoMember(5)]
+        [ProtoMember(40)]
         private int numChildren = 0;
 
-        [ProtoMember(6)]
+        [ProtoMember(50)]
         private string displayName;
 
         /// <summary>
@@ -131,7 +128,6 @@ namespace Playblack.BehaviourTree {
             if (model != null) { // We can explicitly set null values you see
                 model.children = new List<UnityBtModel>();
                 model.contextData = new List<ValueField>();
-                model.enable = true;
                 model.ModelClassName = modelClassName;
             }
             if (parent != null) {
@@ -145,7 +141,6 @@ namespace Playblack.BehaviourTree {
             if (model != null) { // We can explicitly set null values you see
                 model.children = new List<UnityBtModel>();
                 model.contextData = new List<ValueField>();
-                model.enable = true;
                 model.ModelClassName = modelClassName;
             }
             if (parent != null) {
@@ -279,6 +274,7 @@ namespace Playblack.BehaviourTree {
             if (this.contextData == null) {
                 this.contextData = new List<ValueField>();
             }
+            Debug.Log("After deserialize - children count for "+ this.ModelClassName +" is " + this.children.Count);
         }
 
         /// <summary>
@@ -297,8 +293,11 @@ namespace Playblack.BehaviourTree {
             }
             Debug.Log("Generating child structure ...");
             if (this.ModelClassName == null) {
+                // FIXME: This situation happens with deserialized lists that previously had null values.
+                // Protobuf doesn't know the concept of null so it defaults to a default instance 
+                // of UnityBtModel when deserializing null values. And then this happens as the default object has nothing to describe it.
                 Debug.LogError("No classname specified ... Much error!");
-                return new List<ChildDescriptorAttribute>(0); // FIXME: This situation possibly happens with deserialized lists that previously had null values.
+                return new List<ChildDescriptorAttribute>(0);
             }
             this.childStructure = new List<ChildDescriptorAttribute>();
             // unity doesn't want the type argument version so we gotta do this instead ...

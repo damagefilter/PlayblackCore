@@ -31,7 +31,9 @@ namespace PlayBlack.Editor.Sequencer {
         }
 
         public void OnGUI() {
-            this.OperatorRenderer.RenderEditorWindowView(SequencerRenderer);
+            if (this.OperatorRenderer != null) {
+                this.OperatorRenderer.RenderEditorWindowView(SequencerRenderer);
+            }
         }
     }
 }
