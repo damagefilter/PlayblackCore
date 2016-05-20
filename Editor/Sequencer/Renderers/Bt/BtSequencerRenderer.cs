@@ -18,8 +18,19 @@ namespace PlayBlack.Editor.Sequencer.Renderers.Bt {
         /// </summary>
         private List<UnityBtModel> corruptedModels;
 
+        private static GUISkin editorSkin;
+
+        public static GUISkin EditorSkin {
+            get {
+                return editorSkin;
+            }
+        }
+
         public BtSequencerRenderer() {
             this.corruptedModels = new List<UnityBtModel>();
+            if (editorSkin == null) {
+                editorSkin = Resources.Load<GUISkin>("SequenceEditorLight");
+            }
         }
         #region Rendering Process
 
@@ -109,16 +120,16 @@ namespace PlayBlack.Editor.Sequencer.Renderers.Bt {
                         window.SequencerRenderer = this;
                     });
                     // Followup buttons come directly after, without extra indents
-                    if (GUILayout.Button("up", GUILayout.Width(25))) {
+                    if (GUILayout.Button("up", EditorSkin.button, GUILayout.Width(25))) {
                         int newIndex = referenceParentObject.children.IndexOf(referenceObject) - 1;
                         referenceParentObject.ScheduleChildReorder(referenceObject, newIndex);
                     }
-                    if (GUILayout.Button("dn", GUILayout.Width(25))) {
+                    if (GUILayout.Button("dn", EditorSkin.button, GUILayout.Width(25))) {
                         int newIndex = referenceParentObject.children.IndexOf(referenceObject) + 1;
                         referenceParentObject.ScheduleChildReorder(referenceObject, newIndex);
                     }
 
-                    if (GUILayout.Button("x", GUILayout.Width(18))) {
+                    if (GUILayout.Button("x", EditorSkin.button, GUILayout.Width(18))) {
                         if (referenceParentObject == null) {
                             Debug.LogError("Tried to remove a root object or corrupted model " + referenceObject.ModelClassName);
                             return;
@@ -148,7 +159,7 @@ namespace PlayBlack.Editor.Sequencer.Renderers.Bt {
             GUILayout.BeginHorizontal();
             {
                 GUILayout.Space(this.IndentLevel);
-                if (GUILayout.Button(label)) {
+                if (GUILayout.Button(label, EditorSkin.button)) {
                     if (onClick != null) {
                         onClick();
                     }

@@ -274,7 +274,6 @@ namespace Playblack.BehaviourTree {
             if (this.contextData == null) {
                 this.contextData = new List<ValueField>();
             }
-            Debug.Log("After deserialize - children count for "+ this.ModelClassName +" is " + this.children.Count);
         }
 
         /// <summary>
@@ -291,7 +290,6 @@ namespace Playblack.BehaviourTree {
             if (childStructure != null) {
                 return childStructure;
             }
-            Debug.Log("Generating child structure ...");
             if (this.ModelClassName == null) {
                 // FIXME: This situation happens with deserialized lists that previously had null values.
                 // Protobuf doesn't know the concept of null so it defaults to a default instance 
