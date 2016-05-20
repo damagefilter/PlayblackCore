@@ -17,7 +17,7 @@
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
     <OutputPath>bin\Debug\</OutputPath>
-    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <DefineConstants>TRACE;DEBUG;DEV_BUILD</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
@@ -78,7 +78,8 @@
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
-    <PostBuildEvent>xcopy "$(ProjectDir)$(OutDir)$(TargetFileName)" "$(SolutionDir)build\Editor\" /F /R /Y /I</PostBuildEvent>
+    <PostBuildEvent>xcopy "$(ProjectDir)$(OutDir)$(TargetFileName)" "$(SolutionDir)build\$(ConfigurationName)\Editor\" /F /R /Y /I
+xcopy "$(ProjectDir)Resources" "$(SolutionDir)build\$(ConfigurationName)\Editor\Resources\" /F /R /Y /I /S</PostBuildEvent>
   </PropertyGroup>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

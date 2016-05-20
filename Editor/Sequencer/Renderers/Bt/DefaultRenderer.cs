@@ -172,7 +172,9 @@ namespace PlayBlack.Editor.Sequencer.Renderers.Bt {
             if (this.modelToRender != model) {
                 if (model != null) {
                     if (model.ModelClassName != null) {
+#if DEV_BUILD
                         this.childStructure = model.GetChildStructure();
+#endif
                     }
                     else {
                         // When ModelClassName is null, means we're having a deserialized default element here
