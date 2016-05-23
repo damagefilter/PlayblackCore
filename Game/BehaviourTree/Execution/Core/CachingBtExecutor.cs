@@ -9,13 +9,13 @@ namespace Playblack.BehaviourTree.Execution.Core {
     /// </summary>
     public class CachingBtExecutor : IBTExecutor {
 
-        private ModelTask modelBT;
+        private ModelTask rootModel;
 
         private ExecutionTask executionBT;
 
-        private ICollection<ExecutionTask> tickableTasks;
-        private ICollection<ExecutionTask> tickableTasksInsertionQueue;
-        private ICollection<ExecutionTask> tickableTasksDeletionQueue;
+        private IList<ExecutionTask> tickableTasks;
+        private IList<ExecutionTask> tickableTasksInsertionQueue;
+        private IList<ExecutionTask> tickableTasksDeletionQueue;
         // TODO: Add collection of execution interrupters for interrupter models
 
         /// <summary>
@@ -40,12 +40,12 @@ namespace Playblack.BehaviourTree.Execution.Core {
             if (context == null) {
                 throw new NullReferenceException("Input DataContext is null but must not!");
             }
-            this.modelBT = modelBT;
-            this.modelBT.ComputePositions();
+            this.rootModel = modelBT;
+            this.rootModel.ComputePositions();
             this.context = context;
-            this.tickableTasks = new LinkedList<ExecutionTask>();
-            this.tickableTasksDeletionQueue = new LinkedList<ExecutionTask>();
-            this.tickableTasksInsertionQueue = new LinkedList<ExecutionTask>();
+            this.tickableTasks = new List<ExecutionTask>();
+            this.tickableTasksDeletionQueue = new List<ExecutionTask>();
+            this.tickableTasksInsertionQueue = new List<ExecutionTask>();
             this.taskStates = new Dictionary<Position, DataContext>();
         }
 
@@ -54,11 +54,11 @@ namespace Playblack.BehaviourTree.Execution.Core {
                 throw new NullReferenceException("Input ModelTask is null, but must not!");
             }
 
-            this.modelBT = modelBT;
+            this.rootModel = modelBT;
             this.context = new DataContext();
-            this.tickableTasks = new LinkedList<ExecutionTask>();
-            this.tickableTasksDeletionQueue = new LinkedList<ExecutionTask>();
-            this.tickableTasksInsertionQueue = new LinkedList<ExecutionTask>();
+            this.tickableTasks = new List<ExecutionTask>();
+            this.tickableTasksDeletionQueue = new List<ExecutionTask>();
+            this.tickableTasksInsertionQueue = new List<ExecutionTask>();
             this.taskStates = new Dictionary<Position, DataContext>();
         }
 
@@ -74,13 +74,13 @@ namespace Playblack.BehaviourTree.Execution.Core {
             if (currentStatus == TaskStatus.RUNNING || currentStatus == TaskStatus.UNINITIALISED) {
                 this.ProcessQueues();
                 if (!this.isInitialised) {
-                    this.executionBT = this.modelBT.CreateExecutor(this, null);
+                    this.executionBT = this.rootModel.CreateExecutor(this, null);
                     this.executionBT.Spawn(this.context);
                     this.isInitialised = true;
                 }
                 else {
-                    foreach (var t in tickableTasks) {
-                        t.Tick();
+                    for (int i = 0; i < tickableTasks.Count; ++i) {
+                        tickableTasks[i].Tick();
                     }
                 }
             }
@@ -93,7 +93,7 @@ namespace Playblack.BehaviourTree.Execution.Core {
         }
 
         public ModelTask GetBehaviourTree() {
-            return this.modelBT;
+            return this.rootModel;
         }
 
         public TaskStatus GetStatus() {
@@ -125,10 +125,6 @@ namespace Playblack.BehaviourTree.Execution.Core {
 
         public void RequestTickableRemoval(ExecutionTask task) {
             tickableTasksDeletionQueue.Add(task);
-        }
-
-        public void CopyTaskStates(CachingBtExecutor executor) {
-            this.taskStates = executor.taskStates;
         }
 
         private void ProcessQueues() {

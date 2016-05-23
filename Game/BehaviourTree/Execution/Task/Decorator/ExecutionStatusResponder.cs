@@ -11,7 +11,7 @@ namespace Playblack.BehaviourTree.Execution.Task.Decorator {
         private ExecutionTask decoratedExecutor;
 
         private ModelTask successModel, failModel;
-        private bool doNotTick;
+        private bool doNotTick, failed;
 
         public ExecutionStatusResponder(ModelTask modelTask, IBTExecutor executor, ExecutionTask parent) : base(modelTask, executor, parent) {
             if (!(modelTask is ModelStatusResponder)) {
@@ -27,48 +27,46 @@ namespace Playblack.BehaviourTree.Execution.Task.Decorator {
 
         protected override void InternalSpawn() {
             this.decoratedExecutor = ((ModelDecorator)this.ModelTask).GetChild().CreateExecutor(this.BTExecutor, this);
-            this.decoratedExecutor.AddTaskListener(this);
+            // This saves us, depending on situation, a lot of cpu time when we don't have to check
+            // for the decorated executor status and run through a lot of decisions on each tick.
+            // It may return running for a lot of ticks so better listen for when it actually changes
+            this.decoratedExecutor.AddTaskStatusChangedCallback(this.DecoratedExecutorStatusChange);
             this.decoratedExecutor.Spawn(this.GetGlobalContext());
+            // while not ticking return running
+            doNotTick = true;
+            failed = false; // if failed, return failed
             this.successModel = this.ModelTask.Children[1];
             this.failModel = this.ModelTask.Children[2];
             if (successModel == null && failModel == null) {
-                doNotTick = true;
                 throw new ArgumentException("At least one condition must be handled by a model in StatusResponder! Both were null!");
+            }
+        }
+
+        private void DecoratedExecutorStatusChange(TaskEvent e) {
+            executingCondition = null;
+            if ((e.NewStatus == TaskStatus.FAILURE || e.NewStatus == TaskStatus.TERMINATED) && failModel != null) {
+                this.executingCondition = failModel.CreateExecutor(this.BTExecutor, this);
+            }
+            else if (e.NewStatus == TaskStatus.SUCCESS && successModel != null) {
+                this.executingCondition = successModel.CreateExecutor(this.BTExecutor, this);
+            }
+
+            if (executingCondition != null) {
+                executingCondition.Spawn(this.GetGlobalContext());
+                doNotTick = false;
+                failed = true;
             }
         }
 
         protected override TaskStatus InternalTick() {
             if (doNotTick) {
-                return TaskStatus.FAILURE;
-            }
-            // While the decorated executor is still running, do nothing.
-            var childStatus = this.decoratedExecutor.GetStatus();
-            if (childStatus == TaskStatus.RUNNING) {
                 return TaskStatus.RUNNING;
             }
+            else if (failed) {
+                return TaskStatus.FAILURE;
+            }
             else {
-                // Once the decorated executor is finished, analyse the result and assign the fail or success model and return for now
-                if (executingCondition == null) {
-                    if (childStatus == TaskStatus.FAILURE || childStatus == TaskStatus.TERMINATED) {
-                        if (failModel == null) {
-                            return childStatus;
-                        }
-                        executingCondition = failModel.CreateExecutor(this.BTExecutor, this);
-                    }
-                    else {
-                        if (successModel == null) {
-                            return TaskStatus.SUCCESS;
-                        }
-                        executingCondition = successModel.CreateExecutor(this.BTExecutor, this);
-                    }
-                    executingCondition.AddTaskListener(this);
-                    executingCondition.Spawn(this.GetGlobalContext());
-                    return TaskStatus.RUNNING;
-                }
-                else {
-                    // the fail or success model was assigned, return its status
-                    return this.executingCondition.GetStatus();
-                }
+                return this.executingCondition.GetStatus();
             }
         }
 
@@ -87,10 +85,6 @@ namespace Playblack.BehaviourTree.Execution.Task.Decorator {
 
         protected override DataContext StoreTerminationState() {
             return null;
-        }
-
-        public override void OnChildStatusChanged(TaskEvent e) {
-            this.Tick();
         }
     }
 }

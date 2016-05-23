@@ -43,7 +43,6 @@ namespace Playblack.BehaviourTree.Execution.Task.Composite {
             this.activeChildIndex = 0;
             this.children = this.ModelTask.Children;
             this.activeChild = this.children[this.activeChildIndex].CreateExecutor(this.BTExecutor, this);
-            this.activeChild.AddTaskListener(this);
             this.activeChild.Spawn(this.GetGlobalContext());
         }
 
@@ -63,10 +62,8 @@ namespace Playblack.BehaviourTree.Execution.Task.Composite {
                 else {
                     this.activeChildIndex++;
                     if (this.activeChild != null) {
-                        this.activeChild.RemoveTaskListener(this);
                     }
                     this.activeChild = this.children[this.activeChildIndex].CreateExecutor(this.BTExecutor, this);
-                    this.activeChild.AddTaskListener(this);
                     this.activeChild.Spawn(this.GetGlobalContext());
                     return TaskStatus.RUNNING;
                 }
@@ -81,10 +78,6 @@ namespace Playblack.BehaviourTree.Execution.Task.Composite {
         protected override DataContext StoreTerminationState() {
             // not doing a thing
             return null;
-        }
-
-        public override void OnChildStatusChanged(TaskEvent e) {
-            this.Tick();
         }
 
         protected override void InternalTerminate() {

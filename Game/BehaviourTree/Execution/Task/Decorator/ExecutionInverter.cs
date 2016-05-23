@@ -23,7 +23,6 @@ namespace Playblack.BehaviourTree.Execution.Task.Decorator {
 
         protected override void InternalSpawn() {
             this.child = ((ModelDecorator)this.ModelTask).GetChild().CreateExecutor(this.BTExecutor, this);
-            this.child.AddTaskListener(this);
             this.child.Spawn(this.GetGlobalContext());
         }
 
@@ -50,10 +49,6 @@ namespace Playblack.BehaviourTree.Execution.Task.Decorator {
 
         protected override DataContext StoreTerminationState() {
             return null;
-        }
-
-        public override void OnChildStatusChanged(TaskEvent e) {
-            this.Tick();
         }
     }
 }

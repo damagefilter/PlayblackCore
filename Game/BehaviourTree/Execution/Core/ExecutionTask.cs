@@ -5,7 +5,10 @@ using Playblack.BehaviourTree.Model.Core;
 using System.Collections.Generic;
 
 namespace Playblack.BehaviourTree.Execution.Core {
-    public abstract class ExecutionTask : ITaskListener {
+    public abstract class ExecutionTask {
+
+        public delegate void TaskStatusChanged(TaskEvent e);
+
         private ModelTask modelTask;
         public ModelTask ModelTask {
             get {
@@ -20,7 +23,7 @@ namespace Playblack.BehaviourTree.Execution.Core {
         }
         private DataContext globalContext;
 
-        private ICollection<ITaskListener> listeners;
+        private TaskStatusChanged listeners;
 
         private TaskStatus status;
 
@@ -42,7 +45,6 @@ namespace Playblack.BehaviourTree.Execution.Core {
         public ExecutionTask(ModelTask modelTask, IBTExecutor executor, ExecutionTask parent) {
             this.modelTask = modelTask;
             this.executor = executor;
-            this.listeners = new LinkedList<ITaskListener>();
             this.spawnable = true;
             this.tickable = false;
             this.status = TaskStatus.UNINITIALISED;
@@ -74,6 +76,8 @@ namespace Playblack.BehaviourTree.Execution.Core {
             this.RestoreStateFromContext(this.modelTask.Context);
             DataContext previousState = this.executor.GetTaskState(this.position);
             this.RestoreState(previousState);
+            // Add to the insertion queue. The InternalSpawn process may remove it again
+            // If the task does not need ticking.
             this.executor.RequestTickableInsertion(this);
             // Do the specific spawning thing
             InternalSpawn();
@@ -96,15 +100,13 @@ namespace Playblack.BehaviourTree.Execution.Core {
             if (!ValidateInternalTickStatus(newStatus)) {
                 throw new IllegalReturnStatusException(newStatus + " cannot be returned by ExecutionTask.InternalTick()");
             }
-            this.status = newStatus;
-
+            
             if (newStatus != TaskStatus.RUNNING) {
-                DataContext taskState = StoreState();
-                this.executor.SetTaskState(this.position, taskState);
+                this.executor.SetTaskState(this.position, StoreState());
                 this.executor.RequestTickableRemoval(this);
-
-                FireTaskEvent(newStatus);
+                BroadcastTaskStatusChange(newStatus);
             }
+            this.status = newStatus;
             return newStatus;
         }
 
@@ -142,12 +144,12 @@ namespace Playblack.BehaviourTree.Execution.Core {
             return this.globalContext;
         }
 
-        public void AddTaskListener(ITaskListener listener) {
-            this.listeners.Add(listener);
+        public void AddTaskStatusChangedCallback(TaskStatusChanged listener) {
+            this.listeners += listener;
         }
 
-        public void RemoveTaskListener(ITaskListener listener) {
-            this.listeners.Remove(listener);
+        public void RemoveTaskStatusChanged(TaskStatusChanged listener) {
+            this.listeners -= listener;
         }
 
         public void Terminate() {
@@ -158,8 +160,7 @@ namespace Playblack.BehaviourTree.Execution.Core {
                 this.terminated = true;
                 this.status = TaskStatus.TERMINATED;
                 this.executor.RequestTickableRemoval(this);
-                var taskContext = this.StoreTerminationState();
-                this.executor.SetTaskState(this.position, taskContext);
+                this.executor.SetTaskState(this.position, this.StoreState());
             }
         }
 
@@ -386,12 +387,14 @@ namespace Playblack.BehaviourTree.Execution.Core {
             return 0;
         }
 
-        private void FireTaskEvent(TaskStatus newStatus) {
-            foreach (ITaskListener l in this.listeners) {
-                l.OnChildStatusChanged(new TaskEvent(this, newStatus, this.GetStatus()));
+        /// <summary>
+        /// Called before the task status will be set.
+        /// </summary>
+        /// <param name="newStatus"></param>
+        private void BroadcastTaskStatusChange(TaskStatus newStatus) {
+            if (this.listeners != null) {
+                this.listeners(new TaskEvent(this, newStatus, this.GetStatus()));
             }
         }
-
-        public abstract void OnChildStatusChanged(TaskEvent e);
     }
 }
