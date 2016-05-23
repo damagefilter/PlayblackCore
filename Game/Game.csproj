@@ -56,7 +56,6 @@
     <Compile Include="BehaviourTree\Exceptions\IllegalReturnStatusException.cs" />
     <Compile Include="BehaviourTree\Exceptions\NotTickableException.cs" />
     <Compile Include="BehaviourTree\Exceptions\SpawnException.cs" />
-    <Compile Include="BehaviourTree\Execution\Core\Events\ITaskListener.cs" />
     <Compile Include="BehaviourTree\Execution\Core\Events\TaskEvent.cs" />
     <Compile Include="BehaviourTree\Execution\Core\ExecutionTask.cs" />
     <Compile Include="BehaviourTree\Execution\Core\IBTExecutor.cs" />
