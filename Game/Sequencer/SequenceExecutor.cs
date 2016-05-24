@@ -4,12 +4,13 @@ using System.Collections.Generic;
 using Playblack.BehaviourTree.Execution.Core;
 using Playblack.Csp;
 using Playblack.BehaviourTree;
+using System.Collections;
 
 namespace Playblack.Sequencer {
     /// <summary>
     /// Executes a behaviour tree of some description.
     /// </summary>
-    [OutputAware("OnExecutionFinish", "OnExecutionTrigger")]
+    [OutputAware("OnExecutionFinish", "OnExecutionTrigger", "OnExecutionTerminated")]
     public class SequenceExecutor : MonoBehaviour {
         [SerializeField]
         private List<ValueField> globalDataContext;
@@ -43,37 +44,39 @@ namespace Playblack.Sequencer {
 
         public void Start() {
             this.executor = this.GetExecutor();
-            if (sequenceContainer.TypeOfExecution == ExecutionType.ON_START_ONCE || sequenceContainer.TypeOfExecution == ExecutionType.ON_START_PARALLEL) {
-                this.executor.Tick();
+            if (sequenceContainer.TypeOfExecution == ExecutionType.AUTO) {
+                StartCoroutine("TickExecutorParallel");
             }
         }
 
-        public void Update() {
-            if ((sequenceContainer.TypeOfExecution == ExecutionType.ON_START_PARALLEL) || (sequenceContainer.TypeOfExecution == ExecutionType.TRIGGER_PARALLEL && wasTriggered)) {
-                if (this.executor == null) {
-                    this.executor = this.GetExecutor();
-                }
-                if (this.executor.GetStatus() == TaskStatus.SUCCESS || this.executor.GetStatus() == TaskStatus.FAILURE) {
-                    this.executor.Terminate();
-                    this.FireOutput("OnExecutionFinish");
-                }
-                else {
-                    this.executor.Tick();
-                }
+        /// <summary>
+        /// Instead of update we use this.
+        /// It's started as coroutine making the BT more or less parallel
+        /// and also saves the overhead of calling Update from engine code.
+        /// </summary>
+        /// <returns></returns>
+        private IEnumerator TickExecutorParallel() {
+            var status = this.executor.GetStatus();
+            if (status == TaskStatus.SUCCESS || status == TaskStatus.FAILURE) {
+                this.executor.Terminate();
+                this.FireOutput("OnExecutionFinish");
+                StopCoroutine("TickExecutorParallel");
+            }
+            else {
+                this.executor.Tick();
+                yield return new WaitForFixedUpdate();
             }
         }
 
         [InputFunc("TriggerExecution")]
         private void TriggerExecution() {
-            this.wasTriggered = true;
-            if (sequenceContainer.TypeOfExecution == ExecutionType.TRIGGER_ONCE) {
+            if (this.sequenceContainer.TypeOfExecution == ExecutionType.TRIGGER) {
                 if (this.executor == null) {
                     this.executor = this.GetExecutor();
                 }
-                this.executor.Tick();
-                ranOnce = true;
+                StartCoroutine("TickExecutorParallel");
+                this.FireOutput("OnExecutionTrigger");
             }
-            this.FireOutput("OnExecutionTrigger");
         }
 
         [InputFunc("ResetSequencer")]
@@ -82,6 +85,16 @@ namespace Playblack.Sequencer {
                 return; // nothing to reset
             }
             this.executor.Reset();
+        }
+
+        [InputFunc("Terminate")]
+        public void TerminateBT() {
+            if (this.executor == null) {
+                return; // nothing to reset
+            }
+            this.executor.Terminate();
+            StopCoroutine("TickExecutorParallel");
+            this.FireOutput("OnExecutionTerminated");
         }
     }
 }
