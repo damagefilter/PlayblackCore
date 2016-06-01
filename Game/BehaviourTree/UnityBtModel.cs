@@ -99,7 +99,7 @@ namespace Playblack.BehaviourTree {
                     return mtInstance;
                 }
                 // First: introspect the class to see if it's one we can work with
-                var type = Type.GetType(this.modelClassName);
+                var type = this.ModelType;
                 //if (!type.IsAssignableFrom(typeof(ModelTask))) { 
                 if (!typeof(ModelTask).IsAssignableFrom(type)) {
                     throw new ArgumentException("'" + type + "' is not a ModelTask object. I don't know how to use it. Fix it.");

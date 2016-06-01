@@ -195,7 +195,7 @@ namespace Playblack.Editor.Csp {
     }
 
     struct OutputConfig {
-        public int outputIndex, componentIndex, inputIndex;
+        public int outputIndex;
         public string targetName;
         public SignalDataCache cache;
 

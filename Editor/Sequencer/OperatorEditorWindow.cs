@@ -1,10 +1,6 @@
 ﻿using Playblack.BehaviourTree;
 using PlayBlack.Editor.Sequencer.Renderers;
 using PlayBlack.Editor.Windows;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 
 namespace PlayBlack.Editor.Sequencer {
 

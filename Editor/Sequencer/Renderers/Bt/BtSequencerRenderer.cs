@@ -110,6 +110,7 @@ namespace PlayBlack.Editor.Sequencer.Renderers.Bt {
         public void RenderEditOperatorButton(string label, UnityBtModel referenceObject, UnityBtModel referenceParentObject, IOperatorRenderer<UnityBtModel> operatorRenderer) {
             EditorGUILayout.BeginHorizontal();
             {
+                var opr = operatorRenderer as DefaultRenderer;
                 var indent = EditorGUI.indentLevel;
                 EditorGUI.indentLevel = this.IndentLevel;
                 if (referenceParentObject != null) {

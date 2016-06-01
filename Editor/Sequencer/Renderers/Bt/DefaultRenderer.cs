@@ -39,7 +39,7 @@ namespace PlayBlack.Editor.Sequencer.Renderers.Bt {
             int indent = sequenceRenderer.IndentLevel;
             sequenceRenderer.RenderEditOperatorButton(modelToRender.DisplayName, modelToRender, parentModel, this);
             sequenceRenderer.IndentLevel += 10;
-            var r = new DefaultRenderer(); // used to render children. Effectively causes each operator to have one renderer
+            
             foreach (var kvp in childStructure) {
                 // in the default list we ignore insert indexes and just render the whole list then cancel any further rendering
                 if (kvp.Name == "default") {
@@ -51,9 +51,20 @@ namespace PlayBlack.Editor.Sequencer.Renderers.Bt {
                             modelToRender.children.RemoveAt(i);
                             // Stuff is shifted down when removing at index, so count from that index again
                             i--;
+                            Debug.Log("Removed null child in default list");
                             continue;
                         }
                         else {
+                            DefaultRenderer r = null;
+                            if (childRenderers.Count > i + 1) {
+                                r = childRenderers[i];
+                            }
+                            else {
+                                while (childRenderers.Count < i + 1) { // index is 0-based, count is not, so add one. Just sayin.
+                                    childRenderers.Add(new DefaultRenderer());
+                                }
+                                r = childRenderers[i];
+                            }
                             // If child already exists, just draw it
                             r.SetSubjects(modelToRender.children[i], modelToRender);
                             r.ResetToDefaults(); // Reset scrollpos and folded stuff to avoid confusion
@@ -80,6 +91,16 @@ namespace PlayBlack.Editor.Sequencer.Renderers.Bt {
                     sequenceRenderer.RenderAddOperatorButton(modelToRender, kvp.InsertIndex);
                 }
                 else {
+                    DefaultRenderer r = null;
+                    if (childRenderers.Count < kvp.InsertIndex + 1) {
+                        r = childRenderers[kvp.InsertIndex];
+                    }
+                    else {
+                        while (childRenderers.Count < kvp.InsertIndex + 1) { // index is 0-based, count is not, so add one. Just sayin.
+                            childRenderers.Add(new DefaultRenderer());
+                        }
+                        r = childRenderers[kvp.InsertIndex];
+                    }
                     // Operator already exists, draw that one
                     r.SetSubjects(modelToRender.children[kvp.InsertIndex], modelToRender);
                     r.ResetToDefaults(); // Reset scrollpos and folded stuff to avoid confusion
@@ -167,20 +188,23 @@ namespace PlayBlack.Editor.Sequencer.Renderers.Bt {
             // this.DrawRemoveButton();
         }
 
+        private List<DefaultRenderer> childRenderers;
         public void SetSubjects(params UnityBtModel[] subjects) {
             var model = subjects[0];
             if (this.modelToRender != model) {
                 if (model != null) {
                     if (model.ModelClassName != null) {
-#if DEV_BUILD
                         this.childStructure = model.GetChildStructure();
-#endif
                     }
                     else {
                         // When ModelClassName is null, means we're having a deserialized default element here
                         // which is due to specification limitations in protobuf (it doesn't know null references)
                         // Anyhow, in such case this means what we actually want to render is a null value (empty slot in parent object)
                         model = null;
+                    }
+                    if (model.children.Count > 0) {
+                        // Pre-create all renderers for the models children.
+                        this.childRenderers = new List<DefaultRenderer>(model.children.Count);
                     }
                 }
                 this.modelToRender = model;

@@ -36,7 +36,7 @@ namespace Playblack.Sequencer {
 
         private bool wasTriggered;
 
-        private bool ranOnce;
+        private bool running;
 
         public IBTExecutor GetExecutor() {
             return sequenceContainer.GetExecutor(new DataContext(globalDataContext), actor);
@@ -45,6 +45,7 @@ namespace Playblack.Sequencer {
         public void Start() {
             this.executor = this.GetExecutor();
             if (sequenceContainer.TypeOfExecution == ExecutionType.AUTO) {
+                running = true;
                 StartCoroutine("TickExecutorParallel");
             }
         }
@@ -56,16 +57,21 @@ namespace Playblack.Sequencer {
         /// </summary>
         /// <returns></returns>
         private IEnumerator TickExecutorParallel() {
-            var status = this.executor.GetStatus();
-            if (status == TaskStatus.SUCCESS || status == TaskStatus.FAILURE) {
-                this.executor.Terminate();
-                this.FireOutput("OnExecutionFinish");
-                StopCoroutine("TickExecutorParallel");
+            while (running) {
+                var status = this.executor.GetStatus();
+                if (status == TaskStatus.SUCCESS || status == TaskStatus.FAILURE) {
+                    Debug.Log("Terminating Sequence Executor. Status is " + status);
+                    this.executor.Terminate();
+                    this.FireOutput("OnExecutionFinish");
+                    running = false;
+                    StopCoroutine("TickExecutorParallel");
+                }
+                else {
+                    this.executor.Tick();
+                    yield return 0;
+                }
             }
-            else {
-                this.executor.Tick();
-                yield return new WaitForFixedUpdate();
-            }
+            
         }
 
         [InputFunc("TriggerExecution")]
@@ -74,8 +80,11 @@ namespace Playblack.Sequencer {
                 if (this.executor == null) {
                     this.executor = this.GetExecutor();
                 }
-                StartCoroutine("TickExecutorParallel");
-                this.FireOutput("OnExecutionTrigger");
+                if (!running) {
+                    StartCoroutine("TickExecutorParallel");
+                    this.FireOutput("OnExecutionTrigger");
+                    running = true;
+                }
             }
         }
 
@@ -94,6 +103,7 @@ namespace Playblack.Sequencer {
             }
             this.executor.Terminate();
             StopCoroutine("TickExecutorParallel");
+            running = false;
             this.FireOutput("OnExecutionTerminated");
         }
     }

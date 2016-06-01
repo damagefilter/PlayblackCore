@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 14
-VisualStudioVersion = 14.0.25123.0
+VisualStudioVersion = 14.0.24720.0
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Game", "Game\Game.csproj", "{5E7B8F9A-D911-4F06-936E-00ABF1D1C670}"
 EndProject
@@ -10,15 +10,24 @@ EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
+		Release Develop|Any CPU = Release Develop|Any CPU
+		Release Distribution|Any CPU = Release Distribution|Any CPU
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
 		{5E7B8F9A-D911-4F06-936E-00ABF1D1C670}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{5E7B8F9A-D911-4F06-936E-00ABF1D1C670}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5E7B8F9A-D911-4F06-936E-00ABF1D1C670}.Release Develop|Any CPU.ActiveCfg = Release Develop|Any CPU
+		{5E7B8F9A-D911-4F06-936E-00ABF1D1C670}.Release Develop|Any CPU.Build.0 = Release Develop|Any CPU
+		{5E7B8F9A-D911-4F06-936E-00ABF1D1C670}.Release Distribution|Any CPU.ActiveCfg = Release Distribution|Any CPU
+		{5E7B8F9A-D911-4F06-936E-00ABF1D1C670}.Release Distribution|Any CPU.Build.0 = Release Distribution|Any CPU
 		{5E7B8F9A-D911-4F06-936E-00ABF1D1C670}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{5E7B8F9A-D911-4F06-936E-00ABF1D1C670}.Release|Any CPU.Build.0 = Release|Any CPU
 		{C580C8DE-FD0C-457E-B016-E5121BD07B45}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{C580C8DE-FD0C-457E-B016-E5121BD07B45}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C580C8DE-FD0C-457E-B016-E5121BD07B45}.Release Develop|Any CPU.ActiveCfg = Release Develop|Any CPU
+		{C580C8DE-FD0C-457E-B016-E5121BD07B45}.Release Develop|Any CPU.Build.0 = Release Develop|Any CPU
+		{C580C8DE-FD0C-457E-B016-E5121BD07B45}.Release Distribution|Any CPU.ActiveCfg = Release Distribution|Any CPU
 		{C580C8DE-FD0C-457E-B016-E5121BD07B45}.Release|Any CPU.ActiveCfg = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
