@@ -23,5 +23,11 @@ namespace PlayBlack.Editor.Sequencer.Renderers {
         /// </summary>
         /// <param name="subject"></param>
         void SetSubjects(params TRenderType[] subject);
+
+        /// <summary>
+        /// Returns the primary rendering subject
+        /// </summary>
+        /// <returns></returns>
+        TRenderType GetSubjectToRender();
     }
 }

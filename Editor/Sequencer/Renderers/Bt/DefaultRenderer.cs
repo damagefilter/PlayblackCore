@@ -37,7 +37,7 @@ namespace PlayBlack.Editor.Sequencer.Renderers.Bt {
                 return;
             }
             int indent = sequenceRenderer.IndentLevel;
-            sequenceRenderer.RenderEditOperatorButton(modelToRender.DisplayName, modelToRender, parentModel, this);
+            sequenceRenderer.RenderEditOperatorButton(modelToRender.CodeViewDisplay, modelToRender, parentModel, this);
             sequenceRenderer.IndentLevel += 10;
             
             foreach (var kvp in childStructure) {
@@ -214,7 +214,7 @@ namespace PlayBlack.Editor.Sequencer.Renderers.Bt {
             }
         }
 
-        public UnityBtModel GetModelToRender() {
+        public UnityBtModel GetSubjectToRender() {
             return this.modelToRender;
         }
 

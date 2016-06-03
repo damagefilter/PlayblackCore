@@ -34,8 +34,6 @@ namespace Playblack.Sequencer {
 
         private IBTExecutor executor;
 
-        private bool wasTriggered;
-
         private bool running;
 
         public IBTExecutor GetExecutor() {

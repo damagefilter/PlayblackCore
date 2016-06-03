@@ -57,7 +57,7 @@ namespace PlayBlack.Editor.Sequencer.Renderers.Bt {
         public void DoRenderLoop() {
             // Important note: We don't render the root model as it is always a sequence.
             // we're just adding to it if appropriate
-            var mr = operatorRenderer.GetModelToRender();
+            var mr = operatorRenderer.GetSubjectToRender();
             operatorRenderer.SetSubjects(mr);
             operatorRenderer.RenderCodeView(this);
             ProcessCorruptedModels(mr);

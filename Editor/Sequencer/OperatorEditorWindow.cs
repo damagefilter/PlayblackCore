@@ -1,5 +1,6 @@
 ﻿using Playblack.BehaviourTree;
 using PlayBlack.Editor.Sequencer.Renderers;
+using PlayBlack.Editor.Sequencer.Renderers.Bt;
 using PlayBlack.Editor.Windows;
 
 namespace PlayBlack.Editor.Sequencer {
@@ -30,6 +31,12 @@ namespace PlayBlack.Editor.Sequencer {
             if (this.OperatorRenderer != null) {
                 this.OperatorRenderer.RenderEditorWindowView(SequencerRenderer);
             }
+        }
+
+        public void OnDestroy() {
+            // Called when closed
+            this.OperatorRenderer.GetSubjectToRender().UpdateCodeViewDisplay();
+            UnityEngine.Debug.Log("Closing Operator Editor Window");
         }
     }
 }

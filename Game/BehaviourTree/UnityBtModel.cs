@@ -6,6 +6,7 @@ using Playblack.Extensions;
 using ProtoBuf;
 using UnityEngine;
 using Fasterflect;
+using Playblack.Sequencer;
 
 namespace Playblack.BehaviourTree {
 
@@ -49,22 +50,6 @@ namespace Playblack.BehaviourTree {
                 if ((children.Count == 0 || children.Count < proposedNumChildren) && proposedNumChildren != -1) {
                     this.ResizeChildren(true);
                 }
-            }
-        }
-
-        public Type ModelType {
-            get {
-                var type = Type.GetType(this.modelClassName);
-                if (type != null) {
-                    return type;
-                }
-                foreach (var a in AppDomain.CurrentDomain.GetAssemblies()) {
-                    type = a.GetType(this.modelClassName);
-                    if (type != null) {
-                        return type;
-                    }
-                }
-                return null;
             }
         }
 
@@ -114,7 +99,60 @@ namespace Playblack.BehaviourTree {
                 return mt;
             }
         }
-        
+
+        public Type ModelType {
+            get {
+                var type = Type.GetType(this.modelClassName);
+                if (type != null) {
+                    return type;
+                }
+                foreach (var a in AppDomain.CurrentDomain.GetAssemblies()) {
+                    type = a.GetType(this.modelClassName);
+                    if (type != null) {
+                        return type;
+                    }
+                }
+                return null;
+            }
+        }
+#if UNITY_EDITOR
+        private string cachedCodeViewDisplay;
+        public string CodeViewDisplay {
+            get {
+                if (cachedCodeViewDisplay == null) {
+                    UpdateCodeViewDisplay();
+                }
+                return cachedCodeViewDisplay;
+            }
+
+        }
+
+        public void UpdateCodeViewDisplay() {
+            if (contextData == null || contextData.Count == 0) {
+                cachedCodeViewDisplay = this.DisplayName;
+                return;
+            }
+            var t = ModelType;
+            if (t == null) {
+                // There's nothing yet, use displayname if any
+                // otherwise stuff is just null.
+                cachedCodeViewDisplay = this.DisplayName;
+                return;
+            }
+            var attrib = t.Attribute<CodeViewFormattingHintAttribute>();
+            if (attrib == null) {
+                cachedCodeViewDisplay = this.DisplayName;
+                return;
+            }
+
+            var theString = attrib.Format;
+            foreach (var valueField in this.contextData) {
+                theString = theString.Replace("{" + valueField.Name + "}", valueField.UnityValue);
+            }
+            cachedCodeViewDisplay = theString;
+        }
+#endif
+
         public static UnityBtModel NewInstance(UnityBtModel parent) {
             var model = new UnityBtModel();
             model.children = new List<UnityBtModel>();
