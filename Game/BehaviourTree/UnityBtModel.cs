@@ -147,7 +147,11 @@ namespace Playblack.BehaviourTree {
 
             var theString = attrib.Format;
             foreach (var valueField in this.contextData) {
-                theString = theString.Replace("{" + valueField.Name + "}", valueField.UnityValue);
+                string valueString = valueField.UnityValue;
+                if (!string.IsNullOrEmpty(valueString) && valueString.Length > 50) {
+                    valueString = valueString.Substring(0, 47) + "...";
+                }
+                theString = theString.Replace("{" + valueField.Name + "}", valueString);
             }
             cachedCodeViewDisplay = theString;
         }

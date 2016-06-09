@@ -92,7 +92,7 @@ namespace PlayBlack.Editor.Sequencer.Renderers.Bt {
                 }
                 else {
                     DefaultRenderer r = null;
-                    if (childRenderers.Count < kvp.InsertIndex + 1) {
+                    if (childRenderers.Count >= kvp.InsertIndex + 1) {
                         r = childRenderers[kvp.InsertIndex];
                     }
                     else {
@@ -175,7 +175,7 @@ namespace PlayBlack.Editor.Sequencer.Renderers.Bt {
                                 data.Value = EditorGUILayout.TextField(data.UnityValue, GUILayout.Width(150));
                                 break;
                             case Playblack.BehaviourTree.ValueType.TEXT:
-                                data.Value = EditorGUILayout.TextField(data.UnityValue, GUILayout.Width(150), GUILayout.Height(50));
+                                data.Value = EditorGUILayout.TextArea(data.UnityValue, GUILayout.Width(150), GUILayout.Height(50));
                                 break;
                         }
                     }
@@ -202,9 +202,15 @@ namespace PlayBlack.Editor.Sequencer.Renderers.Bt {
                         // Anyhow, in such case this means what we actually want to render is a null value (empty slot in parent object)
                         model = null;
                     }
-                    if (model.children.Count > 0) {
-                        // Pre-create all renderers for the models children.
+                    if (model != null && model.children != null && model.children.Count > 0) {
                         this.childRenderers = new List<DefaultRenderer>(model.children.Count);
+                        // Pre-create all renderers for the models children.
+                        for (int i = 0; i < model.children.Count; ++i) {
+                            this.childRenderers.Add(new DefaultRenderer());
+                        }
+                    }
+                    else {
+                        this.childRenderers = new List<DefaultRenderer>(3);
                     }
                 }
                 this.modelToRender = model;
