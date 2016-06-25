@@ -17,6 +17,7 @@ namespace Playblack.Sequencer {
 
         // Should work with savegame and unity serializer
         [SerializeField]
+        [HideInInspector] // Will be handled by the sequencer editor panel
         private SequenceContainer sequenceContainer;
 
         public SequenceContainer SequenceCommands {
@@ -62,7 +63,6 @@ namespace Playblack.Sequencer {
                     this.executor.Terminate();
                     this.FireOutput("OnExecutionFinish");
                     running = false;
-                    StopCoroutine("TickExecutorParallel");
                 }
                 else {
                     this.executor.Tick();
@@ -73,15 +73,15 @@ namespace Playblack.Sequencer {
         }
 
         [InputFunc("TriggerExecution")]
-        private void TriggerExecution() {
+        public void TriggerExecution() {
             if (this.sequenceContainer.TypeOfExecution == ExecutionType.TRIGGER) {
                 if (this.executor == null) {
                     this.executor = this.GetExecutor();
                 }
                 if (!running) {
+                    running = true;
                     StartCoroutine("TickExecutorParallel");
                     this.FireOutput("OnExecutionTrigger");
-                    running = true;
                 }
             }
         }
@@ -94,7 +94,7 @@ namespace Playblack.Sequencer {
             this.executor.Reset();
         }
 
-        [InputFunc("Terminate")]
+        [InputFunc("TerminateBT", DisplayName = "Terminate")]
         public void TerminateBT() {
             if (this.executor == null) {
                 return; // nothing to reset
