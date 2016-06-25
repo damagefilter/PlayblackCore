@@ -28,11 +28,11 @@ namespace PlayBlack.Editor.Sequencer {
         /// </summary>
         private DescriptorType displayedOperators;
 
-        private List<Type> knownAiOperators;
+        private static List<Type> knownAiOperators;
 
-        private List<Type> knownLogicOperators;
+        private static List<Type> knownLogicOperators;
 
-        private List<Type> knownGameplayOperators;
+        private static List<Type> knownGameplayOperators;
 
         public override string GetTitle() {
             return "Operator Selector";
@@ -44,17 +44,24 @@ namespace PlayBlack.Editor.Sequencer {
             // Very expensive this.
             // var m2r = OperatorNamespaceRegister.Instance;
             // This properly reads all the model types from everything in and below the Assets.src.ai.behaviourtree namespace
-            var aiTypes = AppDomain.CurrentDomain.GetAssemblies()
-                .SelectMany(t => t.GetTypes())
-                    .Where(t => {
-                        bool typeValid = t.IsClass && !t.IsAbstract;
-                        var attr = t.Attribute<ModelDataDescriptorAttribute>();
-                        bool hasDescriptor = attr != null && attr.DescriptorType == DescriptorType.AI;
-                        return typeValid && hasDescriptor && t.IsSubclassOf(typeof(ModelTask));
-                    });
-            this.knownAiOperators = aiTypes.ToList();
+            FetchOperatorList(false);
+        }
 
-            var sequenceTypes = AppDomain.CurrentDomain.GetAssemblies()
+        private void FetchOperatorList(bool forceNew) {
+            if (knownAiOperators == null || forceNew) {
+                var aiTypes = AppDomain.CurrentDomain.GetAssemblies()
+                            .SelectMany(t => t.GetTypes())
+                                .Where(t => {
+                                    bool typeValid = t.IsClass && !t.IsAbstract;
+                                    var attr = t.Attribute<ModelDataDescriptorAttribute>();
+                                    bool hasDescriptor = attr != null && attr.DescriptorType == DescriptorType.AI;
+                                    return typeValid && hasDescriptor && t.IsSubclassOf(typeof(ModelTask));
+                                });
+                knownAiOperators = aiTypes.ToList();
+            }
+            
+            if (knownLogicOperators == null || forceNew) {
+                var sequenceTypes = AppDomain.CurrentDomain.GetAssemblies()
                 .SelectMany(t => t.GetTypes())
                     .Where(t => {
                         bool typeValid = t.IsClass && !t.IsAbstract;
@@ -62,9 +69,11 @@ namespace PlayBlack.Editor.Sequencer {
                         bool hasDescriptor = attr != null && attr.DescriptorType == DescriptorType.LOGIC;
                         return typeValid && hasDescriptor && t.IsSubclassOf(typeof(ModelTask));
                     });
-            this.knownLogicOperators = sequenceTypes.ToList();
-
-            var gameplayType = AppDomain.CurrentDomain.GetAssemblies()
+                knownLogicOperators = sequenceTypes.ToList();
+            }
+            
+            if (knownGameplayOperators == null || forceNew) {
+                var gameplayType = AppDomain.CurrentDomain.GetAssemblies()
                 .SelectMany(t => t.GetTypes())
                     .Where(t => {
                         bool typeValid = t.IsClass && !t.IsAbstract;
@@ -72,7 +81,9 @@ namespace PlayBlack.Editor.Sequencer {
                         bool hasDescriptor = attr != null && attr.DescriptorType == DescriptorType.GAMEPLAY;
                         return typeValid && hasDescriptor && t.IsSubclassOf(typeof(ModelTask));
                     });
-            this.knownGameplayOperators = gameplayType.ToList();
+                knownGameplayOperators = gameplayType.ToList();
+            }
+            
         }
 
         public void OnGUI() {
@@ -89,7 +100,7 @@ namespace PlayBlack.Editor.Sequencer {
         }
 
         private void ShowOptions() {
-            if (this.knownAiOperators == null || this.knownLogicOperators == null) {
+            if (knownAiOperators == null || knownLogicOperators == null ||knownGameplayOperators == null) {
                 EditorGUILayout.HelpBox("Window wasn't initialised. Reopen it ...?", MessageType.Error);
                 return;
             }
