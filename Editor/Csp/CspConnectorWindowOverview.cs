@@ -78,6 +78,7 @@ namespace Playblack.Editor.Csp {
                 for (int i = 0; i < processor.Outputs.Count; ++i) {
                     var outp = processor.Outputs[i];
                     DrawOutput(ref outp);
+                    processor.Outputs[i] = outp;
                 }
                 EditorGUILayout.Space();
                 EditorGUILayout.Space();
@@ -98,7 +99,9 @@ namespace Playblack.Editor.Csp {
                 }
                 else {
                     data = dataCache.Get(cacheKey);
+                    
                 }
+                dataCache.PutBack(cacheKey); // cause if not, next time we get a null back. Should think about not using the InUse stuff
                 EditorGUILayout.BeginHorizontal();
                 {
                     EditorGUILayout.LabelField(output.Name, GUILayout.Width(listFieldSize));
@@ -108,8 +111,15 @@ namespace Playblack.Editor.Csp {
                     if (oldTarget != newTarget) {
                         dataCache.Remove(cacheKey); // uncache junk.
                         output.Listeners[i].targetProcessorName = newTarget; // will be re-cached and processed next time
+                        Debug.Log("Target changed!");
+                        return;
                     }
-                    if (data.GetComponentList() == null || data.GetComponentList().Length == 0 || output.Listeners[i] == null) {
+                    if (data == null) {
+                        EditorGUILayout.LabelField("Target is null", GUILayout.Width(listFieldSize));
+                        EditorGUILayout.LabelField("No parameter on null target", GUILayout.Width(listFieldSize));
+                        EditorGUILayout.LabelField("No delay on null target", GUILayout.Width(listFieldSize));
+                    }
+                    else if (data.GetComponentList() == null || data.GetComponentList().Length == 0 || output.Listeners[i] == null) {
                         EditorGUILayout.LabelField("No input on target", GUILayout.Width(listFieldSize));
                         EditorGUILayout.LabelField("No parameter on input", GUILayout.Width(listFieldSize));
                         EditorGUILayout.LabelField("No target, no delay", GUILayout.Width(listFieldSize));

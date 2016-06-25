@@ -35,11 +35,12 @@ namespace Playblack.Pooling {
             if (pooledObjects.Count >= maxCapacity) {
                 // remove from the end of the dictionary.
                 pooledObjects.Remove(pooledObjects.Keys.Last());
+                UnityEngine.Debug.LogError("Pool full. Removing last element");
             }
             pooledObjects.Add(key, new PooledObject<TValue>(val));
         }
 
-        public void PuBack(TKey key) {
+        public void PutBack(TKey key) {
             if (!Has(key)) {
                 throw new PutbackFailureException("The thing to put back does not exist in this dictionary");
             }

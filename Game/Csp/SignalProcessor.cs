@@ -305,6 +305,9 @@ namespace Playblack.Csp {
                             needsEntityCleaning = true;
                             continue;
                         }
+                        if (outputs[i].Listeners[j].matchedProcessors[k] == this) {
+                            continue; // for elf-connections don't draw stuff
+                        }
                         Gizmos.color = (Color)new Color32(240, 40, 16, 255);
                         // Draw a connection line
                         var targetPos = outputs[i].Listeners[j].matchedProcessors[k].transform.position;
