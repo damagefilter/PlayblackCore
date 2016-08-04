@@ -67,9 +67,9 @@ namespace Playblack.BehaviourTree.Execution.Core {
             this.isInitialised = false;
             // Makes sure GetStatus returns UNINITIALISED next time
             this.executionBT = null;
-			this.tickableTasks.Clear();
-			this.tickableTasksDeletionQueue.Clear();
-			this.tickableTasksInsertionQueue.Clear();
+            this.tickableTasks.Clear();
+            this.tickableTasksDeletionQueue.Clear();
+            this.tickableTasksInsertionQueue.Clear();
         }
 
         public void Tick() {
