@@ -14,6 +14,7 @@ namespace PlayBlack.Editor.Sequencer {
         private BtSequencerRenderer sequencerWindow;
 
         private SequenceContainer sequenceContainer;
+        private SequenceExecutor subject; // Used to set this dirty to make unity save it
 
         public override string GetTitle() {
             return "Sequencer";
@@ -23,8 +24,9 @@ namespace PlayBlack.Editor.Sequencer {
             //throw new NotImplementedException();
         }
 
-        public void SetSequencer(SequenceContainer sequenceContainer) {
-            this.sequenceContainer = sequenceContainer;
+        public void SetData(SequenceExecutor subject) {
+            this.sequenceContainer = subject.SequenceCommands;
+            this.subject = subject;
             this.sequencerWindow = new BtSequencerRenderer();
             this.sequencerWindow.OperatorRenderer = new DefaultRenderer();
             this.sequencerWindow.OperatorRenderer.SetSubjects(this.sequenceContainer.RootModel);
@@ -57,6 +59,10 @@ namespace PlayBlack.Editor.Sequencer {
             }
             EditorGUILayout.EndHorizontal();
             Repaint();
+            if (subject != null) {
+                EditorUtility.SetDirty(subject); // Happens when viewing the editor and switching to play mode
+            }
+            
         }
 
     }
