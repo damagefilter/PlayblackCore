@@ -326,6 +326,7 @@ namespace Playblack.BehaviourTree {
         public int GetProposedNumChildren() {
             return ModelType.Attribute<ModelDataDescriptorAttribute>().NumChildren;
         }
+
 #if DEV_BUILD
         private List<ChildDescriptorAttribute> childStructure;
         public IList<ChildDescriptorAttribute> GetChildStructure() {

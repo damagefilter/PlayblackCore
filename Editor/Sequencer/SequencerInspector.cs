@@ -1,10 +1,5 @@
 ﻿using Playblack.Sequencer;
-using PlayBlack.Editor.Sequencer.Renderers.Bt;
 using PlayBlack.Editor.Windows;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using UnityEditor;
 using UnityEngine;
 
@@ -17,10 +12,10 @@ namespace PlayBlack.Editor.Sequencer {
                 return;
             }
             base.OnInspectorGUI();
-            SequenceExecutor trigger = target as SequenceExecutor;
+            SequenceExecutor sequencer = target as SequenceExecutor;
             if (GUILayout.Button("Open Sequencer Settings")) {
                 var window = GenericPopupWindow.Popup<SequencerEditorWindow>();
-                window.SetData(trigger);
+                window.SetData(sequencer);
             }
         }
     }

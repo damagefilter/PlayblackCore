@@ -1,7 +1,10 @@
 ﻿using Playblack.BehaviourTree;
+using Playblack.Sequencer;
 using PlayBlack.Editor.Sequencer.Renderers;
 using PlayBlack.Editor.Sequencer.Renderers.Bt;
 using PlayBlack.Editor.Windows;
+using System;
+using UnityEditor;
 
 namespace PlayBlack.Editor.Sequencer {
 
@@ -36,7 +39,9 @@ namespace PlayBlack.Editor.Sequencer {
         public void OnDestroy() {
             // Called when closed
             this.OperatorRenderer.GetSubjectToRender().UpdateCodeViewDisplay();
-            UnityEngine.Debug.Log("Closing Operator Editor Window");
+            // Dirty hack to force unity into serializing the internal byte array properly
+            // by just saving the whole scene .... jeezus christ
+            EditorApplication.SaveScene();
         }
     }
 }

@@ -1,4 +1,5 @@
 ﻿using Playblack.BehaviourTree;
+using Playblack.Sequencer;
 using PlayBlack.Editor.Windows;
 using System;
 using System.Collections.Generic;
@@ -52,7 +53,9 @@ namespace PlayBlack.Editor.Sequencer.Renderers.Bt {
         private DefaultRenderer operatorRenderer = new DefaultRenderer();
         /// <summary>
         /// Handles rendering of all the things and cleans up messes and rearrangements
-        /// of senquence parts and all that good stuff
+        /// of senquence parts and all that good stuff.
+        /// 
+        /// Passed in editedExecutor reference is for efficient saving / undo steps
         /// </summary>
         public void DoRenderLoop() {
             // Important note: We don't render the root model as it is always a sequence.

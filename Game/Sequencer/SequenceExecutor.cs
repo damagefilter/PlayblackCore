@@ -5,27 +5,42 @@ using Playblack.BehaviourTree.Execution.Core;
 using Playblack.Csp;
 using Playblack.BehaviourTree;
 using System.Collections;
+using Playblack.BehaviourTree.Model.Core;
+using System.IO;
+using Playblack.Savegame.Model;
+using Playblack.BehaviourTree.Model.Task.Composite;
 
 namespace Playblack.Sequencer {
     /// <summary>
     /// Executes a behaviour tree of some description.
     /// </summary>
     [OutputAware("OnExecutionFinish", "OnExecutionTrigger", "OnExecutionTerminated")]
-    public class SequenceExecutor : MonoBehaviour {
+    public class SequenceExecutor : MonoBehaviour, ISerializationCallbackReceiver {
         [SerializeField]
         private List<ValueField> globalDataContext;
 
         // Should work with savegame and unity serializer
         [SerializeField]
-        [HideInInspector] // Will be handled by the sequencer editor panel
-        private SequenceContainer sequenceContainer;
+        [HideInInspector]
+        private byte[] serializedModelTree;
 
-        public SequenceContainer SequenceCommands {
+        private UnityBtModel rootModel;
+
+        public UnityBtModel RootModel {
             get {
-                return sequenceContainer;
+                return rootModel;
+            }
+        }
+
+        [SerializeField]
+        private ExecutionType executionType;
+
+        public ExecutionType TypeOfExecution {
+            get {
+                return executionType;
             }
             set {
-                sequenceContainer = value;
+                executionType = value;
             }
         }
 
@@ -37,13 +52,16 @@ namespace Playblack.Sequencer {
 
         private bool running;
 
+        public SequenceExecutor() {
+            this.rootModel = UnityBtModel.NewInstance(null, new UnityBtModel(), typeof(ModelSequence).ToString());
+        }
         public IBTExecutor GetExecutor() {
-            return sequenceContainer.GetExecutor(new DataContext(globalDataContext), actor);
+            return this.GetExecutor(new DataContext(globalDataContext), actor);
         }
 
         public void Start() {
             this.executor = this.GetExecutor();
-            if (sequenceContainer.TypeOfExecution == ExecutionType.AUTO) {
+            if (this.TypeOfExecution == ExecutionType.AUTO) {
                 running = true;
                 StartCoroutine("TickExecutorParallel");
             }
@@ -74,7 +92,7 @@ namespace Playblack.Sequencer {
 
         [InputFunc("TriggerExecution")]
         public void TriggerExecution() {
-            if (this.sequenceContainer.TypeOfExecution == ExecutionType.TRIGGER) {
+            if (this.TypeOfExecution == ExecutionType.TRIGGER) {
                 if (this.executor == null) {
                     this.executor = this.GetExecutor();
                 }
@@ -103,6 +121,45 @@ namespace Playblack.Sequencer {
             StopCoroutine("TickExecutorParallel");
             running = false;
             this.FireOutput("OnExecutionTerminated");
+        }
+        public IBTExecutor GetExecutor(DataContext context, UnityEngine.Object actor) {
+            context["actor"] = actor;
+
+            var root = rootModel.Model;
+            RecursiveLoadModelTree(rootModel, root);
+            // TODO: Fetch an implementation from a factory
+            return new CachingBtExecutor(root, context);
+        }
+
+        private void RecursiveLoadModelTree(UnityBtModel current, ModelTask root) {
+            var childQueue = new Dictionary<ModelTask, UnityBtModel>();
+            if (current.children != null && current.children.Count > 0) {
+                foreach (var btModelChild in current.children) {
+                    if (btModelChild == null || btModelChild.ModelClassName == null) {
+                        continue;
+                    }
+                    var modelTask = btModelChild.Model;
+                    root.Children.Add(modelTask);
+
+                    if (btModelChild.children.Count > 0) {
+                        childQueue.Add(modelTask, btModelChild);
+                    }
+                }
+                foreach (var kvp in childQueue) {
+                    RecursiveLoadModelTree(kvp.Value, kvp.Key);
+                }
+            }
+        }
+
+        public void OnAfterDeserialize() {
+            using (var ms = new MemoryStream(serializedModelTree)) {
+                ms.Position = 0;
+                this.rootModel = DataSerializer.DeserializeProtoObject<UnityBtModel>(ms.ToArray());
+            }
+        }
+
+        public void OnBeforeSerialize() {
+            this.serializedModelTree = DataSerializer.SerializeProtoObject(this.rootModel);
         }
     }
 }

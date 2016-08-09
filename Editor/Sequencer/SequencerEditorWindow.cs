@@ -1,11 +1,6 @@
-﻿using Playblack.BehaviourTree;
-using Playblack.Sequencer;
+﻿using Playblack.Sequencer;
 using PlayBlack.Editor.Sequencer.Renderers.Bt;
 using PlayBlack.Editor.Windows;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using UnityEditor;
 
 namespace PlayBlack.Editor.Sequencer {
@@ -13,7 +8,6 @@ namespace PlayBlack.Editor.Sequencer {
 
         private BtSequencerRenderer sequencerWindow;
 
-        private SequenceContainer sequenceContainer;
         private SequenceExecutor subject; // Used to set this dirty to make unity save it
 
         public override string GetTitle() {
@@ -25,18 +19,16 @@ namespace PlayBlack.Editor.Sequencer {
         }
 
         public void SetData(SequenceExecutor subject) {
-            this.sequenceContainer = subject.SequenceCommands;
             this.subject = subject;
             this.sequencerWindow = new BtSequencerRenderer();
             this.sequencerWindow.OperatorRenderer = new DefaultRenderer();
-            this.sequencerWindow.OperatorRenderer.SetSubjects(this.sequenceContainer.RootModel);
-
+            this.sequencerWindow.OperatorRenderer.SetSubjects(subject.RootModel);
         }
 
         private void DrawSequenceSettings() {
             EditorGUILayout.BeginVertical();
             {
-                sequenceContainer.TypeOfExecution = (ExecutionType)EditorGUILayout.EnumPopup("Execution Mode", sequenceContainer.TypeOfExecution);
+                subject.TypeOfExecution = (ExecutionType)EditorGUILayout.EnumPopup("Execution Mode", subject.TypeOfExecution);
             }
             EditorGUILayout.EndVertical();
         }
@@ -59,11 +51,6 @@ namespace PlayBlack.Editor.Sequencer {
             }
             EditorGUILayout.EndHorizontal();
             Repaint();
-            if (subject != null) {
-                EditorUtility.SetDirty(subject); // Happens when viewing the editor and switching to play mode
-            }
-            
         }
-
     }
 }
