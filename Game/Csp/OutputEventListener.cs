@@ -1,14 +1,15 @@
-using System;
 using ProtoBuf;
-using UnityEngine;
+using System;
 using System.Collections;
 using System.Collections.Generic;
-using Playblack.Logic;
+using UnityEngine;
 
 namespace Playblack.Csp {
+
     [ProtoContract]
     [Serializable]
     public class OutputEventListener {
+
         // Only serializable via unity for scene defaults
         // otherwise this is re-written by the ConnectInputs method
         // This keeps a list of processors matching the given processor name
@@ -41,7 +42,7 @@ namespace Playblack.Csp {
                         Debug.LogWarning(method + " is not a declared input func on " + matchedProcessors[i].GetType().Name);
                     }
                     if (delay > 0) {
-                        ThreadManager.Instance.StartCoroutine(ExecuteDelayed(func));
+                        matchedProcessors[i].StartCoroutine(ExecuteDelayed(func));
                     }
                     else {
                         Invoke(func);
@@ -79,7 +80,6 @@ namespace Playblack.Csp {
             //matchedProcessors.AddRange(SignalProcessorTracker.Instance.GetByName(this.processorName));
         }
 
-
         public bool HasParameter(string component) {
             if (matchedProcessors == null) {
                 return false;
@@ -96,8 +96,6 @@ namespace Playblack.Csp {
             catch (Exception) {
                 return false;
             }
-
         }
     }
 }
-

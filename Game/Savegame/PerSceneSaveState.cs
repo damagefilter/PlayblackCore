@@ -1,12 +1,11 @@
-﻿using System;
-using UnityEngine;
-using Playblack.EventSystem.Events;
-using System.IO;
+﻿using Playblack.EventSystem.Events;
 using Playblack.Savegame.Model;
-using System.IO.Compression;
 using System.Collections;
+using System.IO;
+using UnityEngine;
 
 namespace Playblack.Savegame {
+
     /// <summary>
     /// Manages all registered save data and stores it in a format that saves
     /// the game state on a per-scene basis.
@@ -88,4 +87,3 @@ namespace Playblack.Savegame {
         }
     }
 }
-

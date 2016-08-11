@@ -3,11 +3,14 @@ using System.Linq;
 using System.Text;
 
 namespace Playblack.BehaviourTree.Model.Core {
+
     public class Position {
+
         /// <summary>
         /// The list of moves that this position represents
         /// </summary>
         private ICollection<int> moves;
+
         public ICollection<int> Moves {
             get {
                 // TODO: Check if this is modified outside, if not don't return a copy

@@ -1,36 +1,41 @@
-﻿using UnityEngine;
-using Playblack.Savegame.Model;
-using Fasterflect;
+﻿using Fasterflect;
 using Playblack.EventSystem;
 using Playblack.EventSystem.Events;
+using Playblack.Savegame.Model;
 using System;
+using UnityEngine;
 
 namespace Playblack.Savegame {
+
     /// <summary>
     /// The SaveManager.
-    /// This can be attached to prefabs and gameobjects that should be manageable by 
+    /// This can be attached to prefabs and gameobjects that should be manageable by
     /// the savegame system.
     /// </summary>
     public class SaveManager : MonoBehaviour {
 
         [Tooltip("If non-empty the save manager will look in this asset bundle for the asset found under assetPath.")]
-        [SerializeField] private string assetBundle;
+        [SerializeField]
+        private string assetBundle;
 
         [Tooltip("If non-empty the save manager will request this asset from the asset manager before restoring data.")]
-        [SerializeField] private string assetPath;
+        [SerializeField]
+        private string assetPath;
 
         private string uuid;
+
         public string UUID {
             get {
                 return uuid;
             }
         }
-        void Awake() {
+
+        private void Awake() {
             this.uuid = ((GetInstanceID() + Time.time) * UnityEngine.Random.Range(1f, 1024f)).ToString();
             EventDispatcher.Instance.Register<GameSavingEvent>(OnSave);
         }
 
-        void OnDestroy() {
+        private void OnDestroy() {
             EventDispatcher.Instance.Unregister<GameSavingEvent>(OnSave);
         }
 
@@ -57,21 +62,27 @@ namespace Playblack.Savegame {
                         case SaveField.FIELD_COLOR:
                             componentBlock.AddColor(memberSet[j].Name, (Color)components[i].TryGetValue(memberSet[j].Name, Flags.InstanceAnyVisibility));
                             break;
+
                         case SaveField.FIELD_FLOAT:
                             componentBlock.AddFloat(memberSet[j].Name, (float)components[i].TryGetValue(memberSet[j].Name, Flags.InstanceAnyVisibility));
                             break;
+
                         case SaveField.FIELD_INT:
                             componentBlock.AddInt(memberSet[j].Name, (int)components[i].TryGetValue(memberSet[j].Name, Flags.InstanceAnyVisibility));
                             break;
+
                         case SaveField.FIELD_PROTOBUF_OBJECT:
                             componentBlock.AddProtoObject(memberSet[j].Name, components[i].TryGetValue(memberSet[j].Name, Flags.InstanceAnyVisibility));
                             break;
+
                         case SaveField.FIELD_SIMPLE_OBJECT:
                             componentBlock.AddSimpleObject(memberSet[j].Name, components[i].TryGetValue(memberSet[j].Name, Flags.InstanceAnyVisibility));
                             break;
+
                         case SaveField.FIELD_STRING:
                             componentBlock.AddString(memberSet[j].Name, (string)components[i].TryGetValue(memberSet[j].Name, Flags.InstanceAnyVisibility));
                             break;
+
                         case SaveField.FIELD_VECTOR_POSITION:
                             componentBlock.AddVector(memberSet[j].Name, (Vector3)components[i].TryGetValue(memberSet[j].Name, Flags.InstanceAnyVisibility));
                             break;
@@ -109,21 +120,27 @@ namespace Playblack.Savegame {
                         case SaveField.FIELD_COLOR:
                             component.TrySetValue(memberSet[j].Name, data.ComponentList[i].ReadColor(memberSet[j].Name), Flags.InstanceAnyVisibility);
                             break;
+
                         case SaveField.FIELD_FLOAT:
                             component.TrySetValue(memberSet[j].Name, data.ComponentList[i].ReadFloat(memberSet[j].Name), Flags.InstanceAnyVisibility);
                             break;
+
                         case SaveField.FIELD_INT:
                             component.TrySetValue(memberSet[j].Name, data.ComponentList[i].ReadInt(memberSet[j].Name), Flags.InstanceAnyVisibility);
                             break;
+
                         case SaveField.FIELD_PROTOBUF_OBJECT:
                             component.TrySetValue(memberSet[j].Name, data.ComponentList[i].ReadProtoObject(memberSet[j].Name, memberSet[j].Type()), Flags.InstanceAnyVisibility);
                             break;
+
                         case SaveField.FIELD_SIMPLE_OBJECT:
                             component.TrySetValue(memberSet[j].Name, data.ComponentList[i].ReadSimpleObject(memberSet[j].Name), Flags.InstanceAnyVisibility);
                             break;
+
                         case SaveField.FIELD_STRING:
                             component.TrySetValue(memberSet[j].Name, data.ComponentList[i].ReadString(memberSet[j].Name), Flags.InstanceAnyVisibility);
                             break;
+
                         case SaveField.FIELD_VECTOR_POSITION:
                             component.TrySetValue(memberSet[j].Name, data.ComponentList[i].ReadVector(memberSet[j].Name), Flags.InstanceAnyVisibility);
                             break;

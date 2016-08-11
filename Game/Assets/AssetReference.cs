@@ -2,8 +2,9 @@
 using UnityEngine;
 
 namespace Playblack {
-    class AssetReference : IDisposable {
-        int count;
+
+    internal class AssetReference : IDisposable {
+        private int count;
         public AssetBundle bundle;
 
         public AssetReference(AssetBundle bundle) {
@@ -31,4 +32,3 @@ namespace Playblack {
         }
     }
 }
-

@@ -1,9 +1,9 @@
-using System;
+using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
-using System.Collections.Generic;
 
 namespace Playblack.Csp {
+
     // TODO: Currently this is obsolete as we're using unities object graph.
     // However, if this turns out to be too expensive, we'll need the tracker again.
     /// <summary>
@@ -11,6 +11,7 @@ namespace Playblack.Csp {
     /// for connecting their inputs.
     /// </summary>
     public class SignalProcessorTracker : MonoBehaviour {
+
         #region Singleton
 
         private static SignalProcessorTracker _instance;
@@ -52,7 +53,7 @@ namespace Playblack.Csp {
         /// <summary>
         /// When unity quits, it destroys objects in a random order.
         /// In principle, a Singleton is only destroyed when application quits.
-        /// If any script calls Instance after it have been destroyed, 
+        /// If any script calls Instance after it have been destroyed,
         ///   it will create a buggy ghost object that will stay on the Editor scene
         ///   even after stopping playing the Application. Really bad!
         /// So, this was made to be sure we're not creating that buggy ghost object.
@@ -61,7 +62,7 @@ namespace Playblack.Csp {
             applicationIsQuitting = true;
         }
 
-        #endregion
+        #endregion Singleton
 
         private List<SignalProcessor> trackedHandlers;
         private List<SignalProcessor> preTrackedHandlers;
@@ -82,7 +83,6 @@ namespace Playblack.Csp {
                     preTrackedHandlers.Remove(handler);
                 }
             }
-            
         }
 
         /// <summary>
@@ -138,4 +138,3 @@ namespace Playblack.Csp {
         }
     }
 }
-

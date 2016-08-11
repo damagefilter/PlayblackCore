@@ -2,11 +2,13 @@
 using System.Collections.Generic;
 
 namespace Playblack.EventSystem {
+
     // Defines the callback for events
     public delegate void Callback<T>(T hook);
 
     public class EventDispatcher {
         private static EventDispatcher instance;
+
         public static EventDispatcher Instance {
             get {
                 if (instance == null) {
@@ -35,10 +37,11 @@ namespace Playblack.EventSystem {
         public void ClearAll() {
             registrants.Clear();
         }
+
         /// <summary>
         /// Register the specified handler.
         /// The event type on the handler defines when it is called.
-        /// If it has an UIShowEvent as argument, it will be called when an UIShowEvent 
+        /// If it has an UIShowEvent as argument, it will be called when an UIShowEvent
         /// is passed to the Call() method.
         /// </summary>
         /// <param name="handler">Handler.</param>
@@ -73,7 +76,6 @@ namespace Playblack.EventSystem {
             registrants[paramType] = handlers;
         }
 
-
         /// <summary>
         /// Call the specified event.
         /// This will cause all registrants to be called that
@@ -90,6 +92,7 @@ namespace Playblack.EventSystem {
                 }
             }
         }
-        #endregion
+
+        #endregion API
     }
 }

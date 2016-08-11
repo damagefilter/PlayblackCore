@@ -1,8 +1,8 @@
-﻿using System;
+﻿using System.Collections.Generic;
 using System.Linq;
-using System.Collections.Generic;
 
 namespace Playblack.Pooling {
+
     /// <summary>
     /// An object pool that pools named objects.
     /// </summary>
@@ -52,4 +52,3 @@ namespace Playblack.Pooling {
         }
     }
 }
-

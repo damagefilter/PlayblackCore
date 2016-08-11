@@ -1,17 +1,22 @@
-﻿using System;
+﻿using System.IO;
 using UnityEditor;
 using UnityEngine;
-using System.IO;
 
 namespace Playblack.Editor.Mods {
+
     public static class ModToolsToolbar {
+
         #region Config
+
         [MenuItem("Mod Tools/Config/Init Config")]
         public static void InitModConfig() {
             var unused = ModConfig.Instance;
         }
-        #endregion
+
+        #endregion Config
+
         #region Build
+
         [MenuItem("Mod Tools/Build/Build AssetBundles")]
         public static void BuildAssetBundles() {
             // TODO: Should probably open some dialogue with configuration options
@@ -30,7 +35,6 @@ namespace Playblack.Editor.Mods {
         /// </summary>
         [MenuItem("Mod Tools/Build/Build DLL")]
         public static void BuildDll() {
-            
             // TODO: Should probably open some dialogue with configuration options
             // from which the build can be triggered.
             var cfg = ModConfig.Instance;
@@ -43,7 +47,7 @@ namespace Playblack.Editor.Mods {
             }
             BuildTools.BuildDll(cfg);
         }
-        #endregion
+
+        #endregion Build
     }
 }
-

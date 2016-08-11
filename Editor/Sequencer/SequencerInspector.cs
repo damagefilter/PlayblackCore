@@ -7,6 +7,7 @@ namespace PlayBlack.Editor.Sequencer {
 
     [CustomEditor(typeof(SequenceExecutor))]
     public class SequencerInspector : UnityEditor.Editor {
+
         public override void OnInspectorGUI() {
             if (target == null) {
                 return;

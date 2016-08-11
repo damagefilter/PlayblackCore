@@ -4,8 +4,8 @@ using PlayBlack.Editor.Windows;
 using UnityEditor;
 
 namespace PlayBlack.Editor.Sequencer {
-    public class SequencerEditorWindow : GenericPopupWindow {
 
+    public class SequencerEditorWindow : GenericPopupWindow {
         private BtSequencerRenderer sequencerWindow;
 
         private SequenceExecutor subject; // Used to set this dirty to make unity save it
@@ -47,7 +47,6 @@ namespace PlayBlack.Editor.Sequencer {
                 else {
                     EditorGUILayout.HelpBox("Nothing selected", MessageType.Info);
                 }
-
             }
             EditorGUILayout.EndHorizontal();
             Repaint();

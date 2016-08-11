@@ -1,15 +1,13 @@
 ﻿using ProtoBuf;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 
 namespace Playblack.Savegame.Model {
+
     /// <summary>
     /// Describes the contents of a field inside a save structure.
     /// </summary>
     [ProtoContract]
     public class FieldDescription {
+
         /// <summary>
         /// Field type info must be cast to the SaveField enum in order to make sense.
         /// Conversely, to correctly store this you must pass the int representation of a SaveField.

@@ -1,7 +1,5 @@
-﻿using System;
-using Playblack.EventSystem.Events;
+﻿namespace Playblack.Mods {
 
-namespace Playblack.Mods {
     /// <summary>
     /// Defines the communication channel between the core game and modded / extra content.
     /// Implement this to hook your customisations into the game.
@@ -9,7 +7,9 @@ namespace Playblack.Mods {
     /// Use Application.persistentDataPath.
     /// </summary>
     public interface IMod {
+
         #region Descriptions
+
         /// <summary>
         /// Return the mods name.
         /// </summary>
@@ -41,13 +41,14 @@ namespace Playblack.Mods {
         /// <summary>
         /// Provides a list with AssetBundles that specifically contain scenes.
         /// Every asset inside a Scene AssetBundle is expected to be an actual scene.
-        /// 
+        ///
         /// </summary>
         /// <value>The scenes.</value>
         string[] ScenesBundles {
             get;
         }
-        #endregion
+
+        #endregion Descriptions
 
         #region Hooks
 
@@ -67,6 +68,6 @@ namespace Playblack.Mods {
         /// </summary>
         void OnDisable();
 
-        #endregion
+        #endregion Hooks
     }
 }

@@ -1,14 +1,12 @@
 ﻿using Playblack.BehaviourTree;
-using Playblack.Sequencer;
 using PlayBlack.Editor.Windows;
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using UnityEditor;
 using UnityEngine;
 
 namespace PlayBlack.Editor.Sequencer.Renderers.Bt {
+
     public class BtSequencerRenderer : ISequencerRenderer<UnityBtModel> {
 
         /// <summary>
@@ -33,6 +31,7 @@ namespace PlayBlack.Editor.Sequencer.Renderers.Bt {
                 editorSkin = Resources.Load<GUISkin>("SequenceEditorLight");
             }
         }
+
         #region Rendering Process
 
         public int IndentLevel {
@@ -51,10 +50,11 @@ namespace PlayBlack.Editor.Sequencer.Renderers.Bt {
         }
 
         private DefaultRenderer operatorRenderer = new DefaultRenderer();
+
         /// <summary>
         /// Handles rendering of all the things and cleans up messes and rearrangements
         /// of senquence parts and all that good stuff.
-        /// 
+        ///
         /// Passed in editedExecutor reference is for efficient saving / undo steps
         /// </summary>
         public void DoRenderLoop() {
@@ -92,7 +92,8 @@ namespace PlayBlack.Editor.Sequencer.Renderers.Bt {
                 DoScheduledReorders(child);
             }
         }
-        #endregion
+
+        #endregion Rendering Process
 
         #region API
 
@@ -151,7 +152,8 @@ namespace PlayBlack.Editor.Sequencer.Renderers.Bt {
         public void RenderOperatorDummyButton(string label) {
             DrawButton(label, null);
         }
-        #endregion
+
+        #endregion API
 
         /// <summary>
         /// Internally draws buttons to achieve proper indenting,

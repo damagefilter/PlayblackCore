@@ -2,7 +2,9 @@
 using System.Collections.Generic;
 
 namespace Playblack.BehaviourTree.Model.Core {
+
     public abstract class ModelTask {
+
         /// <summary>
         /// The children.
         /// </summary>
@@ -67,6 +69,7 @@ namespace Playblack.BehaviourTree.Model.Core {
             }
             this.position = new Position();
         }
+
         // reflection ctor
         public ModelTask() {
             this.children = new List<ModelTask>();
@@ -78,7 +81,7 @@ namespace Playblack.BehaviourTree.Model.Core {
         /// whose root is this node. After calling this method, the positions of all
         /// the tasks below this one will be available and accessible through
         /// {@link #getPosition()}.
-        /// 
+        ///
         /// It is important to note that, when calling this method, this task is
         /// considered to be the root of the behaviour tree, so its position will be
         /// set to an empty sequence of moves, with no offset, and the positions of
@@ -102,7 +105,6 @@ namespace Playblack.BehaviourTree.Model.Core {
         }
 
         private void RecursiveComputePositions(ModelTask t) {
-
             for (int i = 0; i < t.children.Count; ++i) {
                 ModelTask currentChild = t.children[i];
                 Position currentChildPos = new Position(t.position);

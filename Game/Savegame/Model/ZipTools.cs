@@ -1,7 +1,9 @@
 ﻿// FIXME: Find a library that can compress byte arrays that is not Gzip because
 // it requires a native zip library (zlib) which unity doesn't ship.
 namespace Playblack.Savegame.Model {
+
     public static class ZipTools {
+
         /// <summary>
         /// Takes in an array of bytes and applies gzip compression to it.
         /// </summary>
@@ -48,4 +50,3 @@ namespace Playblack.Savegame.Model {
         }
     }
 }
-

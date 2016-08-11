@@ -1,15 +1,16 @@
-﻿using System;
+﻿using ProtoBuf;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using ProtoBuf;
 
 namespace Playblack.Savegame.Model {
+
     [ProtoContract]
     public class SceneDataBlock : IDataBlock {
+
         #region Data Block
+
         [ProtoMember(100)]
         private string sceneName;
+
         public string SceneName {
             get {
                 return sceneName;
@@ -18,12 +19,14 @@ namespace Playblack.Savegame.Model {
 
         [ProtoMember(200)]
         private List<GameObjectDataBlock> objects;
+
         public List<GameObjectDataBlock> SceneObjects {
             get {
                 return objects;
             }
         }
-        #endregion
+
+        #endregion Data Block
 
         #region IDataBlock implementation
 
@@ -33,7 +36,7 @@ namespace Playblack.Savegame.Model {
             }
         }
 
-        #endregion
+        #endregion IDataBlock implementation
 
         public SceneDataBlock() {
             // Protobuf ctor

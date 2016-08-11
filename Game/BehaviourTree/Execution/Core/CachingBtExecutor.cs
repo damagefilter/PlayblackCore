@@ -3,12 +3,12 @@ using System;
 using System.Collections.Generic;
 
 namespace Playblack.BehaviourTree.Execution.Core {
+
     /// <summary>
     /// Executes a tree structure by caching all active execution tasks.
     /// This way we don't need to traverse the whole tree on each tick.
     /// </summary>
     public class CachingBtExecutor : IBTExecutor {
-
         private ModelTask rootModel;
 
         private ExecutionTask executionBT;
@@ -62,7 +62,6 @@ namespace Playblack.BehaviourTree.Execution.Core {
             this.taskStates = new Dictionary<Position, DataContext>();
         }
 
-        
         public void Reset() {
             this.isInitialised = false;
             // Makes sure GetStatus returns UNINITIALISED next time
@@ -116,7 +115,6 @@ namespace Playblack.BehaviourTree.Execution.Core {
             }
             return null;
         }
-
 
         public void SetTaskState(Position pos, DataContext taskState) {
             this.taskStates[pos] = taskState;

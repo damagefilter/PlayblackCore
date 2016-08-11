@@ -1,13 +1,15 @@
 ﻿using System;
-using System.IO;
 using System.Diagnostics;
+using System.IO;
 using UnityEditor;
 
 namespace Playblack.Editor.Mods {
+
     /// <summary>
     /// A set of methods that help with building a mod bundle.
     /// </summary>
     public static class BuildTools {
+
         public static void BuildDll(ModConfig cfg) {
             if (!Directory.Exists(cfg.CodePath)) {
                 throw new ArgumentException(cfg.CodePath + " is not a directory!");
@@ -34,4 +36,3 @@ namespace Playblack.Editor.Mods {
         }
     }
 }
-

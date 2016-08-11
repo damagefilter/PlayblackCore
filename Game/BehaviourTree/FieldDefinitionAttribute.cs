@@ -1,5 +1,5 @@
-﻿
-namespace Playblack.BehaviourTree {
+﻿namespace Playblack.BehaviourTree {
+
     public class FieldDefinitionAttribute : System.Attribute {
         private string defaultUnityValue = null;
         private ValueType fieldValueType;
@@ -24,7 +24,7 @@ namespace Playblack.BehaviourTree {
         }
 
         /// <summary>
-        /// 
+        ///
         /// </summary>
         /// <param name="fieldName">The name of the field in the executor class to address</param>
         /// <param name="displayName">The corresponding display name. It MUST be unique within the set of fields on a class!!! IMPORTANT</param>
@@ -35,7 +35,7 @@ namespace Playblack.BehaviourTree {
         }
 
         /// <summary>
-        /// 
+        ///
         /// </summary>
         /// <param name="fieldName">The name of the field in the executor class to address</param>
         /// <param name="displayName">The corresponding display name. It MUST be unique within the set of fields on a class!!! IMPORTANT</param>

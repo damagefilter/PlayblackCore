@@ -1,6 +1,6 @@
-﻿using System;
+﻿using Fasterflect;
+using System;
 using System.Collections.Generic;
-using Fasterflect;
 
 namespace Playblack.BehaviourTree {
 
@@ -54,7 +54,6 @@ namespace Playblack.BehaviourTree {
             get {
                 return operatorName;
             }
-            
         }
 
         public DescriptorType DescriptorType {

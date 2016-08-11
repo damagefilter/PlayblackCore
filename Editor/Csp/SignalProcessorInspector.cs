@@ -1,13 +1,13 @@
-﻿using System;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using Playblack.Csp;
 using UnityEditor;
-using Playblack.Csp;
+using UnityEngine;
 
 namespace Playblack.Editor.Csp {
+
     [CustomEditor(typeof(SignalProcessor))]
-    class SignalProcessorInspector : UnityEditor.Editor {
+    internal class SignalProcessorInspector : UnityEditor.Editor {
         private static CspConnectorWindowOverview edWindow;
+
         public override void OnInspectorGUI() {
             if (GUILayout.Button("Open Outputs")) {
                 if (edWindow == null) {

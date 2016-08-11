@@ -1,28 +1,34 @@
-using System;
 using ProtoBuf;
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 
 namespace Playblack.Savegame.Model {
+
     /// <summary>
     /// A block of data representing one saveable component.
     /// A bunch of these are added to a GameObjectDataBlock to represent the (relevant) state of a full gameobject.
     /// </summary>
     [ProtoContract]
     public class ComponentDataBlock : IDataBlock {
+
         #region Data Section
+
         [ProtoMember(100)]
         private string componentName;
+
         public string ComponentName {
             get {
                 return componentName;
             }
         }
+
         /// <summary>
         /// List of fields to be saved and or restored.
         /// </summary>
         [ProtoMember(200)]
         private List<FieldDescription> saveData;
+
         public List<FieldDescription> SaveData {
             get {
                 return saveData;
@@ -36,12 +42,14 @@ namespace Playblack.Savegame.Model {
         /// </summary>
         [ProtoMember(300)]
         private string assemblyName;
+
         public string AssemblyName {
             get {
                 return assemblyName;
             }
         }
-        #endregion
+
+        #endregion Data Section
 
         #region IDataBlock implementation
 
@@ -51,7 +59,7 @@ namespace Playblack.Savegame.Model {
             }
         }
 
-        #endregion
+        #endregion IDataBlock implementation
 
         public ComponentDataBlock() {
             // Protobuf ctor
@@ -64,6 +72,7 @@ namespace Playblack.Savegame.Model {
         }
 
         #region adding data
+
         public void AddInt(string name, int value) {
             var fd = new FieldDescription((int)SaveField.FIELD_INT, name, DataSerializer.SerializeSimpleObject(value));
             saveData.Add(fd);
@@ -107,8 +116,11 @@ namespace Playblack.Savegame.Model {
             var fd = new FieldDescription((int)SaveField.FIELD_SIMPLE_OBJECT, name, DataSerializer.SerializeSimpleObject(value));
             saveData.Add(fd);
         }
-        #endregion
+
+        #endregion adding data
+
         #region reading data
+
         public int ReadInt(string name) {
             for (int i = 0; i < saveData.Count; ++i) {
                 if (saveData[i].fieldName == name) {
@@ -191,7 +203,7 @@ namespace Playblack.Savegame.Model {
             }
             return null;
         }
-        #endregion
+
+        #endregion reading data
     }
 }
-

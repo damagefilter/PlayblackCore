@@ -1,4 +1,5 @@
-﻿using Playblack.BehaviourTree;
+﻿using Fasterflect;
+using Playblack.BehaviourTree;
 using Playblack.BehaviourTree.Model.Core;
 using PlayBlack.Editor.Windows;
 using System;
@@ -6,9 +7,9 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEditor;
 using UnityEngine;
-using Fasterflect;
 
 namespace PlayBlack.Editor.Sequencer {
+
     public class OperatorSelector : GenericPopupWindow {
 
         /// <summary>
@@ -59,7 +60,7 @@ namespace PlayBlack.Editor.Sequencer {
                                 });
                 knownAiOperators = aiTypes.ToList();
             }
-            
+
             if (knownLogicOperators == null || forceNew) {
                 var sequenceTypes = AppDomain.CurrentDomain.GetAssemblies()
                 .SelectMany(t => t.GetTypes())
@@ -71,7 +72,7 @@ namespace PlayBlack.Editor.Sequencer {
                     });
                 knownLogicOperators = sequenceTypes.ToList();
             }
-            
+
             if (knownGameplayOperators == null || forceNew) {
                 var gameplayType = AppDomain.CurrentDomain.GetAssemblies()
                 .SelectMany(t => t.GetTypes())
@@ -83,7 +84,6 @@ namespace PlayBlack.Editor.Sequencer {
                     });
                 knownGameplayOperators = gameplayType.ToList();
             }
-            
         }
 
         public void OnGUI() {
@@ -100,7 +100,7 @@ namespace PlayBlack.Editor.Sequencer {
         }
 
         private void ShowOptions() {
-            if (knownAiOperators == null || knownLogicOperators == null ||knownGameplayOperators == null) {
+            if (knownAiOperators == null || knownLogicOperators == null || knownGameplayOperators == null) {
                 EditorGUILayout.HelpBox("Window wasn't initialised. Reopen it ...?", MessageType.Error);
                 return;
             }
@@ -110,9 +110,11 @@ namespace PlayBlack.Editor.Sequencer {
                 case DescriptorType.AI:
                     models = knownAiOperators;
                     break;
+
                 case DescriptorType.LOGIC:
                     models = knownLogicOperators;
                     break;
+
                 case DescriptorType.GAMEPLAY:
                     models = knownGameplayOperators;
                     break;

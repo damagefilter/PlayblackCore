@@ -1,11 +1,11 @@
-﻿using System;
+﻿using System.Collections.Generic;
 using UnityEngine;
-using System.Collections.Generic;
+
 // Code derivated from https://gist.github.com/asus4/2691788
 namespace Playblack.Assets {
-    public class AssetManager {
 
-        private Dictionary<string,AssetReference> bundles = new Dictionary<string,AssetReference>();
+    public class AssetManager {
+        private Dictionary<string, AssetReference> bundles = new Dictionary<string, AssetReference>();
 
         public void AddAssetBundle(string bundleName, AssetBundle bundle) {
             if (bundles.ContainsKey(bundleName)) {
@@ -33,4 +33,3 @@ namespace Playblack.Assets {
         }
     }
 }
-

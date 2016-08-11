@@ -1,14 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-
-namespace PlayBlack.Editor.Sequencer.Renderers {
+﻿namespace PlayBlack.Editor.Sequencer.Renderers {
 
     /// <summary>
     /// Renders a list of ISequencerPartRenderers into a list of interactive buttons
     /// so a sequence can be created / edited etc.
-    /// 
+    ///
     /// Also provides a rudimentary API for nested sequencer parts to be rendered
     /// properly without the sequencerparts knowing their exact context.
     /// </summary>
@@ -40,6 +35,5 @@ namespace PlayBlack.Editor.Sequencer.Renderers {
         /// </summary>
         /// <param name="label"></param>
         void RenderOperatorDummyButton(string label);
-
     }
 }

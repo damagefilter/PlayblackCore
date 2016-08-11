@@ -4,7 +4,9 @@ using Playblack.BehaviourTree.Model.Task.Leaf;
 using System;
 
 namespace Playblack.BehaviourTree.Execution.Task.Leaf {
+
     public abstract class ExecutionAction : ExecutionTask {
+
         public ExecutionAction(ModelTask modelTask, IBTExecutor executor, ExecutionTask parent) :
             base(modelTask, executor, parent) {
             if (!(modelTask is ModelAction)) {

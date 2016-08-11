@@ -1,7 +1,7 @@
-﻿using System;
-using UnityEngine;
+﻿using UnityEngine;
 
-namespace Playblack {
+namespace Playblack.Extensions {
+
     public static class MonoBehaviourExtensions {
 
         /// <summary>
@@ -27,4 +27,3 @@ namespace Playblack {
         }
     }
 }
-

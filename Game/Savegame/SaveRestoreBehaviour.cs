@@ -1,16 +1,19 @@
-﻿using System;
-using UnityEngine;
+﻿using Playblack.EventSystem;
 using Playblack.EventSystem.Events;
-using Playblack.EventSystem;
+using System;
+using UnityEngine;
 
 namespace Playblack.Savegame {
-    public class SaveRestoreBehaviour : MonoBehaviour {
-        [Tooltip("Defines the way the game is saved. Defaults to a per-scene save. Loading between different types is not supported and leads to terrible errors!")]
-        [SerializeField]private string saveTypeImpl = "Playblack.Savegame.PerSceneSaveState";
 
+    public class SaveRestoreBehaviour : MonoBehaviour {
+
+        [Tooltip("Defines the way the game is saved. Defaults to a per-scene save. Loading between different types is not supported and leads to terrible errors!")]
+        [SerializeField]
+        private string saveTypeImpl = "Playblack.Savegame.PerSceneSaveState";
 
         private ISaveState saveStateInstance;
-        void Awake() {
+
+        private void Awake() {
             var other = FindObjectOfType<SaveRestoreBehaviour>();
             if (other != null && other != this) {
                 Debug.LogWarning("Second SaveRestoreBehaviour was created. Destroying it. Only one allowed");
@@ -28,20 +31,19 @@ namespace Playblack.Savegame {
             DontDestroyOnLoad(this.gameObject);
         }
 
-        void OnDestroy() {
+        private void OnDestroy() {
             EventDispatcher.Instance.Unregister<RequestSaveEvent>(OnSaveRequest);
             EventDispatcher.Instance.Unregister<RequestSaveLoadEvent>(OnSavegameLoad);
         }
 
-        void OnSaveRequest(RequestSaveEvent hook) {
+        private void OnSaveRequest(RequestSaveEvent hook) {
             saveStateInstance.SaveName = hook.SaveName;
             saveStateInstance.CreateSave();
         }
 
-        void OnSavegameLoad(RequestSaveLoadEvent hook) {
+        private void OnSavegameLoad(RequestSaveLoadEvent hook) {
             saveStateInstance.SaveName = hook.SaveName;
             hook.LoadingProcess = StartCoroutine(saveStateInstance.RestoreSave(hook.DataId));
         }
     }
 }
-

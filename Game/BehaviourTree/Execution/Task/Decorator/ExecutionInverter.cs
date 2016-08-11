@@ -1,12 +1,11 @@
 using Playblack.BehaviourTree.Execution.Core;
-using Playblack.BehaviourTree.Execution.Core.Events;
 using Playblack.BehaviourTree.Model.Core;
 using Playblack.BehaviourTree.Model.Task.Decorator;
 using System;
 
 namespace Playblack.BehaviourTree.Execution.Task.Decorator {
-    public class ExecutionInverter : ExecutionDecorator {
 
+    public class ExecutionInverter : ExecutionDecorator {
         private ExecutionTask child;
 
         public ExecutionInverter(ModelTask modelTask, IBTExecutor executor, ExecutionTask parent) : base(modelTask, executor, parent) {

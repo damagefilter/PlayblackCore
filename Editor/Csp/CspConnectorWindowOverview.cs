@@ -1,10 +1,11 @@
-﻿using System;
-using UnityEngine;
-using UnityEditor;
-using Playblack.Csp;
+﻿using Playblack.Csp;
 using Playblack.Pooling;
+using System;
+using UnityEditor;
+using UnityEngine;
 
 namespace Playblack.Editor.Csp {
+
     /// <summary>
     /// Shows a list of existing  connections outgoing from the given signal processor.
     /// Also offers functionality to create new connections, edit / remove existing ones.
@@ -15,6 +16,7 @@ namespace Playblack.Editor.Csp {
 
         private SignalProcessor processor;
         private string[] outputs;
+
         // NOTE: the editor window has all these output managing and not the SIgnalDataCache objects
         // because if they were we'd have a lot of redundant data flying around the memory.
         // Just saying
@@ -99,7 +101,6 @@ namespace Playblack.Editor.Csp {
                 }
                 else {
                     data = dataCache.Get(cacheKey);
-                    
                 }
                 dataCache.PutBack(cacheKey); // cause if not, next time we get a null back. Should think about not using the InUse stuff
                 EditorGUILayout.BeginHorizontal();
@@ -126,7 +127,7 @@ namespace Playblack.Editor.Csp {
                     }
                     else {
                         // Select which input. needs 2 dropdowns because of component selection.
-                        
+
                         // Input on processors: Component selection
                         int componentIndex = EditorGUILayout.Popup(data.GetComponentIndex(output.Listeners[i].component), data.GetComponentList(), GUILayout.Width(listFieldSize / 2.05f));
                         string componentName = data.GetComponentName(componentIndex);
@@ -204,7 +205,7 @@ namespace Playblack.Editor.Csp {
         }
     }
 
-    struct OutputConfig {
+    internal struct OutputConfig {
         public int outputIndex;
         public string targetName;
         public SignalDataCache cache;
@@ -214,4 +215,3 @@ namespace Playblack.Editor.Csp {
         }
     }
 }
-

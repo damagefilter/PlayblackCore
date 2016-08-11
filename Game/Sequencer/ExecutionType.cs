@@ -1,12 +1,10 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 
 namespace Playblack.Sequencer {
 
     [Serializable]
     public enum ExecutionType {
+
         /// <summary>
         /// The Sequence can only be started via trigger input
         /// Continues with fixed update intervals in a coroutine.

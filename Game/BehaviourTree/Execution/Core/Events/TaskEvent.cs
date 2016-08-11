@@ -1,5 +1,5 @@
-﻿
-namespace Playblack.BehaviourTree.Execution.Core.Events {
+﻿namespace Playblack.BehaviourTree.Execution.Core.Events {
+
     public class TaskEvent {
 
         /// <summary>

@@ -1,9 +1,6 @@
 ﻿using Playblack.BehaviourTree;
-using Playblack.Sequencer;
 using PlayBlack.Editor.Sequencer.Renderers;
-using PlayBlack.Editor.Sequencer.Renderers.Bt;
 using PlayBlack.Editor.Windows;
-using System;
 using UnityEditor;
 
 namespace PlayBlack.Editor.Sequencer {

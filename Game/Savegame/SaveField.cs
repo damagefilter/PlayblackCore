@@ -1,9 +1,10 @@
-using System;
-
 namespace Playblack.Savegame {
+
     public enum SaveField {
+
         // Immediately restorable
         FIELD_FLOAT = 0,
+
         FIELD_INT,
         FIELD_STRING,
         FIELD_COLOR,
@@ -17,4 +18,3 @@ namespace Playblack.Savegame {
         //FIELD_SCENE_ENTITY_REF
     }
 }
-

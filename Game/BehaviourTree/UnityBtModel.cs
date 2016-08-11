@@ -1,12 +1,11 @@
-﻿using System;
-using System.Reflection;
-using System.Collections.Generic;
+﻿using Fasterflect;
 using Playblack.BehaviourTree.Model.Core;
 using Playblack.Extensions;
-using ProtoBuf;
-using UnityEngine;
-using Fasterflect;
 using Playblack.Sequencer;
+using ProtoBuf;
+using System;
+using System.Collections.Generic;
+using UnityEngine;
 
 namespace Playblack.BehaviourTree {
 
@@ -22,6 +21,7 @@ namespace Playblack.BehaviourTree {
     /// </summary>
     [ProtoContract]
     public class UnityBtModel {
+
         [ProtoMember(10)]
         public List<ValueField> contextData;
 
@@ -75,6 +75,7 @@ namespace Playblack.BehaviourTree {
         /// This is required in order to avoid concurrent modifications to the child list.
         /// </summary>
         private Dictionary<UnityBtModel, int> scheduledReorders = new Dictionary<UnityBtModel, int>();
+
         private ModelTask mtInstance;
 
         public ModelTask Model {
@@ -85,7 +86,7 @@ namespace Playblack.BehaviourTree {
                 }
                 // First: introspect the class to see if it's one we can work with
                 var type = this.ModelType;
-                //if (!type.IsAssignableFrom(typeof(ModelTask))) { 
+                //if (!type.IsAssignableFrom(typeof(ModelTask))) {
                 if (!typeof(ModelTask).IsAssignableFrom(type)) {
                     throw new ArgumentException("'" + type + "' is not a ModelTask object. I don't know how to use it. Fix it.");
                 }
@@ -115,8 +116,10 @@ namespace Playblack.BehaviourTree {
                 return null;
             }
         }
+
 #if UNITY_EDITOR
         private string cachedCodeViewDisplay;
+
         public string CodeViewDisplay {
             get {
                 if (cachedCodeViewDisplay == null) {
@@ -124,7 +127,6 @@ namespace Playblack.BehaviourTree {
                 }
                 return cachedCodeViewDisplay;
             }
-
         }
 
         public void UpdateCodeViewDisplay() {
@@ -155,6 +157,7 @@ namespace Playblack.BehaviourTree {
             }
             cachedCodeViewDisplay = theString;
         }
+
 #endif
 
         public static UnityBtModel NewInstance(UnityBtModel parent) {
@@ -175,7 +178,7 @@ namespace Playblack.BehaviourTree {
             if (parent != null) {
                 parent.children.Add(model);
             }
-            
+
             return model;
         }
 
@@ -192,12 +195,12 @@ namespace Playblack.BehaviourTree {
                 }
                 parent.children[insertIndex] = model;
             }
-            
+
             return model;
         }
 
         public bool RemoveChild(UnityBtModel model) {
-            int index = this.children.IndexOf(model);            
+            int index = this.children.IndexOf(model);
             if (index >= 0) {
                 var child = children[index];
                 children.RemoveAt(index);
@@ -225,11 +228,11 @@ namespace Playblack.BehaviourTree {
         public void ResizeChildren() {
             ResizeChildren(false);
         }
+
         /// <summary>
         /// Resize the children array to the currently set numChildren
         /// </summary>
         public void ResizeChildren(bool useNulls) {
-
             bool needsRefill = children.Count < numChildren;
 
             if (needsRefill) {
@@ -244,7 +247,7 @@ namespace Playblack.BehaviourTree {
                 }
             }
             else {
-                // Shrinking 
+                // Shrinking
                 while (children.Count > numChildren) {
                     var child = children[children.Count - 1];
                     children.RemoveAt(children.Count - 1);
@@ -274,7 +277,6 @@ namespace Playblack.BehaviourTree {
             }
             scheduledReorders.Clear();
         }
-
 
         /// <summary>
         /// Get an array with proposed fields for the underlying Model.
@@ -329,13 +331,14 @@ namespace Playblack.BehaviourTree {
 
 #if DEV_BUILD
         private List<ChildDescriptorAttribute> childStructure;
+
         public IList<ChildDescriptorAttribute> GetChildStructure() {
             if (childStructure != null) {
                 return childStructure;
             }
             if (this.ModelClassName == null) {
                 // FIXME: This situation happens with deserialized lists that previously had null values.
-                // Protobuf doesn't know the concept of null so it defaults to a default instance 
+                // Protobuf doesn't know the concept of null so it defaults to a default instance
                 // of UnityBtModel when deserializing null values. And then this happens as the default object has nothing to describe it.
                 Debug.LogError("No classname specified ... Much error!");
                 return new List<ChildDescriptorAttribute>(0);
@@ -349,7 +352,7 @@ namespace Playblack.BehaviourTree {
             this.childStructure.Sort((a, b) => { return a.DisplayDelta > b.DisplayDelta ? 1 : -1; });
             return this.childStructure;
         }
+
 #endif
     }
 }
-

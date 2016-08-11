@@ -1,7 +1,8 @@
-﻿using System.Collections.Generic;
-using ProtoBuf;
+﻿using ProtoBuf;
+using System.Collections.Generic;
 
 namespace Playblack.BehaviourTree {
+
     /// <summary>
     /// Simple data globalContext tool.
     /// </summary>
@@ -57,7 +58,6 @@ namespace Playblack.BehaviourTree {
                     return internalData[key];
                 }
                 return null;
-
             }
             set {
                 internalData[key] = value;

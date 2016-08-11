@@ -1,6 +1,7 @@
 ﻿using Playblack.BehaviourTree.Model.Core;
 
 namespace Playblack.BehaviourTree.Execution.Core {
+
     public interface IBTExecutor {
 
         /// <summary>
@@ -28,6 +29,7 @@ namespace Playblack.BehaviourTree.Execution.Core {
         * Note that ticking a tree that has already finished should have no effect
         * on the tree.
         */
+
         void Tick();
 
         /// <summary>

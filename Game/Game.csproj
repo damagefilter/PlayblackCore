@@ -108,7 +108,6 @@
     <Compile Include="EventSystem\Events\GameSavingEvent.cs" />
     <Compile Include="EventSystem\Event.cs" />
     <Compile Include="EventSystem\IEvent.cs" />
-    <Compile Include="Logic\Entity.cs" />
     <Compile Include="Pooling\GameObjectPool.cs" />
     <Compile Include="Pooling\PutbackFailureException.cs" />
     <Compile Include="Pooling\MaxCapacityReachedException.cs" />
@@ -118,7 +117,6 @@
     <Compile Include="Savegame\SaveField.cs" />
     <Compile Include="Sequencer\CodeViewFormattingHintAttribute.cs" />
     <Compile Include="Sequencer\ExecutionType.cs" />
-    <Compile Include="Sequencer\SequenceContainer.cs" />
     <Compile Include="ThreadManager.cs" />
     <Compile Include="Savegame\Model\ComponentDataBlock.cs" />
     <Compile Include="Savegame\Model\GameObjectDataBlock.cs" />
@@ -156,7 +154,7 @@
     <Compile Include="EventSystem\Events\RequestSaveLoadEvent.cs" />
     <Compile Include="BehaviourTree\Execution\Core\CachingBtExecutor.cs" />
     <Compile Include="Mods\IMod.cs" />
-    <Compile Include="MonoBehaviourExtensions.cs" />
+    <Compile Include="Extensions\MonoBehaviourExtensions.cs" />
     <Compile Include="Sequencer\SequenceExecutor.cs" />
   </ItemGroup>
   <ItemGroup />

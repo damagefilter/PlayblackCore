@@ -5,8 +5,8 @@ using Playblack.BehaviourTree.Model.Task.Decorator;
 using System;
 
 namespace Playblack.BehaviourTree.Execution.Task.Decorator {
-    public class ExecutionStatusResponder : ExecutionDecorator {
 
+    public class ExecutionStatusResponder : ExecutionDecorator {
         private ExecutionTask executingCondition;
         private ExecutionTask decoratedExecutor;
 

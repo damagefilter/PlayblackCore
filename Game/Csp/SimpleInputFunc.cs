@@ -1,16 +1,15 @@
-using System;
-
 namespace Playblack.Csp {
-    public class SimpleInputFunc : InputFunc {
 
+    public class SimpleInputFunc : InputFunc {
         private SimpleSignal callback;
-        public SimpleInputFunc (string name, SimpleSignal callback) : base(name) {
+
+        public SimpleInputFunc(string name, SimpleSignal callback) : base(name) {
             this.callback = callback;
         }
 
         #region InputFunc implementation
 
-        public override void Invoke (string param) {
+        public override void Invoke(string param) {
             // param is unused here
             this.callback();
         }
@@ -18,7 +17,7 @@ namespace Playblack.Csp {
         public override bool HasParameter() {
             return false;
         }
-        #endregion
+
+        #endregion InputFunc implementation
     }
 }
-

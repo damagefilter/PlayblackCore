@@ -1,8 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using ProtoBuf;
+﻿using ProtoBuf;
+using System;
 using UnityEngine;
 
 namespace Playblack.BehaviourTree {
@@ -10,6 +7,7 @@ namespace Playblack.BehaviourTree {
     * Loosely typed serializable value field thing for setting arbitrary data in unity editor.
     * Is used to assign values to anything that isn't ConVars
     */
+
     [Serializable]
     [ProtoContract]
     public class ValueField {
@@ -30,6 +28,7 @@ namespace Playblack.BehaviourTree {
         [SerializeField]
         [ProtoMember(2)]
         private string unityValue;
+
         public string UnityValue {
             get {
                 return unityValue;
@@ -42,10 +41,13 @@ namespace Playblack.BehaviourTree {
                     switch (varType) {
                         case ValueType.BOOL:
                             return bool.Parse(unityValue);
+
                         case ValueType.FLOAT:
                             return float.Parse(unityValue);
+
                         case ValueType.INT:
                             return int.Parse(unityValue);
+
                         case ValueType.STRING:
                         case ValueType.TEXT:
                             return unityValue;
@@ -77,7 +79,6 @@ namespace Playblack.BehaviourTree {
         }
 
         public ValueField() {
-
         }
 
         public ValueField(string name, string value, ValueType type) {

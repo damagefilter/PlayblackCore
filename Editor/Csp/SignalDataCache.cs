@@ -1,8 +1,9 @@
-﻿using System;
-using Playblack.Csp;
+﻿using Playblack.Csp;
+using System;
 using System.Collections.Generic;
 
 namespace Playblack.Editor.Csp {
+
     /// <summary>
     /// Helper object to cache signal data for a handler.
     /// Used to speed up the signal editor and make it less inefficient.
@@ -33,7 +34,6 @@ namespace Playblack.Editor.Csp {
                     }
                 }
             }
-            
 
             this.inputMapping = new Dictionary<string, string[]>(inputMap.Count);
             componentList = new string[inputMap.Count];
@@ -46,7 +46,9 @@ namespace Playblack.Editor.Csp {
                 ++k;
             }
         }
+
         #region Inputs
+
         /// <summary>
         /// Get the index number of the input name from the given component.
         /// Used for editor popup fields.
@@ -76,15 +78,18 @@ namespace Playblack.Editor.Csp {
 
         /// <summary>
         /// Get the list of all inputs for the given component.
-        /// 
+        ///
         /// </summary>
         /// <returns>The input list.</returns>
         /// <param name="component">Component.</param>
         public string[] GetInputList(string component) {
             return (component == null || !inputMapping.ContainsKey(component)) ? null : inputMapping[component];
         }
-        #endregion
+
+        #endregion Inputs
+
         #region Components
+
         public int GetComponentIndex(string component) {
             return component == null ? 0 : Array.IndexOf(this.componentList, component);
         }
@@ -99,7 +104,7 @@ namespace Playblack.Editor.Csp {
         public string[] GetComponentList() {
             return this.componentList;
         }
-        #endregion
+
+        #endregion Components
     }
 }
-

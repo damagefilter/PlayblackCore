@@ -1,15 +1,16 @@
 ﻿using System;
-using System.Collections.Generic;
-using ProtoBuf;
 using System.IO;
 using System.Runtime.Serialization.Formatters.Binary;
 
 namespace Playblack.Savegame.Model {
+
     /// <summary>
     /// Class of static methods helping with serializing and deserializing from and to byte arrays.
     /// </summary>
     public static class DataSerializer {
+
         #region Serialize
+
         /// <summary>
         /// Serializes any simple object into a byte array.
         /// </summary>
@@ -54,9 +55,11 @@ namespace Playblack.Savegame.Model {
                 return ms.ToArray();
             }
         }
-        #endregion
+
+        #endregion Serialize
 
         #region Deserialize
+
         /// <summary>
         /// Deserializes a system byte array (non-protobuf bytes) back into an object.
         /// </summary>
@@ -119,6 +122,7 @@ namespace Playblack.Savegame.Model {
                 return obj;
             }
         }
-        #endregion
+
+        #endregion Deserialize
     }
 }

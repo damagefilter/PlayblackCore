@@ -1,15 +1,16 @@
 using Playblack.BehaviourTree.Execution.Core;
-using Playblack.BehaviourTree.Execution.Core.Events;
 using Playblack.BehaviourTree.Model.Core;
 using Playblack.BehaviourTree.Model.Task.Composite;
 using System;
 using System.Collections.Generic;
 
 namespace Playblack.BehaviourTree.Execution.Task.Composite {
+
     /// <summary>
     /// Returns after the first successful child a success status
     /// </summary>
     public class ExecutionSelector : ExecutionComposite {
+
         /// <summary>
         /// list index of active child
         /// </summary>
@@ -25,14 +26,13 @@ namespace Playblack.BehaviourTree.Execution.Task.Composite {
         /// </summary>
         private IList<ModelTask> children;
 
-
         public ExecutionSelector(ModelTask modelTask, IBTExecutor executor, ExecutionTask parent)
             : base(modelTask, executor, parent) {
-                if (!(modelTask is ModelSelector)) {
-                    throw new ArgumentException("The ModelTask must subclass "
-                    + typeof(ModelSelector) + " but it inherits from "
-                    + modelTask.GetType().BaseType);
-                }
+            if (!(modelTask is ModelSelector)) {
+                throw new ArgumentException("The ModelTask must subclass "
+                + typeof(ModelSelector) + " but it inherits from "
+                + modelTask.GetType().BaseType);
+            }
         }
 
         protected override void RestoreState(DataContext context) {

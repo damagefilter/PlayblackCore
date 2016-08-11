@@ -1,16 +1,18 @@
+using ProtoBuf;
 using System;
 using System.Collections.Generic;
-using ProtoBuf;
 using UnityEngine;
 
 namespace Playblack.Csp {
+
     /// <summary>
     /// Defines a signal output and registered listeners.
-    /// 
+    ///
     /// </summary>
     [Serializable]
     [ProtoContract]
     public class OutputFunc {
+
         [SerializeField]
         [ProtoMember(1)]
         protected List<OutputEventListener> registeredListeners; // protobuf needs protected
@@ -30,9 +32,9 @@ namespace Playblack.Csp {
                 return this.outputName;
             }
         }
+
         // protobuf ctor
         public OutputFunc() {
-
         }
 
         public OutputFunc(string outputName) {
@@ -74,4 +76,3 @@ namespace Playblack.Csp {
         }
     }
 }
-

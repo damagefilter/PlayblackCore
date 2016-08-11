@@ -1,18 +1,20 @@
-﻿using System;
-using ProtoBuf;
+﻿using ProtoBuf;
 using System.Collections.Generic;
-using System.IO;
 
 namespace Playblack.Savegame.Model {
+
     /// <summary>
     /// A block of data representing a full game object.
     /// This is a collection of ComponentDataBlock objects mapped by theor component name.
     /// </summary>
     [ProtoContract]
     public class GameObjectDataBlock : IDataBlock {
+
         #region data
+
         [ProtoMember(100)]
         private string uuid;
+
         public string UUID {
             get {
                 return uuid;
@@ -21,6 +23,7 @@ namespace Playblack.Savegame.Model {
 
         [ProtoMember(150)]
         private string sceneName;
+
         public string SceneName {
             get {
                 return sceneName;
@@ -29,6 +32,7 @@ namespace Playblack.Savegame.Model {
 
         [ProtoMember(200)]
         private string assetBundle;
+
         public string AssetBundle {
             get {
                 return assetBundle;
@@ -37,6 +41,7 @@ namespace Playblack.Savegame.Model {
 
         [ProtoMember(300)]
         private string assetPath;
+
         public string AssetPath {
             get {
                 return assetPath;
@@ -45,6 +50,7 @@ namespace Playblack.Savegame.Model {
 
         [ProtoMember(400)]
         private bool loadAsset;
+
         public bool MustLoadAsset {
             get {
                 return loadAsset;
@@ -53,13 +59,14 @@ namespace Playblack.Savegame.Model {
 
         [ProtoMember(500)]
         private List<ComponentDataBlock> componentList;
+
         public List<ComponentDataBlock> ComponentList {
             get {
                 return componentList;
             }
         }
 
-        #endregion
+        #endregion data
 
         #region IDataBlock implementation
 
@@ -69,7 +76,8 @@ namespace Playblack.Savegame.Model {
             }
         }
 
-        #endregion
+        #endregion IDataBlock implementation
+
         public GameObjectDataBlock() {
             // protobuf ctor
         }

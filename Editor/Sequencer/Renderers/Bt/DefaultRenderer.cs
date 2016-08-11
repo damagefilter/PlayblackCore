@@ -1,14 +1,12 @@
 ﻿using Playblack.BehaviourTree;
-using Fasterflect;
-using UnityEditor;
-using UnityEngine;
 using PlayBlack.Editor.Windows;
 using System.Collections.Generic;
-using System.Linq;
+using UnityEditor;
+using UnityEngine;
 
 namespace PlayBlack.Editor.Sequencer.Renderers.Bt {
-    public class DefaultRenderer : IOperatorRenderer<UnityBtModel> {
 
+    public class DefaultRenderer : IOperatorRenderer<UnityBtModel> {
         protected UnityBtModel modelToRender;
         protected UnityBtModel parentModel;
         private IList<ChildDescriptorAttribute> childStructure;
@@ -19,6 +17,7 @@ namespace PlayBlack.Editor.Sequencer.Renderers.Bt {
             scrollPos = Vector2.zero;
             this.insertIndex = -1;
         }
+
         public virtual void RenderCodeView(ISequencerRenderer<UnityBtModel> sequenceRenderer) {
             // Happens in the best families.
             // That's when we're processing an empty child slot, which means we wanna add the add-operator button and get out.
@@ -39,7 +38,7 @@ namespace PlayBlack.Editor.Sequencer.Renderers.Bt {
             int indent = sequenceRenderer.IndentLevel;
             sequenceRenderer.RenderEditOperatorButton(modelToRender.CodeViewDisplay, modelToRender, parentModel, this);
             sequenceRenderer.IndentLevel += 10;
-            
+
             foreach (var kvp in childStructure) {
                 // in the default list we ignore insert indexes and just render the whole list then cancel any further rendering
                 if (kvp.Name == "default") {
@@ -77,7 +76,7 @@ namespace PlayBlack.Editor.Sequencer.Renderers.Bt {
                     }
                     break;
                 }
-                
+
                 // Displays a name for structuring purposes.
                 sequenceRenderer.RenderOperatorDummyButton(kvp.Name);
                 sequenceRenderer.IndentLevel += 10;
@@ -113,7 +112,6 @@ namespace PlayBlack.Editor.Sequencer.Renderers.Bt {
             sequenceRenderer.IndentLevel = indent;
         }
 
-        
         private void SetInsertIndex(int insertIndex) {
             this.insertIndex = insertIndex;
         }
@@ -151,8 +149,9 @@ namespace PlayBlack.Editor.Sequencer.Renderers.Bt {
                                 else {
                                     bool boolVal = (bool)data.Value;
                                     data.Value = EditorGUILayout.Toggle(boolVal, GUILayout.Width(150));
-                                }                      
+                                }
                                 break;
+
                             case Playblack.BehaviourTree.ValueType.FLOAT:
                                 if (data.Value == null) {
                                     data.Value = EditorGUILayout.FloatField(0f, GUILayout.Width(150));
@@ -162,6 +161,7 @@ namespace PlayBlack.Editor.Sequencer.Renderers.Bt {
                                     data.Value = EditorGUILayout.FloatField(floatVal, GUILayout.Width(150));
                                 }
                                 break;
+
                             case Playblack.BehaviourTree.ValueType.INT:
                                 if (data.Value == null) {
                                     data.Value = EditorGUILayout.IntField(0, GUILayout.Width(150));
@@ -171,9 +171,11 @@ namespace PlayBlack.Editor.Sequencer.Renderers.Bt {
                                     data.Value = EditorGUILayout.IntField(intVal, GUILayout.Width(150));
                                 }
                                 break;
+
                             case Playblack.BehaviourTree.ValueType.STRING:
                                 data.Value = EditorGUILayout.TextField(data.UnityValue, GUILayout.Width(150));
                                 break;
+
                             case Playblack.BehaviourTree.ValueType.TEXT:
                                 data.Value = EditorGUILayout.TextArea(data.UnityValue, GUILayout.Width(150), GUILayout.Height(50));
                                 break;
@@ -189,6 +191,7 @@ namespace PlayBlack.Editor.Sequencer.Renderers.Bt {
         }
 
         private List<DefaultRenderer> childRenderers;
+
         public void SetSubjects(params UnityBtModel[] subjects) {
             var model = subjects[0];
             if (this.modelToRender != model) {

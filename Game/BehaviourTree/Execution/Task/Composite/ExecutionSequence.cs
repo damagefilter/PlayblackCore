@@ -1,15 +1,16 @@
 using Playblack.BehaviourTree.Execution.Core;
-using Playblack.BehaviourTree.Execution.Core.Events;
 using Playblack.BehaviourTree.Model.Core;
 using Playblack.BehaviourTree.Model.Task.Composite;
 using System;
 using System.Collections.Generic;
 
 namespace Playblack.BehaviourTree.Execution.Task.Composite {
+
     /// <summary>
     /// Executes everything within the sequence until fail or terminate is received or sequence has ended.
     /// </summary>
     public class ExecutionSequence : ExecutionComposite {
+
         /// <summary>
         /// list index of active child
         /// </summary>
@@ -27,11 +28,11 @@ namespace Playblack.BehaviourTree.Execution.Task.Composite {
 
         public ExecutionSequence(ModelTask modelTask, IBTExecutor executor, ExecutionTask parent)
             : base(modelTask, executor, parent) {
-                if (!(modelTask is ModelSequence)) {
-                    throw new ArgumentException("The ModelTask must subclass "
-                    + typeof(ModelSequence) + " but it inherits from "
-                    + modelTask.GetType().BaseType);
-                }
+            if (!(modelTask is ModelSequence)) {
+                throw new ArgumentException("The ModelTask must subclass "
+                + typeof(ModelSequence) + " but it inherits from "
+                + modelTask.GetType().BaseType);
+            }
         }
 
         protected override void RestoreState(DataContext context) {

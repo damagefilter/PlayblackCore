@@ -1,14 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+﻿namespace Playblack.Sequencer {
 
-namespace Playblack.Sequencer {
     /// <summary>
     /// Can be attached to Models to describe in the editor view
     /// how the model should look.
     /// </summary>
     public class CodeViewFormattingHintAttribute : System.Attribute {
+
         public string Format {
             get;
             private set;

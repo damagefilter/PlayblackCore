@@ -1,10 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+﻿namespace PlayBlack.Editor.Sequencer.Renderers {
 
-namespace PlayBlack.Editor.Sequencer.Renderers {
     public interface IOperatorRenderer<TRenderType> {
+
         /// <summary>
         /// Renders something comlex
         /// </summary>
@@ -16,7 +13,6 @@ namespace PlayBlack.Editor.Sequencer.Renderers {
         /// or add/edit parts of the sequence
         /// </summary>
         void RenderCodeView(ISequencerRenderer<TRenderType> sequenceRenderer);
-
 
         /// <summary>
         /// Set the subject that you want to render with this sequence part renderer

@@ -5,33 +5,38 @@ using Playblack.BehaviourTree.Model.Core;
 using System.Collections.Generic;
 
 namespace Playblack.BehaviourTree.Execution.Core {
+
     public abstract class ExecutionTask {
 
         public delegate void TaskStatusChanged(TaskEvent e);
 
         private ModelTask modelTask;
+
         public ModelTask ModelTask {
             get {
                 return this.modelTask;
             }
         }
+
         private IBTExecutor executor;
+
         public IBTExecutor BTExecutor {
             get {
                 return this.executor;
             }
         }
+
         private DataContext globalContext;
 
         private TaskStatusChanged listeners;
 
         private TaskStatus status;
 
-        private bool 
+        private bool
             // Flag if this can (and should) be spawned
-            spawnable, 
+            spawnable,
             // Flag if this can be ticked (has been spawned
-            tickable, 
+            tickable,
             // are we terminated?
             terminated;
 
@@ -100,7 +105,7 @@ namespace Playblack.BehaviourTree.Execution.Core {
             if (!ValidateInternalTickStatus(newStatus)) {
                 throw new IllegalReturnStatusException(newStatus + " cannot be returned by ExecutionTask.InternalTick()");
             }
-            
+
             if (newStatus != TaskStatus.RUNNING) {
                 this.executor.SetTaskState(this.position, StoreState());
                 this.executor.RequestTickableRemoval(this);
@@ -113,15 +118,14 @@ namespace Playblack.BehaviourTree.Execution.Core {
         /// <summary>
         /// Takes the models descriptor information and the stored local context and
         /// populates the fields of this task automatically.
-        /// 
+        ///
         /// Does not work for children of course as they are not context data.
-        /// 
+        ///
         /// Gets the context passed since it should be re-usable by RestoreState so some plumbing of
         /// fetching fields and assigning / casting values is done automatically.
         /// Works only on fields decoreted with FieldDefinitionAttribute ofc
         /// </summary>
         protected void RestoreStateFromContext(DataContext context) {
-
             // Kinda copied from UnityBtModel as the logic is always getting stuff from the ModelDataDescriptor
             // which contains code to retrieve the described fields.
             // This avoids most of the dupe code
@@ -165,7 +169,9 @@ namespace Playblack.BehaviourTree.Execution.Core {
         }
 
         #region to implement
+
         protected abstract void RestoreState(DataContext context);
+
         // description copied from jbt sources
         /**
         * This is the method that carries out the actual spawning process of the
@@ -244,7 +250,9 @@ namespace Playblack.BehaviourTree.Execution.Core {
         * termination of one or several of its children, then it should request to
         * be inserted into the list of tickable nodes.
         */
+
         protected abstract void InternalSpawn();
+
         // description copied from jbt sources
         /**
         * <code>internalTick()</code> is the method that actually carries out the
@@ -315,12 +323,14 @@ namespace Playblack.BehaviourTree.Execution.Core {
         * Status object, only certain return values are allowed. In particular,
         * only {@link Status#SUCCESS}, {@link Status#FAILURE} and
         * {@link Status#RUNNING} can be returned.
-        * 
+        *
         * @return the status of the task after being ticked.
         */
+
         protected abstract TaskStatus InternalTick();
 
         protected abstract void InternalTerminate();
+
         // description copied from jbt sources
         /**
          * This method stores the persistent state of an ExecutionTask. Some tasks
@@ -357,15 +367,17 @@ namespace Playblack.BehaviourTree.Execution.Core {
          * <p>
          * This method may return null if the task does not need to store any state
          * information for future use.
-         * 
+         *
          * @return an ITaskState object with the persistent state information of the
          *         task, for future use. The returned ITaskState must be readable by
          *         <code>restoreState()</code>.
          */
+
         protected abstract DataContext StoreState();
 
         protected abstract DataContext StoreTerminationState();
-        #endregion
+
+        #endregion to implement
 
         private static bool ValidateInternalTickStatus(TaskStatus status) {
             return !(status == TaskStatus.TERMINATED || status == TaskStatus.UNINITIALISED);

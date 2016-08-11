@@ -1,4 +1,5 @@
 ﻿namespace Playblack.EventSystem.Events {
+
     public class SaveGameLoadedEvent : Event<SaveGameLoadedEvent> {
 
         /// <summary>

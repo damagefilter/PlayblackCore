@@ -1,12 +1,14 @@
-﻿using System;
-using System.Collections;
+﻿using System.Collections;
 
 namespace Playblack.Savegame {
+
     public interface ISaveState {
+
         string SaveName {
             get;
             set;
         }
+
         /// <summary>
         /// Creates the save file for the current game state.
         /// The save file name is determined by the SaveName property.
@@ -23,4 +25,3 @@ namespace Playblack.Savegame {
         IEnumerator RestoreSave(string dataId);
     }
 }
-

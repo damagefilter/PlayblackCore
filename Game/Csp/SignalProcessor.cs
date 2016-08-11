@@ -8,12 +8,15 @@ using Playblack.Savegame;
 using UnityEngine;
 
 #if UNITY_EDITOR
+
 using UnityEditor;
+
 #endif
 
 namespace Playblack.Csp {
 
     public delegate void SimpleSignal();
+
     public delegate void ParameterSignal(string param);
 
     /// <summary>
@@ -22,6 +25,7 @@ namespace Playblack.Csp {
     [DisallowMultipleComponent]
     [SaveableComponent]
     public class SignalProcessor : MonoBehaviour {
+
         /// <summary>
         /// Signals this Entity can receive and process.
         /// This list represents volatile information and needs to be rebuilt
@@ -50,11 +54,11 @@ namespace Playblack.Csp {
                 }
                 return this.outputs;
             }
-            #if UNITY_EDITOR
+#if UNITY_EDITOR
             set {
                 this.outputs = value;
             }
-            #endif
+#endif
         }
 
         /// <summary>
@@ -62,7 +66,6 @@ namespace Playblack.Csp {
         /// their type and all attached attributes to it.
         /// </summary>
         private static GenericObjectPoolMap<Type, InputFuncAttribute[]> inputFuncCache = new GenericObjectPoolMap<Type, InputFuncAttribute[]>(10, 50);
-
 
         public InputFunc GetInputFunc(string name, string component) {
             if (inputFuncs == null) {
@@ -101,7 +104,6 @@ namespace Playblack.Csp {
                 InputFuncAttribute[] attribs = null;
                 if (inputFuncCache.Has(type)) {
                     attribs = inputFuncCache.Get(type);
-
                 }
                 else {
                     var attribList = new List<InputFuncAttribute>(methods.Count / 2); // round about this number as init capacity
@@ -237,7 +239,7 @@ namespace Playblack.Csp {
         /// <summary>
         /// Runs through all known output signals and hooks up the linking information to real gameobjects in the scene.
         /// This usually must be called after loading a game or to clean up linking information.
-        /// 
+        ///
         /// NOTE: On a clean / default scene this data gets fed in by unity and will be correct.
         /// This is only required after loading a save game.
         /// </summary>
@@ -275,9 +277,10 @@ namespace Playblack.Csp {
             EventDispatcher.Instance.Unregister<SaveGameLoadedEvent>(OnSaveGameLoaded);
         }
 
-        #endregion
+        #endregion Unity Related
 
-        #if UNITY_EDITOR
+#if UNITY_EDITOR
+
         public virtual void OnDrawGizmos() {
             if (outputs == null || outputs.Count <= 0) {
                 return;
@@ -294,7 +297,7 @@ namespace Playblack.Csp {
                 if (outputs[i].Listeners == null) {
                     continue; // can be null after deserialization
                 }
-//                foreach (var listener in output.Listeners) {
+                //                foreach (var listener in output.Listeners) {
                 for (int j = 0; j < outputs[i].Listeners.Count; ++j) {
                     bool needsEntityCleaning = false;
                     if (outputs[i].Listeners[j] == null || outputs[i].Listeners[j].matchedProcessors == null) {
@@ -313,7 +316,7 @@ namespace Playblack.Csp {
                         var targetPos = outputs[i].Listeners[j].matchedProcessors[k].transform.position;
                         Gizmos.DrawLine(this.transform.position, targetPos);
 
-                        // Prepare the orientation for a cone cap 
+                        // Prepare the orientation for a cone cap
                         // to display in which direction the connection goes
                         var direction = targetPos - this.transform.position;
                         // This may or may not work
@@ -326,7 +329,6 @@ namespace Playblack.Csp {
                         Ray r = new Ray(this.transform.position, direction);
                         var pos = r.GetPoint(direction.magnitude - 0.5f);
                         Handles.ConeCap(0, pos, rot, 0.3f);
-
                     }
                     if (needsEntityCleaning) {
                         var list = new List<SignalProcessor>();
@@ -343,7 +345,7 @@ namespace Playblack.Csp {
                 }
             }
         }
-        #endif
+
+#endif
     }
 }
-

@@ -1,12 +1,11 @@
 using Playblack.BehaviourTree.Execution.Core;
-using Playblack.BehaviourTree.Execution.Core.Events;
 using Playblack.BehaviourTree.Model.Core;
 using Playblack.BehaviourTree.Model.Task.Decorator;
 using System;
 
 namespace Playblack.BehaviourTree.Execution.Task.Decorator {
-    public class ExecutionRepeat : ExecutionDecorator {
 
+    public class ExecutionRepeat : ExecutionDecorator {
         private ExecutionTask child;
 
         protected ExecutionTask Child {

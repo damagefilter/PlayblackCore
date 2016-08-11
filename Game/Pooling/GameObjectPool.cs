@@ -1,10 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+﻿using System.Collections.Generic;
 using UnityEngine;
 
 namespace Playblack.Pooling {
+
     public class GameObjectPool {
         private List<PooledObject<GameObject>> pooledObjects;
         private int maxCapacity;
@@ -32,7 +30,7 @@ namespace Playblack.Pooling {
         /// <param name="obj"></param>
         public void Add(GameObject obj) {
             if (this.pooledObjects.Count >= maxCapacity) {
-                throw new MaxCapacityReachedException("Object pool has reached the capacity of " + this.maxCapacity + ". Cannot add object ("+obj.name+") to pool.");
+                throw new MaxCapacityReachedException("Object pool has reached the capacity of " + this.maxCapacity + ". Cannot add object (" + obj.name + ") to pool.");
             }
 
             obj.SetActive(false);
@@ -68,7 +66,7 @@ namespace Playblack.Pooling {
         public void Clear() {
             // Mark objects for destruction
             for (int i = 0; i < this.pooledObjects.Count; ++i) {
-                GameObject.Destroy(this.pooledObjects[i].Object); 
+                GameObject.Destroy(this.pooledObjects[i].Object);
             }
 
             // Release ther references for GC

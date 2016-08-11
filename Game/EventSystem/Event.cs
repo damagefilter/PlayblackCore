@@ -1,9 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+﻿namespace Playblack.EventSystem.Events {
 
-namespace Playblack.EventSystem.Events {
     public abstract class Event<TImplementor> : IEvent where TImplementor : IEvent {
 
         /// <summary>

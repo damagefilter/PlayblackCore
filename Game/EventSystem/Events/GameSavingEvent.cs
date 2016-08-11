@@ -1,6 +1,7 @@
 ﻿using Playblack.Savegame.Model;
 
 namespace Playblack.EventSystem.Events {
+
     public class GameSavingEvent : Event<GameSavingEvent> {
 
         public SceneDataBlock SceneData {

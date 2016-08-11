@@ -1,11 +1,12 @@
-﻿using System;
+﻿using Playblack.EventSystem;
+using Playblack.EventSystem.Events;
 using System.Collections;
 using UnityEngine;
-using Playblack.EventSystem;
-using Playblack.EventSystem.Events;
 
 namespace Playblack.Assets {
+
     public class AsyncAssetLoader : MonoBehaviour {
+
         /// <summary>
         /// Used as callback for asynchronously loading assets.
         /// This will NOT instantiate the object!
@@ -18,11 +19,11 @@ namespace Playblack.Assets {
             assetManager = new AssetManager();
         }
 
-        void Awake() {
+        private void Awake() {
             EventDispatcher.Instance.Register<RequestAssetEvent>(OnAssetRequest);
         }
 
-        void OnDestroy() {
+        private void OnDestroy() {
             EventDispatcher.Instance.Unregister<RequestAssetEvent>(OnAssetRequest);
         }
 
@@ -34,7 +35,7 @@ namespace Playblack.Assets {
         private IEnumerator LoadAssetBundle(string assetPath, string assetBundle, AssetLoaded callback) {
             if (assetManager.HasAssetBundle(assetBundle)) {
                 yield return StartCoroutine(LoadAssetFromBundle(assetPath, assetBundle, callback));
-//                yield break; // End this coroutine
+                //                yield break; // End this coroutine
             }
 
             WWW www = new WWW("file://" + Application.streamingAssetsPath + "/" + assetBundle + ".bundle");
@@ -51,4 +52,3 @@ namespace Playblack.Assets {
         }
     }
 }
-

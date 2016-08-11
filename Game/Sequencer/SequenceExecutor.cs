@@ -1,21 +1,23 @@
-﻿using System;
-using UnityEngine;
-using System.Collections.Generic;
+﻿using Playblack.BehaviourTree;
 using Playblack.BehaviourTree.Execution.Core;
-using Playblack.Csp;
-using Playblack.BehaviourTree;
-using System.Collections;
 using Playblack.BehaviourTree.Model.Core;
-using System.IO;
-using Playblack.Savegame.Model;
 using Playblack.BehaviourTree.Model.Task.Composite;
+using Playblack.Csp;
+using Playblack.Extensions;
+using Playblack.Savegame.Model;
+using System.Collections;
+using System.Collections.Generic;
+using System.IO;
+using UnityEngine;
 
 namespace Playblack.Sequencer {
+
     /// <summary>
     /// Executes a behaviour tree of some description.
     /// </summary>
     [OutputAware("OnExecutionFinish", "OnExecutionTrigger", "OnExecutionTerminated")]
     public class SequenceExecutor : MonoBehaviour, ISerializationCallbackReceiver {
+
         [SerializeField]
         private List<ValueField> globalDataContext;
 
@@ -55,6 +57,7 @@ namespace Playblack.Sequencer {
         public SequenceExecutor() {
             this.rootModel = UnityBtModel.NewInstance(null, new UnityBtModel(), typeof(ModelSequence).ToString());
         }
+
         public IBTExecutor GetExecutor() {
             return this.GetExecutor(new DataContext(globalDataContext), actor);
         }
@@ -87,7 +90,6 @@ namespace Playblack.Sequencer {
                     yield return 0;
                 }
             }
-            
         }
 
         [InputFunc("TriggerExecution")]
@@ -122,6 +124,7 @@ namespace Playblack.Sequencer {
             running = false;
             this.FireOutput("OnExecutionTerminated");
         }
+
         public IBTExecutor GetExecutor(DataContext context, UnityEngine.Object actor) {
             context["actor"] = actor;
 
@@ -163,4 +166,3 @@ namespace Playblack.Sequencer {
         }
     }
 }
-
