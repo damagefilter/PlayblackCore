@@ -1,6 +1,7 @@
 ﻿using Playblack.Csp;
 using System;
 using System.Collections.Generic;
+using System.Text;
 
 namespace Playblack.Editor.Csp {
 
@@ -16,23 +17,34 @@ namespace Playblack.Editor.Csp {
             // Generates data.
             // This is a more or lesss expensive task which is why the results are stored for later re-use.
             listener.matchedProcessors.Clear();
-            var hits = UnityEngine.Object.FindObjectsOfType<SignalProcessor>(); // expensive but it's not used THAT often
+             // expensive but it's not used THAT often
             Dictionary<string, List<string>> inputMap = new Dictionary<string, List<string>>();
             if (!string.IsNullOrEmpty(listener.targetProcessorName)) { // check if target processor name is okay
-                for (int i = 0; i < hits.Length; ++i) {
-                    if (!hits[i].name.StartsWith(listener.targetProcessorName, StringComparison.InvariantCulture)) {
-                        continue;
-                    }
-                    listener.matchedProcessors.Add(hits[i]);
-                    foreach (var kvp in hits[i].InputFuncs) {
-                        if (!inputMap.ContainsKey(kvp.Key)) {
-                            inputMap.Add(kvp.Key, new List<string>());
+                // Here come some exceptions. We can reference !self as target which means target is local processor
+                if (listener.targetProcessorName == "!self") {
+                    listener.matchedProcessors.Add(localProcessor);
+                }
+                else {
+                    var hits = UnityEngine.Object.FindObjectsOfType<SignalProcessor>();
+                    for (int i = 0; i < hits.Length; ++i) {
+                        if (!hits[i].name.StartsWith(listener.targetProcessorName, StringComparison.Ordinal)) {
+                            continue;
                         }
-                        for (int j = 0; j < kvp.Value.Count; ++j) {
-                            inputMap[kvp.Key].Add(kvp.Value[j].Name);
+                        listener.matchedProcessors.Add(hits[i]);
+                        if (hits[i].InputFuncs.Count == 0) {
+                            UnityEngine.Debug.LogError("No inputfunc components on processor " + hits[i].name);
+                        }
+                        foreach (var kvp in hits[i].InputFuncs) {
+                            if (!inputMap.ContainsKey(kvp.Key)) {
+                                inputMap.Add(kvp.Key, new List<string>());
+                            }
+                            for (int j = 0; j < kvp.Value.Count; ++j) {
+                                inputMap[kvp.Key].Add(kvp.Value[j].Name);
+                            }
                         }
                     }
                 }
+                
             }
 
             this.inputMapping = new Dictionary<string, string[]>(inputMap.Count);
@@ -45,6 +57,19 @@ namespace Playblack.Editor.Csp {
                 componentList[k] = kvp.Key;
                 ++k;
             }
+        }
+
+        public override string ToString() {
+            StringBuilder sb = new StringBuilder();
+            sb.AppendLine("##### COMPONENTS");
+            foreach (var str in componentList) {
+                sb.AppendLine(str);
+            }
+            sb.AppendLine("##### MATCHED PROCESSORS");
+            foreach (var kvp in inputMapping) {
+                sb.AppendLine(kvp.Key);
+            }
+            return sb.ToString();
         }
 
         #region Inputs

@@ -27,6 +27,10 @@ namespace Playblack.Pooling {
             return default(TValue);
         }
 
+        public void Clear() {
+            pooledObjects.Clear();
+        }
+
         public bool Has(TKey key) {
             return pooledObjects.ContainsKey(key);
         }

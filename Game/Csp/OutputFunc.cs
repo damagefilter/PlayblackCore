@@ -54,19 +54,19 @@ namespace Playblack.Csp {
             }
         }
 
-        public void AttachInput(string sceneName, string inputMethod, string parameter, float executionDelay) {
+        public void AttachInput(string sceneName, string inputMethod, string parameter, float executionDelay, SignalProcessor localProcessor) {
             var l = new OutputEventListener() {
                 targetProcessorName = sceneName,
                 method = inputMethod,
                 param = parameter,
                 delay = executionDelay
             };
-            l.FindTargetProcessors();
+            l.FindTargetProcessors(localProcessor);
             registeredListeners.Add(l);
         }
 
-        public void AttachInput() {
-            this.AttachInput(null, null, null, 0.0f);
+        public void AttachInput(SignalProcessor localProcessor) {
+            this.AttachInput(null, null, null, 0.0f, localProcessor);
         }
 
         public void DetachAtIndex(int index) {

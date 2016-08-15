@@ -11,7 +11,7 @@ namespace Playblack.Editor.Csp {
     /// Also offers functionality to create new connections, edit / remove existing ones.
     /// </summary>
     public class CspConnectorWindowOverview : EditorWindow {
-        private static GenericObjectPoolMap<string, SignalDataCache> dataCache = new GenericObjectPoolMap<string, SignalDataCache>(5, 8);
+        private GenericObjectPoolMap<string, SignalDataCache> dataCache = new GenericObjectPoolMap<string, SignalDataCache>(5, 8);
         private const int listFieldSize = 150;
 
         private SignalProcessor processor;
@@ -42,6 +42,7 @@ namespace Playblack.Editor.Csp {
             for (int i = 0; i < processor.Outputs.Count; ++i) {
                 this.outputs[i] = processor.Outputs[i].Name;
             }
+            this.dataCache.Clear();
         }
 
         public void OnGUI() {
@@ -93,7 +94,7 @@ namespace Playblack.Editor.Csp {
         private void DrawOutput(ref OutputFunc output) {
             int toRemove = -1;
             for (int i = 0; i < output.Listeners.Count; ++i) {
-                string cacheKey = processor.name + output.Listeners[i].targetProcessorName; // this is local processor and target processor names
+                string cacheKey = processor.name + output.Listeners[i].targetProcessorName;
                 SignalDataCache data = null;
                 if (!dataCache.Has(cacheKey)) {
                     data = new SignalDataCache(processor, output.Listeners[i]);
@@ -101,7 +102,15 @@ namespace Playblack.Editor.Csp {
                 }
                 else {
                     data = dataCache.Get(cacheKey);
+                    if (data.GetComponentList() == null || data.GetComponentList().Length == 0) {
+                        // stale data through scene switches and such. rebuild.
+                        Debug.Log("Rebuilding cached data for " + cacheKey);
+                        dataCache.Remove(cacheKey);
+                        data = new SignalDataCache(processor, output.Listeners[i]);
+                        dataCache.Add(cacheKey, data);
+                    }
                 }
+                
                 dataCache.PutBack(cacheKey); // cause if not, next time we get a null back. Should think about not using the InUse stuff
                 EditorGUILayout.BeginHorizontal();
                 {
@@ -120,8 +129,14 @@ namespace Playblack.Editor.Csp {
                         EditorGUILayout.LabelField("No parameter on null target", GUILayout.Width(listFieldSize));
                         EditorGUILayout.LabelField("No delay on null target", GUILayout.Width(listFieldSize));
                     }
-                    else if (data.GetComponentList() == null || data.GetComponentList().Length == 0 || output.Listeners[i] == null) {
-                        EditorGUILayout.LabelField("No input on target", GUILayout.Width(listFieldSize));
+                    else if (data.GetComponentList() == null || data.GetComponentList().Length == 0) {
+                        // That means we need to rebuild it since it's all empty!
+                        EditorGUILayout.LabelField("No input data on target", GUILayout.Width(listFieldSize));
+                        EditorGUILayout.LabelField("No parameter on input", GUILayout.Width(listFieldSize));
+                        EditorGUILayout.LabelField("No target, no delay", GUILayout.Width(listFieldSize));
+                    }
+                    else if (output.Listeners[i] == null) {
+                        EditorGUILayout.LabelField("No output listeners target", GUILayout.Width(listFieldSize));
                         EditorGUILayout.LabelField("No parameter on input", GUILayout.Width(listFieldSize));
                         EditorGUILayout.LabelField("No target, no delay", GUILayout.Width(listFieldSize));
                     }
@@ -133,23 +148,35 @@ namespace Playblack.Editor.Csp {
                         string componentName = data.GetComponentName(componentIndex);
                         if (componentName != output.Listeners[i].component) {
                             output.Listeners[i].component = componentName;
-                            output.Listeners[i].method = null; // Reset method, the old one will very likely not apply anymore
+                            var inMethods = data.GetInputList(componentName);
+                            if (inMethods == null || inMethods.Length == 0) {
+                                output.Listeners[i].method = null; // Reset method, the old one will very likely not apply anymore
+                            }
+                            else {
+                                output.Listeners[i].method = inMethods[0]; // Take first we know
+                            }
                         }
-
-                        // Input on processors: Input Method selection
-                        int inputIndex = EditorGUILayout.Popup(data.GetInputIndex(componentName, output.Listeners[i].method), data.GetInputList(componentName), GUILayout.Width(listFieldSize / 2.05f));
-                        string inputName = data.GetInputName(componentName, inputIndex);
-                        if (inputName != output.Listeners[i].method) {
-                            output.Listeners[i].method = inputName;
-                        }
-
-                        if (output.Listeners[i].HasParameter(componentName)) {
-                            output.Listeners[i].param = EditorGUILayout.TextField(output.Listeners[i].param, GUILayout.Width(listFieldSize));
+                        
+                        if (string.IsNullOrEmpty(componentName)) {
+                            EditorGUILayout.LabelField("Invalid component", GUILayout.Width(listFieldSize));
                         }
                         else {
-                            EditorGUILayout.LabelField("No parameter on input", GUILayout.Width(listFieldSize));
+                            // Input on processors: Input Method selection
+                            var currentIndex = (output.Listeners[i].method != null ? data.GetInputIndex(componentName, output.Listeners[i].method) : 0);
+                            int inputIndex = EditorGUILayout.Popup(currentIndex, data.GetInputList(componentName), GUILayout.Width(listFieldSize / 2.05f));
+                            string inputName = data.GetInputName(componentName, inputIndex);
+                            if (inputName != output.Listeners[i].method) {
+                                output.Listeners[i].method = inputName;
+                            }
+
+                            if (output.Listeners[i].HasParameter(componentName)) {
+                                output.Listeners[i].param = EditorGUILayout.TextField(output.Listeners[i].param, GUILayout.Width(listFieldSize));
+                            }
+                            else {
+                                EditorGUILayout.LabelField("No parameter on input", GUILayout.Width(listFieldSize));
+                            }
+                            output.Listeners[i].delay = EditorGUILayout.FloatField(output.Listeners[i].delay, GUILayout.Width(listFieldSize));
                         }
-                        output.Listeners[i].delay = EditorGUILayout.FloatField(output.Listeners[i].delay, GUILayout.Width(listFieldSize));
                     }
 
                     if (GUILayout.Button("X", GUILayout.Width(listFieldSize))) {
@@ -183,7 +210,7 @@ namespace Playblack.Editor.Csp {
                         string outputName = GetOutputName(outputCfg.outputIndex);
                         for (int i = 0; i < processor.Outputs.Count; ++i) {
                             if (processor.Outputs[i].Name == outputName) {
-                                processor.Outputs[i].AttachInput(outputCfg.targetName, null, null, 0f);
+                                processor.Outputs[i].AttachInput(outputCfg.targetName, null, null, 0f, processor);
                                 outputCfg = new OutputConfig(); // reset stuffs
                                 break;
                             }
@@ -196,7 +223,17 @@ namespace Playblack.Editor.Csp {
                         var result = EditorUtility.DisplayDialog("Re-Scan outputs", "Do you really want to do this? Connections MIGHT be lost during the process!", "I do", "Better not");
                         if (result) {
                             processor.ReadOutputs();
+                            this.outputs = new string[processor.Outputs.Count];
+                            for (int i = 0; i < processor.Outputs.Count; ++i) {
+                                this.outputs[i] = processor.Outputs[i].Name;
+                            }
                         }
+                    }
+                    EditorUtility.SetDirty(processor);
+                    if (GUILayout.Button("Force-Save")) {
+                        EditorApplication.SaveScene();
+                        
+                        Debug.Log("Saved");
                     }
                 }
                 EditorGUILayout.EndVertical();

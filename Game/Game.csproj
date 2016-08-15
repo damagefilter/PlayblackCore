@@ -117,7 +117,6 @@
     <Compile Include="Savegame\SaveField.cs" />
     <Compile Include="Sequencer\CodeViewFormattingHintAttribute.cs" />
     <Compile Include="Sequencer\ExecutionType.cs" />
-    <Compile Include="ThreadManager.cs" />
     <Compile Include="Savegame\Model\ComponentDataBlock.cs" />
     <Compile Include="Savegame\Model\GameObjectDataBlock.cs" />
     <Compile Include="Savegame\Model\DataSerializer.cs" />

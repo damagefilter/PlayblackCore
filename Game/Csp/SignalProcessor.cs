@@ -35,7 +35,7 @@ namespace Playblack.Csp {
 
         public Dictionary<string, List<InputFunc>> InputFuncs {
             get {
-                if (this.inputFuncs == null) {
+                if (this.inputFuncs == null || this.inputFuncs.Count == 0) {
                     this.RebuildInputs();
                 }
                 return this.inputFuncs;
@@ -65,7 +65,7 @@ namespace Playblack.Csp {
         /// This cache is used to speed up the lookups for input funcs on components by remembering
         /// their type and all attached attributes to it.
         /// </summary>
-        private static GenericObjectPoolMap<Type, InputFuncAttribute[]> inputFuncCache = new GenericObjectPoolMap<Type, InputFuncAttribute[]>(10, 50);
+        private GenericObjectPoolMap<Type, InputFuncAttribute[]> inputFuncCache = new GenericObjectPoolMap<Type, InputFuncAttribute[]>(10, 50);
 
         public InputFunc GetInputFunc(string name, string component) {
             if (inputFuncs == null) {
@@ -112,6 +112,9 @@ namespace Playblack.Csp {
                     }
                     attribs = attribList.ToArray();
                     inputFuncCache.Add(type, attribs); // next time a processor sees this component, all the lookup reflection will be spared
+                }
+                if (attribs == null) {
+                    continue;
                 }
                 for (int j = 0; j < attribs.Length; ++j) {
                     try {
@@ -254,7 +257,7 @@ namespace Playblack.Csp {
                 }
                 for (int j = 0; j < outputs[i].Listeners.Count; ++j) {
                     // Finds and re-connects the inputs for signal handlers in the scene
-                    outputs[i].Listeners[j].FindTargetProcessors();
+                    outputs[i].Listeners[j].FindTargetProcessors(this);
                 }
             }
         }
