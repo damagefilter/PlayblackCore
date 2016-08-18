@@ -73,6 +73,10 @@ namespace Playblack.Savegame.Model {
 
         #region adding data
 
+        public void AddBoolean(string name, bool value) {
+            var fd = new FieldDescription((int)SaveField.FIELD_BOOL, name, DataSerializer.SerializeSimpleObject(value));
+            saveData.Add(fd);
+        }
         public void AddInt(string name, int value) {
             var fd = new FieldDescription((int)SaveField.FIELD_INT, name, DataSerializer.SerializeSimpleObject(value));
             saveData.Add(fd);
@@ -128,6 +132,15 @@ namespace Playblack.Savegame.Model {
                 }
             }
             return 0;
+        }
+
+        public bool ReadBool(string name) {
+            for (int i = 0; i < saveData.Count; ++i) {
+                if (saveData[i].fieldName == name) {
+                    return DataSerializer.DeserializeSimpleObject<bool>(saveData[i].fieldContent);
+                }
+            }
+            return false;
         }
 
         public float ReadFloat(string name) {

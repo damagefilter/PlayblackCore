@@ -73,7 +73,7 @@ namespace Playblack.Savegame {
         }
 
         /// <summary>
-        /// Creates the game object from asset.
+        /// Creates the game object from assetbundle or resources path.
         /// This call may be async in which case it will return the coroutine it works on.
         /// </summary>
         /// <returns>The game object from asset.</returns>

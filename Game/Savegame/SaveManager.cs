@@ -14,11 +14,11 @@ namespace Playblack.Savegame {
     /// </summary>
     public class SaveManager : MonoBehaviour {
 
-        [Tooltip("If non-empty the save manager will look in this asset bundle for the asset found under assetPath.")]
+        [Tooltip("If non-empty the save manager will assume the resource under assetPath is from the specified assetbundle name")]
         [SerializeField]
         private string assetBundle;
 
-        [Tooltip("If non-empty the save manager will request this asset from the asset manager before restoring data.")]
+        [Tooltip("Specifies a resource or a path in a specified assetBundle under which the managed GO can be found. Leave empty for raw GO regeneration")]
         [SerializeField]
         private string assetPath;
 
@@ -66,6 +66,9 @@ namespace Playblack.Savegame {
                         case SaveField.FIELD_FLOAT:
                             componentBlock.AddFloat(memberSet[j].Name, (float)components[i].TryGetValue(memberSet[j].Name, Flags.InstanceAnyVisibility));
                             break;
+                        case SaveField.FIELD_BOOL:
+                            componentBlock.AddBoolean(memberSet[j].Name, (bool)components[i].TryGetValue(memberSet[j].Name, Flags.InstanceAnyVisibility));
+                            break;
 
                         case SaveField.FIELD_INT:
                             componentBlock.AddInt(memberSet[j].Name, (int)components[i].TryGetValue(memberSet[j].Name, Flags.InstanceAnyVisibility));
@@ -85,6 +88,10 @@ namespace Playblack.Savegame {
 
                         case SaveField.FIELD_VECTOR_POSITION:
                             componentBlock.AddVector(memberSet[j].Name, (Vector3)components[i].TryGetValue(memberSet[j].Name, Flags.InstanceAnyVisibility));
+                            break;
+                        default:
+                            // In case we have new data types and forgot to add it here for processing
+                            Debug.LogError(memberSet[j].Name + " is of unhandled data type " + a.fieldType);
                             break;
                     }
                 }
@@ -128,6 +135,9 @@ namespace Playblack.Savegame {
                         case SaveField.FIELD_INT:
                             component.TrySetValue(memberSet[j].Name, data.ComponentList[i].ReadInt(memberSet[j].Name), Flags.InstanceAnyVisibility);
                             break;
+                        case SaveField.FIELD_BOOL:
+                            component.TrySetValue(memberSet[j].Name, data.ComponentList[i].ReadBool(memberSet[j].Name), Flags.InstanceAnyVisibility);
+                            break;
 
                         case SaveField.FIELD_PROTOBUF_OBJECT:
                             component.TrySetValue(memberSet[j].Name, data.ComponentList[i].ReadProtoObject(memberSet[j].Name, memberSet[j].Type()), Flags.InstanceAnyVisibility);
@@ -143,6 +153,10 @@ namespace Playblack.Savegame {
 
                         case SaveField.FIELD_VECTOR_POSITION:
                             component.TrySetValue(memberSet[j].Name, data.ComponentList[i].ReadVector(memberSet[j].Name), Flags.InstanceAnyVisibility);
+                            break;
+                        default:
+                            // In case we have new data types and forgot to add it here for processing
+                            Debug.LogError(memberSet[j].Name + " is of unhandled data type " + a.fieldType);
                             break;
                     }
                 }

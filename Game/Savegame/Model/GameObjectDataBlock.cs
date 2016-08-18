@@ -1,4 +1,5 @@
 ﻿using ProtoBuf;
+using System;
 using System.Collections.Generic;
 
 namespace Playblack.Savegame.Model {
@@ -30,6 +31,9 @@ namespace Playblack.Savegame.Model {
             }
         }
 
+        /// <summary>
+        /// The assetbundle name to request
+        /// </summary>
         [ProtoMember(200)]
         private string assetBundle;
 
@@ -39,6 +43,10 @@ namespace Playblack.Savegame.Model {
             }
         }
 
+        /// <summary>
+        /// In case of assetbundle assets, this is the path within the bundle.
+        /// In case of prefabs, this is the path within a Resources folder.
+        /// </summary>
         [ProtoMember(300)]
         private string assetPath;
 
@@ -87,7 +95,9 @@ namespace Playblack.Savegame.Model {
             this.sceneName = sceneName;
             this.assetBundle = assetBundle;
             this.assetPath = assetPath;
-            this.loadAsset = !string.IsNullOrEmpty(assetBundle) && !string.IsNullOrEmpty(assetPath);
+            // We can have only assetPath, that will load from Resources.
+            // Or we can have assetBundle and assetPath, that will load from an assetbundle
+            this.loadAsset = !string.IsNullOrEmpty(assetPath) || (!string.IsNullOrEmpty(assetBundle) && !string.IsNullOrEmpty(assetPath));
             this.componentList = new List<ComponentDataBlock>();
         }
 
