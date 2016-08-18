@@ -43,7 +43,8 @@ namespace Playblack.Savegame {
             // (That also means we don't need to track them all)
             var managers = UnityEngine.Object.FindObjectsOfType<SaveManager>();
             for (int i = 0; i < managers.Length; ++i) {
-                // Needs to be killed right away
+                // SaveManager handled objects need to be destroyed
+                // as they will all be re-created from the save file.
                 UnityEngine.Object.DestroyImmediate(managers[i].gameObject);
             }
             SaveFile file = null;

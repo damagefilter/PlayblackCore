@@ -89,6 +89,9 @@ namespace Playblack.Savegame {
                         case SaveField.FIELD_VECTOR_POSITION:
                             componentBlock.AddVector(memberSet[j].Name, (Vector3)components[i].TryGetValue(memberSet[j].Name, Flags.InstanceAnyVisibility));
                             break;
+                        case SaveField.FIELD_QUATERNION:
+                            componentBlock.AddQuaternion(memberSet[j].Name, (Quaternion)components[i].TryGetValue(memberSet[j].Name, Flags.InstanceAnyVisibility));
+                            break;
                         default:
                             // In case we have new data types and forgot to add it here for processing
                             Debug.LogError(memberSet[j].Name + " is of unhandled data type " + a.fieldType);
@@ -153,6 +156,9 @@ namespace Playblack.Savegame {
 
                         case SaveField.FIELD_VECTOR_POSITION:
                             component.TrySetValue(memberSet[j].Name, data.ComponentList[i].ReadVector(memberSet[j].Name), Flags.InstanceAnyVisibility);
+                            break;
+                        case SaveField.FIELD_QUATERNION:
+                            component.TrySetValue(memberSet[j].Name, data.ComponentList[i].ReadQuaternion(memberSet[j].Name), Flags.InstanceAnyVisibility);
                             break;
                         default:
                             // In case we have new data types and forgot to add it here for processing

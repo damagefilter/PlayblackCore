@@ -111,6 +111,16 @@ namespace Playblack.Savegame.Model {
             saveData.Add(fd);
         }
 
+        public void AddQuaternion(string name, Quaternion value) {
+            var fd = new FieldDescription((int)SaveField.FIELD_QUATERNION, name, DataSerializer.SerializeSimpleObject(new float[] {
+                value.x,
+                value.y,
+                value.z,
+                value.w
+            }));
+            saveData.Add(fd);
+        }
+
         public void AddProtoObject(string name, object value) {
             var fd = new FieldDescription((int)SaveField.FIELD_PROTOBUF_OBJECT, name, DataSerializer.SerializeProtoObject(value));
             saveData.Add(fd);
@@ -179,6 +189,16 @@ namespace Playblack.Savegame.Model {
                 }
             }
             return Vector3.zero;
+        }
+
+        public Quaternion ReadQuaternion(string name) {
+            for (int i = 0; i < saveData.Count; ++i) {
+                if (saveData[i].fieldName == name) {
+                    float[] data = DataSerializer.DeserializeSimpleObject<float[]>(saveData[i].fieldContent);
+                    return new Quaternion(data[0], data[1], data[2], data[3]);
+                }
+            }
+            return Quaternion.identity;
         }
 
         public T ReadProtoObject<T>(string name) {
