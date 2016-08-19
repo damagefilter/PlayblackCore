@@ -288,14 +288,8 @@ namespace Playblack.Csp {
             if (outputs == null || outputs.Count <= 0) {
                 return;
             }
+            Gizmos.color = new Color32(240, 40, 16, 255);
 
-            Handles.color = (Color)new Color32(240, 40, 16, 255);
-            Gizmos.color = (Color)new Color32(240, 40, 16, 255);
-            var labelPos = this.transform.position;
-
-            labelPos.y += 1f;
-
-            Handles.Label(labelPos, this.name);
             for (int i = 0; i < outputs.Count; ++i) {
                 if (outputs[i].Listeners == null) {
                     continue; // can be null after deserialization
@@ -312,9 +306,9 @@ namespace Playblack.Csp {
                             continue;
                         }
                         if (outputs[i].Listeners[j].matchedProcessors[k] == this) {
-                            continue; // for elf-connections don't draw stuff
+                            continue; // for self-connections don't draw stuff
                         }
-                        Gizmos.color = (Color)new Color32(240, 40, 16, 255);
+                        Gizmos.color = new Color32(240, 40, 16, 255);
                         // Draw a connection line
                         var targetPos = outputs[i].Listeners[j].matchedProcessors[k].transform.position;
                         Gizmos.DrawLine(this.transform.position, targetPos);
