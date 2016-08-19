@@ -92,13 +92,23 @@ namespace Playblack.Savegame {
         }
 
         public void Restore(GameObjectDataBlock data, bool addComponents) {
+            Debug.Assert(data != null);
             this.uuid = data.UUID;
             gameObject.name = data.SceneName;
             this.assetPath = data.AssetPath;
             this.assetBundle = data.AssetBundle;
+            Debug.Assert(data.ComponentList != null);
             for (int i = 0; i < data.ComponentList.Count; ++i) {
+                if (data.ComponentList[i] == null) {
+                    Debug.LogError("Error restoring a component. It's null! Index is " + i);
+                    continue;
+                }
                 Component component = null;
                 var componentType = Type.GetType(data.ComponentList[i].ComponentName + "," + data.ComponentList[i].AssemblyName);
+                if (componentType == null) {
+                    Debug.LogError("Failed restoring component type " + data.ComponentList[i].ComponentName + " from assembly " + data.ComponentList[i].AssemblyName);
+                    continue;
+                }
                 Debug.Log("Restoring component type " + data.ComponentList[i].ComponentName + " from assembly " + data.ComponentList[i].AssemblyName);
                 if (!typeof(Component).IsAssignableFrom(componentType)) {
                     Debug.LogError("Restore error: " + componentType + " was expected to be a subtype of Component but isn't! Not restoring data.");
@@ -109,8 +119,12 @@ namespace Playblack.Savegame {
                 }
                 else {
                     component = this.gameObject.GetComponent(componentType);
+                    if (component == null) {
+                        // try again in children because some might have their stuff deeper down the hierarchy
+                        component = this.gameObject.GetComponentInChildren(componentType);
+                    }
                 }
-
+                Debug.AssertFormat(component, "{0} is not contained on prefab or game object {0} and could not be added.", componentType, this.name);
                 var memberSet = componentType.FieldsAndPropertiesWith(typeof(SaveableFieldAttribute));
                 for (int j = 0; j < memberSet.Count; ++j) {
                     SaveableFieldAttribute a = memberSet[j].Attribute<SaveableFieldAttribute>();
