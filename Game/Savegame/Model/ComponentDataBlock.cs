@@ -74,26 +74,27 @@ namespace Playblack.Savegame.Model {
         #region adding data
 
         public void AddBoolean(string name, bool value) {
-            var fd = new FieldDescription((int)SaveField.FIELD_BOOL, name, DataSerializer.SerializeSimpleObject(value));
+            var fd = new FieldDescription(name, DataSerializer.SerializeSimpleObject(value));
             saveData.Add(fd);
         }
+
         public void AddInt(string name, int value) {
-            var fd = new FieldDescription((int)SaveField.FIELD_INT, name, DataSerializer.SerializeSimpleObject(value));
+            var fd = new FieldDescription(name, DataSerializer.SerializeSimpleObject(value));
             saveData.Add(fd);
         }
 
         public void AddFloat(string name, float value) {
-            var fd = new FieldDescription((int)SaveField.FIELD_FLOAT, name, DataSerializer.SerializeSimpleObject(value));
+            var fd = new FieldDescription(name, DataSerializer.SerializeSimpleObject(value));
             saveData.Add(fd);
         }
 
         public void AddString(string name, string value) {
-            var fd = new FieldDescription((int)SaveField.FIELD_STRING, name, DataSerializer.SerializeSimpleObject(value));
+            var fd = new FieldDescription(name, DataSerializer.SerializeSimpleObject(value));
             saveData.Add(fd);
         }
 
         public void AddColor(string name, Color value) {
-            var fd = new FieldDescription((int)SaveField.FIELD_COLOR, name, DataSerializer.SerializeSimpleObject(new float[] {
+            var fd = new FieldDescription(name, DataSerializer.SerializeSimpleObject(new float[] {
                 value.r,
                 value.g,
                 value.b,
@@ -103,7 +104,7 @@ namespace Playblack.Savegame.Model {
         }
 
         public void AddVector(string name, Vector3 value) {
-            var fd = new FieldDescription((int)SaveField.FIELD_VECTOR_POSITION, name, DataSerializer.SerializeSimpleObject(new float[] {
+            var fd = new FieldDescription(name, DataSerializer.SerializeSimpleObject(new float[] {
                 value.x,
                 value.y,
                 value.z
@@ -112,7 +113,7 @@ namespace Playblack.Savegame.Model {
         }
 
         public void AddQuaternion(string name, Quaternion value) {
-            var fd = new FieldDescription((int)SaveField.FIELD_QUATERNION, name, DataSerializer.SerializeSimpleObject(new float[] {
+            var fd = new FieldDescription(name, DataSerializer.SerializeSimpleObject(new float[] {
                 value.x,
                 value.y,
                 value.z,
@@ -122,12 +123,12 @@ namespace Playblack.Savegame.Model {
         }
 
         public void AddProtoObject(string name, object value) {
-            var fd = new FieldDescription((int)SaveField.FIELD_PROTOBUF_OBJECT, name, DataSerializer.SerializeProtoObject(value));
+            var fd = new FieldDescription(name, DataSerializer.SerializeProtoObject(value));
             saveData.Add(fd);
         }
 
         public void AddSimpleObject(string name, object value) {
-            var fd = new FieldDescription((int)SaveField.FIELD_SIMPLE_OBJECT, name, DataSerializer.SerializeSimpleObject(value));
+            var fd = new FieldDescription(name, DataSerializer.SerializeSimpleObject(value));
             saveData.Add(fd);
         }
 
@@ -135,6 +136,11 @@ namespace Playblack.Savegame.Model {
 
         #region reading data
 
+        /// <summary>
+        /// Read a field under the givne name and return it as an integer.
+        /// </summary>
+        /// <param name="name"></param>
+        /// <returns></returns>
         public int ReadInt(string name) {
             for (int i = 0; i < saveData.Count; ++i) {
                 if (saveData[i].fieldName == name) {
@@ -144,6 +150,11 @@ namespace Playblack.Savegame.Model {
             return 0;
         }
 
+        /// <summary>
+        /// Read a field under the givne name and return it as a boolean.
+        /// </summary>
+        /// <param name="name"></param>
+        /// <returns></returns>
         public bool ReadBool(string name) {
             for (int i = 0; i < saveData.Count; ++i) {
                 if (saveData[i].fieldName == name) {
@@ -153,6 +164,11 @@ namespace Playblack.Savegame.Model {
             return false;
         }
 
+        /// <summary>
+        /// Read a field under the givne name and return it as a float.
+        /// </summary>
+        /// <param name="name"></param>
+        /// <returns></returns>
         public float ReadFloat(string name) {
             for (int i = 0; i < saveData.Count; ++i) {
                 if (saveData[i].fieldName == name) {
@@ -162,6 +178,11 @@ namespace Playblack.Savegame.Model {
             return 0f;
         }
 
+        /// <summary>
+        /// Read a field under the givne name and return it as a string.
+        /// </summary>
+        /// <param name="name"></param>
+        /// <returns></returns>
         public string ReadString(string name) {
             for (int i = 0; i < saveData.Count; ++i) {
                 if (saveData[i].fieldName == name) {
@@ -171,6 +192,11 @@ namespace Playblack.Savegame.Model {
             return string.Empty;
         }
 
+        /// <summary>
+        /// Read a field under the givne name and return it as a unity color.
+        /// </summary>
+        /// <param name="name"></param>
+        /// <returns></returns>
         public Color ReadColor(string name) {
             for (int i = 0; i < saveData.Count; ++i) {
                 if (saveData[i].fieldName == name) {
@@ -181,6 +207,11 @@ namespace Playblack.Savegame.Model {
             return Color.clear;
         }
 
+        /// <summary>
+        /// Read a field under the givne name and return it as a unity vector.
+        /// </summary>
+        /// <param name="name"></param>
+        /// <returns></returns>
         public Vector3 ReadVector(string name) {
             for (int i = 0; i < saveData.Count; ++i) {
                 if (saveData[i].fieldName == name) {
@@ -191,6 +222,11 @@ namespace Playblack.Savegame.Model {
             return Vector3.zero;
         }
 
+        /// <summary>
+        /// Read a field under the givne name and return it as unity quaternion.
+        /// </summary>
+        /// <param name="name"></param>
+        /// <returns></returns>
         public Quaternion ReadQuaternion(string name) {
             for (int i = 0; i < saveData.Count; ++i) {
                 if (saveData[i].fieldName == name) {
@@ -201,6 +237,11 @@ namespace Playblack.Savegame.Model {
             return Quaternion.identity;
         }
 
+        /// <summary>
+        /// Read a field under the givne name and interpret it as protobuf data. Returns an object.
+        /// </summary>
+        /// <param name="name"></param>
+        /// <returns></returns>
         public T ReadProtoObject<T>(string name) {
             for (int i = 0; i < saveData.Count; ++i) {
                 if (saveData[i].fieldName == name) {
@@ -219,6 +260,11 @@ namespace Playblack.Savegame.Model {
             return null;
         }
 
+        /// <summary>
+        /// Deserialized the field under the given name as specified type.
+        /// </summary>
+        /// <param name="name"></param>
+        /// <returns></returns>
         public T ReadSimpleObject<T>(string name) {
             for (int i = 0; i < saveData.Count; ++i) {
                 if (saveData[i].fieldName == name) {
@@ -228,6 +274,12 @@ namespace Playblack.Savegame.Model {
             return default(T);
         }
 
+        /// <summary>
+        /// Deserialized the field under the given name as raw object.
+        /// It'S up to the user how to interpret / cast that object
+        /// </summary>
+        /// <param name="name"></param>
+        /// <returns></returns>
         public object ReadSimpleObject(string name) {
             for (int i = 0; i < saveData.Count; ++i) {
                 if (saveData[i].fieldName == name) {

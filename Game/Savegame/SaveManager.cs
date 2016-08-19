@@ -59,31 +59,19 @@ namespace Playblack.Savegame {
                 for (int j = 0; j < memberSet.Count; ++j) {
                     SaveableFieldAttribute a = memberSet[j].Attribute<SaveableFieldAttribute>();
                     switch (a.fieldType) {
-                        case SaveField.FIELD_COLOR:
-                            componentBlock.AddColor(memberSet[j].Name, (Color)components[i].TryGetValue(memberSet[j].Name, Flags.InstanceAnyVisibility));
-                            break;
-
                         case SaveField.FIELD_FLOAT:
-                            componentBlock.AddFloat(memberSet[j].Name, (float)components[i].TryGetValue(memberSet[j].Name, Flags.InstanceAnyVisibility));
-                            break;
                         case SaveField.FIELD_BOOL:
-                            componentBlock.AddBoolean(memberSet[j].Name, (bool)components[i].TryGetValue(memberSet[j].Name, Flags.InstanceAnyVisibility));
-                            break;
-
                         case SaveField.FIELD_INT:
-                            componentBlock.AddInt(memberSet[j].Name, (int)components[i].TryGetValue(memberSet[j].Name, Flags.InstanceAnyVisibility));
+                        case SaveField.FIELD_STRING:
+                        case SaveField.FIELD_SIMPLE_OBJECT:
+                            componentBlock.AddSimpleObject(memberSet[j].Name, components[i].TryGetValue(memberSet[j].Name, Flags.InstanceAnyVisibility));
                             break;
 
                         case SaveField.FIELD_PROTOBUF_OBJECT:
                             componentBlock.AddProtoObject(memberSet[j].Name, components[i].TryGetValue(memberSet[j].Name, Flags.InstanceAnyVisibility));
                             break;
-
-                        case SaveField.FIELD_SIMPLE_OBJECT:
-                            componentBlock.AddSimpleObject(memberSet[j].Name, components[i].TryGetValue(memberSet[j].Name, Flags.InstanceAnyVisibility));
-                            break;
-
-                        case SaveField.FIELD_STRING:
-                            componentBlock.AddString(memberSet[j].Name, (string)components[i].TryGetValue(memberSet[j].Name, Flags.InstanceAnyVisibility));
+                        case SaveField.FIELD_COLOR:
+                            componentBlock.AddColor(memberSet[j].Name, (Color)components[i].TryGetValue(memberSet[j].Name, Flags.InstanceAnyVisibility));
                             break;
 
                         case SaveField.FIELD_VECTOR_POSITION:
@@ -127,38 +115,26 @@ namespace Playblack.Savegame {
                 for (int j = 0; j < memberSet.Count; ++j) {
                     SaveableFieldAttribute a = memberSet[j].Attribute<SaveableFieldAttribute>();
                     switch (a.fieldType) {
-                        case SaveField.FIELD_COLOR:
-                            component.TrySetValue(memberSet[j].Name, data.ComponentList[i].ReadColor(memberSet[j].Name), Flags.InstanceAnyVisibility);
-                            break;
-
+                        // Read them in as simple objects as they can be primitives or arrays of primitives.
+                        // Or they can, of course, be simple objects.
                         case SaveField.FIELD_FLOAT:
-                            component.TrySetValue(memberSet[j].Name, data.ComponentList[i].ReadFloat(memberSet[j].Name), Flags.InstanceAnyVisibility);
-                            break;
-
                         case SaveField.FIELD_INT:
-                            component.TrySetValue(memberSet[j].Name, data.ComponentList[i].ReadInt(memberSet[j].Name), Flags.InstanceAnyVisibility);
-                            break;
                         case SaveField.FIELD_BOOL:
-                            component.TrySetValue(memberSet[j].Name, data.ComponentList[i].ReadBool(memberSet[j].Name), Flags.InstanceAnyVisibility);
-                            break;
-
-                        case SaveField.FIELD_PROTOBUF_OBJECT:
-                            component.TrySetValue(memberSet[j].Name, data.ComponentList[i].ReadProtoObject(memberSet[j].Name, memberSet[j].Type()), Flags.InstanceAnyVisibility);
-                            break;
-
+                        case SaveField.FIELD_STRING:
                         case SaveField.FIELD_SIMPLE_OBJECT:
                             component.TrySetValue(memberSet[j].Name, data.ComponentList[i].ReadSimpleObject(memberSet[j].Name), Flags.InstanceAnyVisibility);
                             break;
-
-                        case SaveField.FIELD_STRING:
-                            component.TrySetValue(memberSet[j].Name, data.ComponentList[i].ReadString(memberSet[j].Name), Flags.InstanceAnyVisibility);
+                        case SaveField.FIELD_PROTOBUF_OBJECT:
+                            component.TrySetValue(memberSet[j].Name, data.ComponentList[i].ReadProtoObject(memberSet[j].Name, memberSet[j].Type()), Flags.InstanceAnyVisibility);
                             break;
-
                         case SaveField.FIELD_VECTOR_POSITION:
                             component.TrySetValue(memberSet[j].Name, data.ComponentList[i].ReadVector(memberSet[j].Name), Flags.InstanceAnyVisibility);
                             break;
                         case SaveField.FIELD_QUATERNION:
                             component.TrySetValue(memberSet[j].Name, data.ComponentList[i].ReadQuaternion(memberSet[j].Name), Flags.InstanceAnyVisibility);
+                            break;
+                        case SaveField.FIELD_COLOR:
+                            component.TrySetValue(memberSet[j].Name, data.ComponentList[i].ReadColor(memberSet[j].Name), Flags.InstanceAnyVisibility);
                             break;
                         default:
                             // In case we have new data types and forgot to add it here for processing
