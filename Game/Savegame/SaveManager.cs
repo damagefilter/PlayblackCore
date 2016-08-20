@@ -46,7 +46,7 @@ namespace Playblack.Savegame {
         /// </summary>
         public void OnSave(GameSavingEvent hook) {
             GameObjectDataBlock goBlock = new GameObjectDataBlock(uuid, gameObject.name, assetBundle, assetPath);
-            var components = GetComponents<Component>();
+            var components = GetComponentsInChildren<Component>();
             for (int i = 0; i < components.Length; ++i) {
                 // Ignore components that are not to be saved.
                 if (!components[i].GetType().IsDefined(typeof(SaveableComponentAttribute), true)) {
@@ -92,17 +92,20 @@ namespace Playblack.Savegame {
         }
 
         public void Restore(GameObjectDataBlock data, bool addComponents) {
-            Debug.Assert(data != null);
+            if (data == null) {
+                Debug.LogError("Error restoring a component. Data is null!");
+                Destroy(this.gameObject);
+                return;
+            }
             this.uuid = data.UUID;
             gameObject.name = data.SceneName;
             this.assetPath = data.AssetPath;
             this.assetBundle = data.AssetBundle;
-            Debug.Assert(data.ComponentList != null);
+            if (data.ComponentList == null) {
+                Debug.LogError("No components to restore on " + data.SceneName);
+                return;
+            }
             for (int i = 0; i < data.ComponentList.Count; ++i) {
-                if (data.ComponentList[i] == null) {
-                    Debug.LogError("Error restoring a component. It's null! Index is " + i);
-                    continue;
-                }
                 Component component = null;
                 var componentType = Type.GetType(data.ComponentList[i].ComponentName + "," + data.ComponentList[i].AssemblyName);
                 if (componentType == null) {
