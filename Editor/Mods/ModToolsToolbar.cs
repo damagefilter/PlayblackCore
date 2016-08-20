@@ -26,7 +26,7 @@ namespace Playblack.Editor.Mods {
             if (!Directory.Exists(exportPath)) {
                 Directory.CreateDirectory(exportPath);
             }
-            BuildPipeline.BuildAssetBundles(exportPath);
+            //BuildPipeline.BuildAssetBundles(exportPath);
         }
 
         /// <summary>
