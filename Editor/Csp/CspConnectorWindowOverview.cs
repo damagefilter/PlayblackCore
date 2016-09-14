@@ -2,6 +2,7 @@
 using Playblack.Pooling;
 using System;
 using UnityEditor;
+using UnityEditor.SceneManagement;
 using UnityEngine;
 
 namespace Playblack.Editor.Csp {
@@ -231,8 +232,8 @@ namespace Playblack.Editor.Csp {
                     }
                     EditorUtility.SetDirty(processor);
                     if (GUILayout.Button("Force-Save")) {
-                        EditorApplication.SaveScene();
-                        
+                        EditorSceneManager.SaveScene(EditorSceneManager.GetActiveScene());
+
                         Debug.Log("Saved");
                     }
                 }

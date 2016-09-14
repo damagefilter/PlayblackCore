@@ -2,6 +2,7 @@
 using PlayBlack.Editor.Sequencer.Renderers;
 using PlayBlack.Editor.Windows;
 using UnityEditor;
+using UnityEditor.SceneManagement;
 
 namespace PlayBlack.Editor.Sequencer {
 
@@ -38,7 +39,7 @@ namespace PlayBlack.Editor.Sequencer {
             this.OperatorRenderer.GetSubjectToRender().UpdateCodeViewDisplay();
             // Dirty hack to force unity into serializing the internal byte array properly
             // by just saving the whole scene .... jeezus christ
-            EditorApplication.SaveScene();
+            EditorSceneManager.SaveScene(EditorSceneManager.GetActiveScene());
         }
     }
 }
