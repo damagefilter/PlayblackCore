@@ -4,6 +4,7 @@ using Playblack.BehaviourTree.Model.Core;
 using Playblack.BehaviourTree.Model.Task.Composite;
 using Playblack.Csp;
 using Playblack.Extensions;
+using Playblack.Savegame;
 using Playblack.Savegame.Model;
 using System.Collections;
 using System.Collections.Generic;
@@ -16,16 +17,22 @@ namespace Playblack.Sequencer {
     /// Executes a behaviour tree of some description.
     /// </summary>
     [OutputAware("OnExecutionFinish", "OnExecutionTrigger", "OnExecutionTerminated")]
+    [SaveableComponent]
     public class SequenceExecutor : MonoBehaviour, ISerializationCallbackReceiver {
 
         [SerializeField]
+        [SaveableField(SaveField.FIELD_PROTOBUF_OBJECT)]
         private List<ValueField> globalDataContext;
 
-        // Should work with savegame and unity serializer
+        // in deployment this is only used on initial scene load
+        // So do not sore that in the save game
         [SerializeField]
         [HideInInspector]
         private byte[] serializedModelTree;
 
+        // This is restored when loading a savegame and is ideally the
+        // original model tree.
+        [SaveableField(SaveField.FIELD_PROTOBUF_OBJECT)]
         private UnityBtModel rootModel;
 
         public UnityBtModel RootModel {
@@ -46,6 +53,32 @@ namespace Playblack.Sequencer {
             }
         }
 
+        // To make the enum known to the savegame
+        [SaveableField(SaveField.FIELD_INT)]
+        private int SaveExecutionType {
+            get {
+                return (int)executionType;
+            }
+            set {
+                executionType = (ExecutionType)value;
+            }
+        }
+
+        // internally used to store the global context of the BT in a save game.
+        // The executor cannot be persisted (doesn't need to be either) but
+        // when we just persist its root context, we can pass it back in and have the state as it was after saving
+        [SaveableField(SaveField.FIELD_PROTOBUF_OBJECT)]
+        private DataContext GlobalContext {
+            get {
+                return executor != null ? executor.GetRootContext() : null;
+            }
+            set {
+                // This is after loading a save game so just create the executor
+                GetExecutor(value);
+            }
+        }
+
+        // Means this cannot be re-created via savegames without a valid prefab
         [SerializeField]
         [Tooltip("The object on which this sequencer is acting (for instance the object that handles AI movement or such thing.")]
         private UnityEngine.Object actor;
@@ -58,8 +91,31 @@ namespace Playblack.Sequencer {
             this.rootModel = UnityBtModel.NewInstance(null, new UnityBtModel(), typeof(ModelSequence).ToString());
         }
 
-        public IBTExecutor GetExecutor() {
-            return this.GetExecutor(new DataContext(globalDataContext), actor);
+        public IBTExecutor GetExecutor(DataContext overrideContext = null) {
+            // recycle this for performance reasons but also to
+            // persist the global context
+            if (this.executor != null) {
+                if (executor.GetStatus() != TaskStatus.UNINITIALISED) {
+                    executor.Terminate();
+                    executor.Reset();
+                }
+                if (overrideContext != null) {
+                    this.executor.SetRootContext(overrideContext);
+                }
+                return this.executor;
+            }
+            else {
+                return this.GetExecutor(overrideContext != null ? overrideContext : new DataContext(globalDataContext), actor);
+            }
+        }
+
+        public IBTExecutor GetExecutor(DataContext context, UnityEngine.Object actor) {
+            context["actor"] = actor;
+
+            var root = rootModel.Model;
+            RecursiveLoadModelTree(rootModel, root);
+            // TODO: Fetch an implementation from a factory
+            return new CachingBtExecutor(root, context);
         }
 
         public void Start() {
@@ -123,15 +179,6 @@ namespace Playblack.Sequencer {
             StopCoroutine("TickExecutorParallel");
             running = false;
             this.FireOutput("OnExecutionTerminated");
-        }
-
-        public IBTExecutor GetExecutor(DataContext context, UnityEngine.Object actor) {
-            context["actor"] = actor;
-
-            var root = rootModel.Model;
-            RecursiveLoadModelTree(rootModel, root);
-            // TODO: Fetch an implementation from a factory
-            return new CachingBtExecutor(root, context);
         }
 
         private void RecursiveLoadModelTree(UnityBtModel current, ModelTask root) {
