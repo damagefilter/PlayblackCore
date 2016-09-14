@@ -12,6 +12,12 @@ namespace Playblack.BehaviourTree {
         [ProtoMember(1)]
         private Dictionary<string, object> internalData;
 
+        public int Count {
+            get {
+                return internalData != null ? internalData.Count : 0;
+            }
+        }
+
         public DataContext() {
             this.internalData = new Dictionary<string, object>();
         }
