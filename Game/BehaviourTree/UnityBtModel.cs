@@ -348,8 +348,20 @@ namespace Playblack.BehaviourTree {
             var childDescriptors = ModelType.Attributes(typeof(ChildDescriptorAttribute));
             for (int i = 0; i < childDescriptors.Count; ++i) {
                 this.childStructure.Add((ChildDescriptorAttribute)childDescriptors[i]);
+                
             }
-            this.childStructure.Sort((a, b) => { return a.DisplayDelta > b.DisplayDelta ? 1 : -1; });
+
+            this.childStructure.Sort((a, b) => {
+                if (a.DisplayDelta > b.DisplayDelta) {
+                    return -1;
+                }
+                else if (a.DisplayDelta < b.DisplayDelta) {
+                    return 1;
+                }
+                else {
+                    return 0;
+                }
+            });
             return this.childStructure;
         }
 
