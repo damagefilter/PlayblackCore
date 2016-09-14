@@ -59,6 +59,14 @@ namespace Playblack.BehaviourTree.Execution.Core {
         DataContext GetRootContext();
 
         /// <summary>
+        /// Override the existing root context with the given context.
+        /// Will apply to all execution tasks with the next initialisation of the tree.
+        /// (After a call to Reset())
+        /// </summary>
+        /// <param name="context"></param>
+        void SetRootContext(DataContext context);
+
+        /// <summary>
         /// Request that the given task is inserted into the tickable
         /// list of this BT executor.
         /// </summary>

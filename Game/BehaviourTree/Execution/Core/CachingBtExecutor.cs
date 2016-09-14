@@ -109,6 +109,10 @@ namespace Playblack.BehaviourTree.Execution.Core {
             return this.context;
         }
 
+        public void SetRootContext(DataContext context) {
+            this.context = context;
+        }
+
         public DataContext GetTaskState(Position pos) {
             if (this.taskStates.ContainsKey(pos)) {
                 return this.taskStates[pos];
