@@ -1,6 +1,7 @@
 ﻿using ProtoBuf;
 using System;
 using System.Collections.Generic;
+using System.Reflection;
 
 namespace Playblack.Savegame.Model {
 
@@ -21,7 +22,7 @@ namespace Playblack.Savegame.Model {
 
             public IDataBlock DataBlock {
                 get {
-                    return (IDataBlock)DataSerializer.DeserializeProtoObject(rawData, Type.GetType(typeName));
+                    return (IDataBlock)DataSerializer.DeserializeProtoObject(rawData, Type.GetType(typeName, true));
                 }
             }
 
@@ -30,7 +31,7 @@ namespace Playblack.Savegame.Model {
             }
 
             public SaveFileEntry(IDataBlock dblock) {
-                this.typeName = dblock.GetType().ToString();
+                this.typeName = dblock.GetType().AssemblyQualifiedName;
                 this.rawData = DataSerializer.SerializeProtoObject(dblock);
             }
         }
