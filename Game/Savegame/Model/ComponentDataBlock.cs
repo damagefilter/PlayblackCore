@@ -103,11 +103,19 @@ namespace Playblack.Savegame.Model {
             saveData.Add(fd);
         }
 
-        public void AddVector(string name, Vector3 value) {
+        public void AddVector3(string name, Vector3 value) {
             var fd = new FieldDescription(name, DataSerializer.SerializeSimpleObject(new float[] {
                 value.x,
                 value.y,
                 value.z
+            }));
+            saveData.Add(fd);
+        }
+
+        public void AddVector2(string name, Vector2 value) {
+            var fd = new FieldDescription(name, DataSerializer.SerializeSimpleObject(new float[] {
+                value.x,
+                value.y,
             }));
             saveData.Add(fd);
         }
@@ -208,11 +216,11 @@ namespace Playblack.Savegame.Model {
         }
 
         /// <summary>
-        /// Read a field under the givne name and return it as a unity vector.
+        /// Read a field under the given name and return it as a unity Vector3.
         /// </summary>
         /// <param name="name"></param>
         /// <returns></returns>
-        public Vector3 ReadVector(string name) {
+        public Vector3 ReadVector3(string name) {
             for (int i = 0; i < saveData.Count; ++i) {
                 if (saveData[i].fieldName == name) {
                     float[] data = DataSerializer.DeserializeSimpleObject<float[]>(saveData[i].fieldContent);
@@ -220,6 +228,21 @@ namespace Playblack.Savegame.Model {
                 }
             }
             return Vector3.zero;
+        }
+
+        /// <summary>
+        /// Read a field under the given name and return it as a unity Vector2.
+        /// </summary>
+        /// <param name="name"></param>
+        /// <returns></returns>
+        public Vector2 ReadVector2(string name) {
+            for (int i = 0; i < saveData.Count; ++i) {
+                if (saveData[i].fieldName == name) {
+                    float[] data = DataSerializer.DeserializeSimpleObject<float[]>(saveData[i].fieldContent);
+                    return new Vector3(data[0], data[1]);
+                }
+            }
+            return Vector2.zero;
         }
 
         /// <summary>

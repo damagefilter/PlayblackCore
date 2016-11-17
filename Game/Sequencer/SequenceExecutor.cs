@@ -54,7 +54,7 @@ namespace Playblack.Sequencer {
         }
 
         // To make the enum known to the savegame
-        [SaveableField(SaveField.FIELD_INT)]
+        [SaveableField(SaveField.FIELD_PRIMITIVE)]
         private int SaveExecutionType {
             get {
                 return (int)executionType;

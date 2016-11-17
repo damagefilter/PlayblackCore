@@ -59,10 +59,7 @@ namespace Playblack.Savegame {
                 for (int j = 0; j < memberSet.Count; ++j) {
                     SaveableFieldAttribute a = memberSet[j].Attribute<SaveableFieldAttribute>();
                     switch (a.fieldType) {
-                        case SaveField.FIELD_FLOAT:
-                        case SaveField.FIELD_BOOL:
-                        case SaveField.FIELD_INT:
-                        case SaveField.FIELD_STRING:
+                        case SaveField.FIELD_PRIMITIVE:
                         case SaveField.FIELD_SIMPLE_OBJECT:
                             componentBlock.AddSimpleObject(memberSet[j].Name, components[i].TryGetValue(memberSet[j].Name, Flags.InstanceAnyVisibility));
                             break;
@@ -74,8 +71,12 @@ namespace Playblack.Savegame {
                             componentBlock.AddColor(memberSet[j].Name, (Color)components[i].TryGetValue(memberSet[j].Name, Flags.InstanceAnyVisibility));
                             break;
 
-                        case SaveField.FIELD_VECTOR_POSITION:
-                            componentBlock.AddVector(memberSet[j].Name, (Vector3)components[i].TryGetValue(memberSet[j].Name, Flags.InstanceAnyVisibility));
+                        case SaveField.FIELD_VECTOR_2:
+                            componentBlock.AddVector2(memberSet[j].Name, (Vector2)components[i].TryGetValue(memberSet[j].Name, Flags.InstanceAnyVisibility));
+                            break;
+
+                        case SaveField.FIELD_VECTOR_3:
+                            componentBlock.AddVector3(memberSet[j].Name, (Vector3)components[i].TryGetValue(memberSet[j].Name, Flags.InstanceAnyVisibility));
                             break;
                         case SaveField.FIELD_QUATERNION:
                             componentBlock.AddQuaternion(memberSet[j].Name, (Quaternion)components[i].TryGetValue(memberSet[j].Name, Flags.InstanceAnyVisibility));
@@ -134,18 +135,18 @@ namespace Playblack.Savegame {
                     switch (a.fieldType) {
                         // Read them in as simple objects as they can be primitives or arrays of primitives.
                         // Or they can, of course, be simple objects.
-                        case SaveField.FIELD_FLOAT:
-                        case SaveField.FIELD_INT:
-                        case SaveField.FIELD_BOOL:
-                        case SaveField.FIELD_STRING:
+                        case SaveField.FIELD_PRIMITIVE:
                         case SaveField.FIELD_SIMPLE_OBJECT:
                             component.TrySetValue(memberSet[j].Name, data.ComponentList[i].ReadSimpleObject(memberSet[j].Name), Flags.InstanceAnyVisibility);
                             break;
                         case SaveField.FIELD_PROTOBUF_OBJECT:
                             component.TrySetValue(memberSet[j].Name, data.ComponentList[i].ReadProtoObject(memberSet[j].Name, memberSet[j].Type()), Flags.InstanceAnyVisibility);
                             break;
-                        case SaveField.FIELD_VECTOR_POSITION:
-                            component.TrySetValue(memberSet[j].Name, data.ComponentList[i].ReadVector(memberSet[j].Name), Flags.InstanceAnyVisibility);
+                        case SaveField.FIELD_VECTOR_2:
+                            component.TrySetValue(memberSet[j].Name, data.ComponentList[i].ReadVector2(memberSet[j].Name), Flags.InstanceAnyVisibility);
+                            break;
+                        case SaveField.FIELD_VECTOR_3:
+                            component.TrySetValue(memberSet[j].Name, data.ComponentList[i].ReadVector3(memberSet[j].Name), Flags.InstanceAnyVisibility);
                             break;
                         case SaveField.FIELD_QUATERNION:
                             component.TrySetValue(memberSet[j].Name, data.ComponentList[i].ReadQuaternion(memberSet[j].Name), Flags.InstanceAnyVisibility);

@@ -60,10 +60,10 @@
     <Reference Include="System.Data" />
     <Reference Include="System.Xml" />
     <Reference Include="UnityEditor">
-      <HintPath>..\lib\Unity5.2\UnityEditor.dll</HintPath>
+      <HintPath>..\lib\UnityEditor.dll</HintPath>
     </Reference>
     <Reference Include="UnityEngine">
-      <HintPath>..\lib\Unity5.2\UnityEngine.dll</HintPath>
+      <HintPath>..\lib\UnityEngine.dll</HintPath>
     </Reference>
   </ItemGroup>
   <ItemGroup>
