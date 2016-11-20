@@ -1,7 +1,9 @@
 ﻿using Fasterflect;
 using Playblack.BehaviourTree.Model.Core;
 using Playblack.Extensions;
+#if UNITY_EDITOR
 using Playblack.Sequencer;
+#endif
 using ProtoBuf;
 using System;
 using System.Collections.Generic;
@@ -329,7 +331,7 @@ namespace Playblack.BehaviourTree {
             return ModelType.Attribute<ModelDataDescriptorAttribute>().NumChildren;
         }
 
-#if DEV_BUILD
+#if UNITY_EDITOR
         private List<ChildDescriptorAttribute> childStructure;
 
         public IList<ChildDescriptorAttribute> GetChildStructure() {
@@ -337,9 +339,8 @@ namespace Playblack.BehaviourTree {
                 return childStructure;
             }
             if (this.ModelClassName == null) {
-                // FIXME: This situation happens with deserialized lists that previously had null values.
-                // Protobuf doesn't know the concept of null so it defaults to a default instance
-                // of UnityBtModel when deserializing null values. And then this happens as the default object has nothing to describe it.
+                // NOTE: So far this seems to be fixed.
+                // I'll keep the condition ust in case (20161120)
                 Debug.LogError("No classname specified ... Much error!");
                 return new List<ChildDescriptorAttribute>(0);
             }
