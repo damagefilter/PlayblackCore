@@ -2,6 +2,7 @@
 using PlayBlack.Editor.Sequencer.Renderers.Bt;
 using PlayBlack.Editor.Windows;
 using UnityEditor;
+using UnityEngine;
 
 namespace PlayBlack.Editor.Sequencer {
 
@@ -9,6 +10,7 @@ namespace PlayBlack.Editor.Sequencer {
         private BtSequencerRenderer sequencerWindow;
 
         private SequenceExecutor subject; // Used to set this dirty to make unity save it
+        private Vector2 codeViewScrollPos;
 
         public override string GetTitle() {
             return "Sequencer";
@@ -38,11 +40,16 @@ namespace PlayBlack.Editor.Sequencer {
             {
                 if (sequencerWindow != null) {
                     this.DrawSequenceSettings();
-                    EditorGUILayout.BeginVertical();
+                    this.codeViewScrollPos = EditorGUILayout.BeginScrollView(this.codeViewScrollPos);
                     {
-                        sequencerWindow.DoRenderLoop();
+                        EditorGUILayout.BeginVertical();
+                        {
+                            sequencerWindow.DoRenderLoop();
+                        }
+                        EditorGUILayout.EndVertical();
                     }
-                    EditorGUILayout.EndVertical();
+                    EditorGUILayout.EndScrollView();
+
                 }
                 else {
                     EditorGUILayout.HelpBox("Nothing selected", MessageType.Info);
