@@ -309,10 +309,9 @@ namespace Playblack.Csp {
                             continue; // for self-connections don't draw stuff
                         }
                         Gizmos.color = new Color32(240, 40, 16, 255);
-                        // Draw a connection line
+                        
                         var targetPos = outputs[i].Listeners[j].matchedProcessors[k].transform.position;
-                        Gizmos.DrawLine(this.transform.position, targetPos);
-
+                        
                         // Prepare the orientation for a cone cap
                         // to display in which direction the connection goes
                         var direction = targetPos - this.transform.position;
@@ -320,12 +319,17 @@ namespace Playblack.Csp {
                         if (UnityEditor.EditorSettings.defaultBehaviorMode == UnityEditor.EditorBehaviorMode.Mode2D) {
                             direction.z = 0f; // this is only needed for 2D where z is just confusing the direction
                         }
-
-                        var rot = Quaternion.LookRotation(direction);
-
+                        if (direction == Vector3.zero) {
+                            continue; // No direction, no line, no cone
+                        }
+                        // Draw the line
+                        Gizmos.DrawLine(this.transform.position, targetPos);
+                        
+                        // Draw the cone cap
+                        Quaternion rot = Quaternion.LookRotation(direction);
                         Ray r = new Ray(this.transform.position, direction);
-                        var pos = r.GetPoint(direction.magnitude - 0.5f);
-                        Handles.ConeCap(0, pos, rot, 0.3f);
+                        var pos = r.GetPoint(direction.magnitude - 1f);
+                        Handles.ConeCap(0, pos, rot, 1f);
                     }
                     if (needsEntityCleaning) {
                         var list = new List<SignalProcessor>();
