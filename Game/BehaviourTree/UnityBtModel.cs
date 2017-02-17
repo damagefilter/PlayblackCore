@@ -121,6 +121,7 @@ namespace Playblack.BehaviourTree {
 
 #if UNITY_EDITOR
         private string cachedCodeViewDisplay;
+        private Dictionary<int, string> childDisplayCache = new Dictionary<int, string>();
 
         public string CodeViewDisplay {
             get {
@@ -150,14 +151,49 @@ namespace Playblack.BehaviourTree {
             }
 
             var theString = attrib.Format;
+            theString = ReplacePlaceholdersWithContextData(theString);
+            cachedCodeViewDisplay = theString;
+            this.childDisplayCache.Clear();
+        }
+
+        private string ReplacePlaceholdersWithContextData(string theString) {
             foreach (var valueField in this.contextData) {
                 string valueString = valueField.UnityValue;
+                if (string.IsNullOrEmpty(valueString)) {
+                    continue;
+                }
                 if (!string.IsNullOrEmpty(valueString) && valueString.Length > 50) {
                     valueString = valueString.Substring(0, 47) + "...";
                 }
                 theString = theString.Replace("{" + valueField.Name + "}", valueString);
             }
-            cachedCodeViewDisplay = theString;
+
+            return theString;
+        }
+
+        public string GetChildDisplayName(int insertIndex) {
+            if (childDisplayCache.ContainsKey(insertIndex)) {
+                return childDisplayCache[insertIndex];
+            }
+            var childs = GetChildStructure();
+            bool foundInsertIndex = false;
+            for (int i = 0; i < childs.Count; ++i) {
+                if (childs[i].InsertIndex == insertIndex) {
+                    var theString = ReplacePlaceholdersWithContextData(childs[i].Name);
+                    this.childDisplayCache.Add(insertIndex, theString);
+                    foundInsertIndex = true;
+                    break;
+                }
+            }
+            if (!foundInsertIndex) {
+                if (childs.Count < insertIndex && childs.Count > 0) {
+                    childDisplayCache.Add(insertIndex, childs[insertIndex].Name);
+                }
+                else {
+                    return "No child descriptor on insert index " + insertIndex;
+                }
+            }
+            return childDisplayCache[insertIndex];
         }
 
 #endif

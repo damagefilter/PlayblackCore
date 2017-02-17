@@ -78,7 +78,7 @@ namespace PlayBlack.Editor.Sequencer.Renderers.Bt {
                 }
 
                 // Displays a name for structuring purposes.
-                sequenceRenderer.RenderOperatorDummyButton(kvp.Name);
+                sequenceRenderer.RenderOperatorDummyButton(modelToRender.GetChildDisplayName(kvp.InsertIndex));
                 sequenceRenderer.IndentLevel += 10;
                 // Make sure the index we want to access exists at all.
                 if (modelToRender.children.Count < kvp.InsertIndex + 1) { // index is 0-based, count is not, so add one. Just sayin.
