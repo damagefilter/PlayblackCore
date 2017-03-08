@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using UnityEditor;
 using UnityEngine;
+using Playblack.Sequencer;
 
 namespace PlayBlack.Editor.Sequencer.Renderers.Bt {
 
@@ -48,6 +49,9 @@ namespace PlayBlack.Editor.Sequencer.Renderers.Bt {
                 this.operatorRenderer = value;
             }
         }
+
+        public SerializedObject SerializedSequenceExecutor { get; set; }
+        public SequenceExecutor SequenceExecutorObject { get; set; }
 
         private DefaultRenderer operatorRenderer = new DefaultRenderer();
 
@@ -123,15 +127,21 @@ namespace PlayBlack.Editor.Sequencer.Renderers.Bt {
                         var window = GenericPopupWindow.Popup<OperatorEditorWindow>();
                         window.OperatorRenderer = operatorRenderer;
                         window.SequencerRenderer = this;
+                        // We need to drag this along into the operator editor where it will be saved and set dirty 
+                        // when the window is closed, which is the only place where data can be changed so it's a perfect fit
+                        window.SequenceExecutorObject = SequenceExecutorObject;
+                        window.SerializedSequenceExecutor = SerializedSequenceExecutor;
                     });
                     // Followup buttons come directly after, without extra indents
                     if (GUILayout.Button("up", EditorSkin.button, GUILayout.Width(25))) {
                         int newIndex = referenceParentObject.children.IndexOf(referenceObject) - 1;
                         referenceParentObject.ScheduleChildReorder(referenceObject, newIndex);
+                        UpdateSerializedModelTree();
                     }
                     if (GUILayout.Button("dn", EditorSkin.button, GUILayout.Width(25))) {
                         int newIndex = referenceParentObject.children.IndexOf(referenceObject) + 1;
                         referenceParentObject.ScheduleChildReorder(referenceObject, newIndex);
+                        UpdateSerializedModelTree();
                     }
 
                     if (GUILayout.Button("x", EditorSkin.button, GUILayout.Width(18))) {
@@ -142,11 +152,28 @@ namespace PlayBlack.Editor.Sequencer.Renderers.Bt {
                         if (!referenceParentObject.NullChild(referenceObject)) {
                             Debug.LogError("Failed to remove a model from its parent (but it is in there!)" + referenceObject.ModelClassName);
                         }
+                        else {
+                            Debug.Log("Nulled child.");
+                            UpdateSerializedModelTree();
+                        }
                     }
                 }
                 EditorGUI.indentLevel = indent;
             }
             EditorGUILayout.EndHorizontal();
+        }
+
+        public void UpdateSerializedModelTree() {
+            int currentArraySize = SerializedSequenceExecutor.FindProperty("serializedModelTree.Array.size").intValue;
+            SequenceExecutorObject.SerializeModelTree(); // Force update of the model tree data here
+            int newArraySize = SequenceExecutorObject.SerializedModelTree.Length;
+            if (newArraySize != currentArraySize)
+                SerializedSequenceExecutor.FindProperty("serializedModelTree.Array.size").intValue = newArraySize;
+
+            for (int i = 0; i < newArraySize; i++) {
+                SerializedSequenceExecutor.FindProperty(string.Format("serializedModelTree.Array.data[{0}]", i)).intValue = SequenceExecutorObject.SerializedModelTree[i];
+            }
+            EditorUtility.SetDirty(SequenceExecutorObject);
         }
 
         public void RenderOperatorDummyButton(string label) {

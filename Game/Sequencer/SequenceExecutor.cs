@@ -218,7 +218,15 @@ namespace Playblack.Sequencer {
             using (var ms = new MemoryStream(serializedModelTree)) {
                 ms.Position = 0;
                 this.rootModel = DataSerializer.DeserializeProtoObject<UnityBtModel>(ms.ToArray());
+                if (this.rootModel.ModelClassName == null) {
+                    // we have a default here!
+                    this.rootModel.ModelClassName = typeof(ModelSequence).ToString();
+                }
             }
+            //if (this.rootModel == null) {
+            //    this.rootModel = new UnityBtModel();
+            //    this.rootModel.ModelClassName = typeof(ModelSequence).ToString();
+            //}
         }
 
         public void SerializeModelTree() {

@@ -1,4 +1,5 @@
 ﻿using Playblack.BehaviourTree;
+using Playblack.Sequencer;
 using PlayBlack.Editor.Sequencer.Renderers;
 using PlayBlack.Editor.Windows;
 using UnityEditor;
@@ -20,6 +21,9 @@ namespace PlayBlack.Editor.Sequencer {
             get; set;
         }
 
+        public SerializedObject SerializedSequenceExecutor { get; set; }
+        public SequenceExecutor SequenceExecutorObject { get; set; }
+
         public override string GetTitle() {
             return "Operator Editor";
         }
@@ -37,9 +41,16 @@ namespace PlayBlack.Editor.Sequencer {
         public void OnDestroy() {
             // Called when closed
             this.OperatorRenderer.GetSubjectToRender().UpdateCodeViewDisplay();
-            // Dirty hack to force unity into serializing the internal byte array properly
-            // by just saving the whole scene .... jeezus christ
-            //EditorSceneManager.SaveScene(EditorSceneManager.GetActiveScene());
+            int currentArraySize = SerializedSequenceExecutor.FindProperty("serializedModelTree.Array.size").intValue;
+            SequenceExecutorObject.SerializeModelTree(); // Force update of the model tree data here
+            int newArraySize = SequenceExecutorObject.SerializedModelTree.Length;
+            if (newArraySize != currentArraySize)
+                SerializedSequenceExecutor.FindProperty("serializedModelTree.Array.size").intValue = newArraySize;
+
+            for (int i = 0; i < newArraySize; i++) {
+                SerializedSequenceExecutor.FindProperty(string.Format("serializedModelTree.Array.data[{0}]", i)).intValue = SequenceExecutorObject.SerializedModelTree[i];
+            }
+            EditorUtility.SetDirty(SequenceExecutorObject);
         }
     }
 }
