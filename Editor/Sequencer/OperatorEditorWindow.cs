@@ -39,7 +39,7 @@ namespace PlayBlack.Editor.Sequencer {
             this.OperatorRenderer.GetSubjectToRender().UpdateCodeViewDisplay();
             // Dirty hack to force unity into serializing the internal byte array properly
             // by just saving the whole scene .... jeezus christ
-            EditorSceneManager.SaveScene(EditorSceneManager.GetActiveScene());
+            //EditorSceneManager.SaveScene(EditorSceneManager.GetActiveScene());
         }
     }
 }

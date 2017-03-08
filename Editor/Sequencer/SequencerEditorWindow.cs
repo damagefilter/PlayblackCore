@@ -10,6 +10,7 @@ namespace PlayBlack.Editor.Sequencer {
         private BtSequencerRenderer sequencerWindow;
 
         private SequenceExecutor subject; // Used to set this dirty to make unity save it
+        private SerializedObject serializedSequenceExecutor;
         private Vector2 codeViewScrollPos;
 
         public override string GetTitle() {
@@ -20,8 +21,9 @@ namespace PlayBlack.Editor.Sequencer {
             //throw new NotImplementedException();
         }
 
-        public void SetData(SequenceExecutor subject) {
+        public void SetData(SequenceExecutor subject, SerializedObject serializedSequenceExecutor) {
             this.subject = subject;
+            this.serializedSequenceExecutor = serializedSequenceExecutor;
             this.sequencerWindow = new BtSequencerRenderer();
             this.sequencerWindow.OperatorRenderer = new DefaultRenderer();
             this.sequencerWindow.OperatorRenderer.SetSubjects(subject.RootModel);
@@ -50,6 +52,16 @@ namespace PlayBlack.Editor.Sequencer {
                     }
                     EditorGUILayout.EndScrollView();
 
+                    int currentArraySize = serializedSequenceExecutor.FindProperty("serializedModelTree.Array.size").intValue;
+                    subject.SerializeModelTree(); // Force update of the model tree data here
+                    int newArraySize = subject.SerializedModelTree.Length;
+                    if (newArraySize != currentArraySize)
+                        serializedSequenceExecutor.FindProperty("serializedModelTree.Array.size").intValue = newArraySize;
+
+                    for (int i = 0; i < newArraySize; i++) {
+                        serializedSequenceExecutor.FindProperty(string.Format("serializedModelTree.Array.data[{0}]", i)).intValue = subject.SerializedModelTree[i];
+                    }
+                    EditorUtility.SetDirty(subject);
                 }
                 else {
                     EditorGUILayout.HelpBox("Nothing selected", MessageType.Info);

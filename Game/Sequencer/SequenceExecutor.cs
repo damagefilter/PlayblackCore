@@ -10,6 +10,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using UnityEngine;
+using System;
 
 namespace Playblack.Sequencer {
 
@@ -18,7 +19,7 @@ namespace Playblack.Sequencer {
     /// </summary>
     [OutputAware("OnExecutionFinish", "OnExecutionTrigger", "OnExecutionTerminated")]
     [SaveableComponent]
-    public class SequenceExecutor : MonoBehaviour, ISerializationCallbackReceiver {
+    public class SequenceExecutor : MonoBehaviour {
 
         [SerializeField]
         [SaveableField(SaveField.FIELD_PROTOBUF_OBJECT)]
@@ -29,6 +30,13 @@ namespace Playblack.Sequencer {
         [SerializeField]
         [HideInInspector]
         private byte[] serializedModelTree;
+#if UNITY_EDITOR
+        public byte[] SerializedModelTree {
+            get {
+                return serializedModelTree;
+            }
+        }
+#endif
 
         // This is restored when loading a savegame and is ideally the
         // original model tree.
@@ -37,6 +45,9 @@ namespace Playblack.Sequencer {
 
         public UnityBtModel RootModel {
             get {
+                if (rootModel == null) {
+                    DeserializeModelTree();
+                }
                 return rootModel;
             }
         }
@@ -88,7 +99,7 @@ namespace Playblack.Sequencer {
         private bool running;
 
         public SequenceExecutor() {
-            this.rootModel = UnityBtModel.NewInstance(null, new UnityBtModel(), typeof(ModelSequence).ToString());
+            //this.rootModel = UnityBtModel.NewInstance(null, new UnityBtModel(), typeof(ModelSequence).ToString());
         }
 
         public IBTExecutor GetExecutor(DataContext overrideContext = null) {
@@ -111,8 +122,10 @@ namespace Playblack.Sequencer {
 
         public IBTExecutor GetExecutor(DataContext context, UnityEngine.Object actor) {
             context["actor"] = actor;
-
-            var root = rootModel.Model;
+            if (RootModel == null) {
+                throw new InvalidOperationException("Tried initializing BTExecutor but root model is null");
+            }
+            var root = RootModel.Model;
             RecursiveLoadModelTree(rootModel, root);
             // TODO: Fetch an implementation from a factory
             return new CachingBtExecutor(root, context);
@@ -201,14 +214,14 @@ namespace Playblack.Sequencer {
             }
         }
 
-        public void OnAfterDeserialize() {
+        public void DeserializeModelTree() {
             using (var ms = new MemoryStream(serializedModelTree)) {
                 ms.Position = 0;
                 this.rootModel = DataSerializer.DeserializeProtoObject<UnityBtModel>(ms.ToArray());
             }
         }
 
-        public void OnBeforeSerialize() {
+        public void SerializeModelTree() {
             this.serializedModelTree = DataSerializer.SerializeProtoObject(this.rootModel);
         }
     }

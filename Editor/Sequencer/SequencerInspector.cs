@@ -14,9 +14,10 @@ namespace PlayBlack.Editor.Sequencer {
             }
             base.OnInspectorGUI();
             SequenceExecutor sequencer = target as SequenceExecutor;
+            
             if (GUILayout.Button("Open Sequencer Settings")) {
                 var window = GenericPopupWindow.Popup<SequencerEditorWindow>();
-                window.SetData(sequencer);
+                window.SetData(sequencer, this.serializedObject);
             }
         }
     }
