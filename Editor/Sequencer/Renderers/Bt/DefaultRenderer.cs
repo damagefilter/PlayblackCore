@@ -22,10 +22,10 @@ namespace PlayBlack.Editor.Sequencer.Renderers.Bt {
             // Happens in the best families.
             // That's when we're processing an empty child slot, which means we wanna add the add-operator button and get out.
             if (modelToRender == null) {
-                Debug.Log("model to render is null. Trying parent model");
+                //Debug.Log("model to render is null. Trying parent model");
                 if (parentModel == null) {
                     // Well that should really not be happening
-                    Debug.LogError("Parent model is null, cannot add the add-operator-button");
+                    //Debug.LogError("Parent model is null, cannot add the add-operator-button");
                     return;
                 }
                 if (this.insertIndex >= 0) {
@@ -207,7 +207,7 @@ namespace PlayBlack.Editor.Sequencer.Renderers.Bt {
                         // When ModelClassName is null, means we're having a deserialized default element here
                         // which is due to specification limitations in protobuf (it doesn't know null references)
                         // Anyhow, in such case this means what we actually want to render is a null value (empty slot in parent object)
-                        Debug.LogWarning("Model has no model class name. Nulling.");
+                        // Debug.LogWarning("Model has no model class name. Nulling.");
                         model = null;
                     }
                     if (model != null && model.children != null && model.children.Count > 0) {

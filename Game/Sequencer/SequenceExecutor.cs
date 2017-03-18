@@ -217,16 +217,18 @@ namespace Playblack.Sequencer {
         public void DeserializeModelTree() {
             using (var ms = new MemoryStream(serializedModelTree)) {
                 ms.Position = 0;
-                this.rootModel = DataSerializer.DeserializeProtoObject<UnityBtModel>(ms.ToArray());
+                var buffer = ms.ToArray();
+                if (buffer != null) {
+                    this.rootModel = DataSerializer.DeserializeProtoObject<UnityBtModel>(buffer);
+                }
+                else {
+                    this.rootModel = UnityBtModel.NewInstance(null, new UnityBtModel(), typeof(ModelSequence).ToString());
+                }
                 if (this.rootModel.ModelClassName == null) {
-                    // we have a default here!
+                    // This happens in corner cases where the serialized bt model didn't have a model class. Rare. Nut needs to be accounted for
                     this.rootModel.ModelClassName = typeof(ModelSequence).ToString();
                 }
             }
-            //if (this.rootModel == null) {
-            //    this.rootModel = new UnityBtModel();
-            //    this.rootModel.ModelClassName = typeof(ModelSequence).ToString();
-            //}
         }
 
         public void SerializeModelTree() {
