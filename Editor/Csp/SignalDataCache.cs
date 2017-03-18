@@ -20,31 +20,24 @@ namespace Playblack.Editor.Csp {
              // expensive but it's not used THAT often
             Dictionary<string, List<string>> inputMap = new Dictionary<string, List<string>>();
             if (!string.IsNullOrEmpty(listener.targetProcessorName)) { // check if target processor name is okay
-                // Here come some exceptions. We can reference !self as target which means target is local processor
-                if (listener.targetProcessorName == "!self") {
-                    listener.matchedProcessors.Add(localProcessor);
-                }
-                else {
-                    var hits = UnityEngine.Object.FindObjectsOfType<SignalProcessor>();
-                    for (int i = 0; i < hits.Length; ++i) {
-                        if (!hits[i].name.StartsWith(listener.targetProcessorName, StringComparison.Ordinal)) {
-                            continue;
+                var hits = UnityEngine.Object.FindObjectsOfType<SignalProcessor>();
+                for (int i = 0; i < hits.Length; ++i) {
+                    if (!hits[i].name.StartsWith(listener.targetProcessorName, StringComparison.Ordinal)) {
+                        continue;
+                    }
+                    listener.matchedProcessors.Add(hits[i]);
+                    if (hits[i].InputFuncs.Count == 0) {
+                        UnityEngine.Debug.LogError("No inputfunc components on processor " + hits[i].name);
+                    }
+                    foreach (var kvp in hits[i].InputFuncs) {
+                        if (!inputMap.ContainsKey(kvp.Key)) {
+                            inputMap.Add(kvp.Key, new List<string>());
                         }
-                        listener.matchedProcessors.Add(hits[i]);
-                        if (hits[i].InputFuncs.Count == 0) {
-                            UnityEngine.Debug.LogError("No inputfunc components on processor " + hits[i].name);
-                        }
-                        foreach (var kvp in hits[i].InputFuncs) {
-                            if (!inputMap.ContainsKey(kvp.Key)) {
-                                inputMap.Add(kvp.Key, new List<string>());
-                            }
-                            for (int j = 0; j < kvp.Value.Count; ++j) {
-                                inputMap[kvp.Key].Add(kvp.Value[j].Name);
-                            }
+                        for (int j = 0; j < kvp.Value.Count; ++j) {
+                            inputMap[kvp.Key].Add(kvp.Value[j].Name);
                         }
                     }
                 }
-                
             }
 
             this.inputMapping = new Dictionary<string, string[]>(inputMap.Count);

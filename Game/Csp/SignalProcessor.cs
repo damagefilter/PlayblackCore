@@ -42,7 +42,6 @@ namespace Playblack.Csp {
             }
         }
 
-        [HideInInspector]
         [SerializeField]
         [SaveableField(SaveField.FIELD_PROTOBUF_OBJECT)]
         protected List<OutputFunc> outputs;
@@ -294,7 +293,6 @@ namespace Playblack.Csp {
                 if (outputs[i].Listeners == null) {
                     continue; // can be null after deserialization
                 }
-                //                foreach (var listener in output.Listeners) {
                 for (int j = 0; j < outputs[i].Listeners.Count; ++j) {
                     bool needsEntityCleaning = false;
                     if (outputs[i].Listeners[j] == null || outputs[i].Listeners[j].matchedProcessors == null) {

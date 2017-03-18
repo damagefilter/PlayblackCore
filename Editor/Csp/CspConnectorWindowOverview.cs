@@ -105,7 +105,7 @@ namespace Playblack.Editor.Csp {
                     data = dataCache.Get(cacheKey);
                     if (data.GetComponentList() == null || data.GetComponentList().Length == 0) {
                         // stale data through scene switches and such. rebuild.
-                        Debug.Log("Rebuilding cached data for " + cacheKey);
+                        Debug.Log("Rebuilding cache for " + cacheKey);
                         dataCache.Remove(cacheKey);
                         data = new SignalDataCache(processor, output.Listeners[i]);
                         dataCache.Add(cacheKey, data);
@@ -122,7 +122,8 @@ namespace Playblack.Editor.Csp {
                     if (oldTarget != newTarget) {
                         dataCache.Remove(cacheKey); // uncache junk.
                         output.Listeners[i].targetProcessorName = newTarget; // will be re-cached and processed next time
-                        Debug.Log("Target changed!");
+                        Debug.Log("Target changed. Rebuilding matched processor list.");
+                        output.Listeners[i].FindTargetProcessors(this.processor);
                         return;
                     }
                     if (data == null) {
@@ -184,6 +185,7 @@ namespace Playblack.Editor.Csp {
                         // Schedule listener for removal
                         toRemove = i;
                     }
+                    
                 }
                 EditorGUILayout.EndHorizontal();
 

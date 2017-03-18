@@ -68,22 +68,15 @@ namespace Playblack.Csp {
             if (string.IsNullOrEmpty(this.targetProcessorName)) {
                 return;
             }
-            if (this.targetProcessorName == "!self") {
-                this.matchedProcessors.Add(localProcessor);
-            }
-            else {
-                // TODO: Check what kind of performance hit this thing has when instantiating loads of objects and how to mitigate
-                // without writing a custom tracker. Seems rather redundant
-                var hits = UnityEngine.Object.FindObjectsOfType<SignalProcessor>();
-                for (int i = 0; i < hits.Length; ++i) {
-                    if (!hits[i].name.StartsWith(this.targetProcessorName, StringComparison.InvariantCulture)) {
-                        continue;
-                    }
-                    this.matchedProcessors.Add(hits[i]);
+            // TODO: Check what kind of performance hit this thing has when instantiating loads of objects and how to mitigate
+            // without writing a custom tracker. Seems rather redundant
+            var hits = UnityEngine.Object.FindObjectsOfType<SignalProcessor>();
+            for (int i = 0; i < hits.Length; ++i) {
+                if (!hits[i].name.StartsWith(this.targetProcessorName, StringComparison.InvariantCulture)) {
+                    continue;
                 }
+                this.matchedProcessors.Add(hits[i]);
             }
-            
-            //matchedProcessors.AddRange(SignalProcessorTracker.Instance.GetByName(this.processorName));
         }
 
         public bool HasParameter(string component) {
