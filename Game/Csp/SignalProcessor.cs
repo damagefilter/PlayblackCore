@@ -24,6 +24,7 @@ namespace Playblack.Csp {
     /// </summary>
     [DisallowMultipleComponent]
     [SaveableComponent]
+    [InitializeOnLoad]
     public class SignalProcessor : MonoBehaviour {
 
         /// <summary>
@@ -71,6 +72,7 @@ namespace Playblack.Csp {
                 this.RebuildInputs();
             }
             if (!inputFuncs.ContainsKey(component)) {
+                Debug.Log("Component " + component + " is not part of this GameObject. No InputFunc for it can be found.");
                 return null;
             }
 
@@ -89,6 +91,7 @@ namespace Playblack.Csp {
         /// for things to call when an output is fired.
         /// </summary>
         private void RebuildInputs() {
+            Debug.Log("Rebuilding InputFunc cache on " + this.gameObject.name);
             var components = GetComponents<Component>();
             if (inputFuncs == null) {
                 inputFuncs = new Dictionary<string, List<InputFunc>>();
