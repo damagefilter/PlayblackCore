@@ -67,7 +67,7 @@ namespace Playblack.Csp {
         private GenericObjectPoolMap<Type, InputFuncAttribute[]> inputFuncCache = new GenericObjectPoolMap<Type, InputFuncAttribute[]>(10, 50);
 
         public InputFunc GetInputFunc(string name, string component) {
-            if (inputFuncs == null) {
+            if (inputFuncs == null || inputFuncs.Count == 0) {
                 this.RebuildInputs();
             }
             if (!inputFuncs.ContainsKey(component)) {

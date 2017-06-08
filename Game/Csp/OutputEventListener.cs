@@ -39,7 +39,8 @@ namespace Playblack.Csp {
                 for (int i = 0; i < matchedProcessors.Count; ++i) {
                     var func = matchedProcessors[i].GetInputFunc(method, component);
                     if (func == null) {
-                        Debug.LogWarning(method + " is not a declared input func on " + matchedProcessors[i].GetType().Name);
+                        Debug.LogWarning(method + " is not a declared input func on " + matchedProcessors[i].gameObject.name);
+                        continue;
                     }
                     if (delay > 0) {
                         matchedProcessors[i].StartCoroutine(ExecuteDelayed(func));
