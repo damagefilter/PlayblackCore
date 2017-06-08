@@ -82,10 +82,11 @@ namespace Playblack.Savegame {
                             case SaveField.FIELD_SIMPLE_OBJECT:
                                 componentBlock.AddSimpleObject(memberSet[j].Name, components[i].TryGetValue(memberSet[j].Name, Flags.InstanceAnyVisibility));
                                 break;
-
+                                
                             case SaveField.FIELD_PROTOBUF_OBJECT:
                                 componentBlock.AddProtoObject(memberSet[j].Name, components[i].TryGetValue(memberSet[j].Name, Flags.InstanceAnyVisibility));
                                 break;
+                                
                             case SaveField.FIELD_COLOR:
                                 componentBlock.AddColor(memberSet[j].Name, (Color)components[i].TryGetValue(memberSet[j].Name, Flags.InstanceAnyVisibility));
                                 break;
@@ -97,9 +98,11 @@ namespace Playblack.Savegame {
                             case SaveField.FIELD_VECTOR_3:
                                 componentBlock.AddVector3(memberSet[j].Name, (Vector3)components[i].TryGetValue(memberSet[j].Name, Flags.InstanceAnyVisibility));
                                 break;
+                                
                             case SaveField.FIELD_QUATERNION:
                                 componentBlock.AddQuaternion(memberSet[j].Name, (Quaternion)components[i].TryGetValue(memberSet[j].Name, Flags.InstanceAnyVisibility));
                                 break;
+                                
                             default:
                                 // In case we have new data types and forgot to add it here for processing
                                 Debug.LogError(memberSet[j].Name + " is of unhandled data type " + a.fieldType);
@@ -139,7 +142,6 @@ namespace Playblack.Savegame {
                     Debug.LogError("Failed restoring component type " + data.ComponentList[i].ComponentName + " from assembly " + data.ComponentList[i].AssemblyName);
                     continue;
                 }
-                Debug.Log("Restoring component type " + data.ComponentList[i].ComponentName + " from assembly " + data.ComponentList[i].AssemblyName);
                 if (!typeof(Component).IsAssignableFrom(componentType)) {
                     Debug.LogError("Restore error: " + componentType + " was expected to be a subtype of Component but isn't! Not restoring data.");
                     continue; // Not a component :(
@@ -148,43 +150,46 @@ namespace Playblack.Savegame {
                     component = this.gameObject.AddComponent(componentType);
                 }
                 else {
-                    component = this.gameObject.GetComponent(componentType);
-                    if (component == null) {
-                        // try again in children because some might have their stuff deeper down the hierarchy
-                        component = this.gameObject.GetComponentInChildren(componentType);
-                    }
+                    component = storeFullObjectTree ? this.gameObject.GetComponentInChildren(componentType) : this.gameObject.GetComponent(componentType);
                 }
-                Debug.AssertFormat(component, "{0} is not contained on prefab or game object {0} and could not be added.", componentType, this.name);
                 var memberSet = componentType.FieldsAndPropertiesWith(typeof(SaveableFieldAttribute));
                 for (int j = 0; j < memberSet.Count; ++j) {
                     SaveableFieldAttribute a = memberSet[j].Attribute<SaveableFieldAttribute>();
-                    switch (a.fieldType) {
-                        // Read them in as simple objects as they can be primitives or arrays of primitives.
-                        // Or they can, of course, be simple objects.
-                        case SaveField.FIELD_PRIMITIVE:
-                        case SaveField.FIELD_SIMPLE_OBJECT:
-                            component.TrySetValue(memberSet[j].Name, data.ComponentList[i].ReadSimpleObject(memberSet[j].Name), Flags.InstanceAnyVisibility);
-                            break;
-                        case SaveField.FIELD_PROTOBUF_OBJECT:
-                            component.TrySetValue(memberSet[j].Name, data.ComponentList[i].ReadProtoObject(memberSet[j].Name, memberSet[j].Type()), Flags.InstanceAnyVisibility);
-                            break;
-                        case SaveField.FIELD_VECTOR_2:
-                            component.TrySetValue(memberSet[j].Name, data.ComponentList[i].ReadVector2(memberSet[j].Name), Flags.InstanceAnyVisibility);
-                            break;
-                        case SaveField.FIELD_VECTOR_3:
-                            component.TrySetValue(memberSet[j].Name, data.ComponentList[i].ReadVector3(memberSet[j].Name), Flags.InstanceAnyVisibility);
-                            break;
-                        case SaveField.FIELD_QUATERNION:
-                            component.TrySetValue(memberSet[j].Name, data.ComponentList[i].ReadQuaternion(memberSet[j].Name), Flags.InstanceAnyVisibility);
-                            break;
-                        case SaveField.FIELD_COLOR:
-                            component.TrySetValue(memberSet[j].Name, data.ComponentList[i].ReadColor(memberSet[j].Name), Flags.InstanceAnyVisibility);
-                            break;
-                        default:
-                            // In case we have new data types and forgot to add it here for processing
-                            Debug.LogError(memberSet[j].Name + " is of unhandled data type " + a.fieldType);
-                            break;
+                    try {
+                        switch (a.fieldType) {
+                            // Read them in as simple objects as they can be primitives or arrays of primitives.
+                            // Or they can, of course, be simple objects.
+                            case SaveField.FIELD_PRIMITIVE:
+                            case SaveField.FIELD_SIMPLE_OBJECT:
+                                component.TrySetValue(memberSet[j].Name, data.ComponentList[i].ReadSimpleObject(memberSet[j].Name), Flags.InstanceAnyVisibility);
+                                break;
+                            case SaveField.FIELD_PROTOBUF_OBJECT:
+                                component.TrySetValue(memberSet[j].Name, data.ComponentList[i].ReadProtoObject(memberSet[j].Name, memberSet[j].Type()), Flags.InstanceAnyVisibility);
+                                break;
+                            case SaveField.FIELD_VECTOR_2:
+                                component.TrySetValue(memberSet[j].Name, data.ComponentList[i].ReadVector2(memberSet[j].Name), Flags.InstanceAnyVisibility);
+                                break;
+                            case SaveField.FIELD_VECTOR_3:
+                                component.TrySetValue(memberSet[j].Name, data.ComponentList[i].ReadVector3(memberSet[j].Name), Flags.InstanceAnyVisibility);
+                                break;
+                            case SaveField.FIELD_QUATERNION:
+                                component.TrySetValue(memberSet[j].Name, data.ComponentList[i].ReadQuaternion(memberSet[j].Name), Flags.InstanceAnyVisibility);
+                                break;
+                            case SaveField.FIELD_COLOR:
+                                component.TrySetValue(memberSet[j].Name, data.ComponentList[i].ReadColor(memberSet[j].Name), Flags.InstanceAnyVisibility);
+                                break;
+                            default:
+                                // In case we have new data types and forgot to add it here for processing
+                                Debug.LogError(memberSet[j].Name + " is of unhandled data type " + a.fieldType);
+                                break;
+                        }
                     }
+                    catch (Exception e) {
+                        Debug.LogError(
+                            "Could not restore the value from field " + memberSet[j].Name + " on component " + componentType + ": \n" +
+                            e.Message);
+                    }
+                    
                 }
             }
         }
