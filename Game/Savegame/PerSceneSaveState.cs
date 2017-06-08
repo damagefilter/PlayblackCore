@@ -1,6 +1,7 @@
 ﻿using Playblack.EventSystem.Events;
 using Playblack.Savegame.Model;
 using System.Collections;
+using System.Collections.Generic;
 using System.IO;
 using UnityEngine;
 using UnityEngine.SceneManagement;
@@ -43,11 +44,17 @@ namespace Playblack.Savegame {
             // Can use GO.Find here, this point in code has no requirement to be super fast.
             // (That also means we don't need to track them all)
             var managers = UnityEngine.Object.FindObjectsOfType<SaveManager>();
-            Debug.Log("Clearing scene. Removing  " + managers.Length + " managed game objects");
+            Debug.Log("Removing saveable objects not marked persistent.");
+            Dictionary<string, SaveManager> persistentObjects = new Dictionary<string, SaveManager>();
             for (int i = 0; i < managers.Length; ++i) {
                 // SaveManager handled objects need to be destroyed
                 // as they will all be re-created from the save file.
-                UnityEngine.Object.DestroyImmediate(managers[i].gameObject);
+                if (!managers[i].PersistsOnRestore) {
+                    Object.DestroyImmediate(managers[i].gameObject);
+                }
+                else {
+                    persistentObjects.Add(managers[i].UUID, managers[i]);
+                }
             }
             SaveFile file = null;
             using (MemoryStream ms = new MemoryStream(File.ReadAllBytes(Application.persistentDataPath + "/" + SaveName + ".save"))) {
@@ -57,11 +64,17 @@ namespace Playblack.Savegame {
             var sceneData = (SceneDataBlock)file.Get(dataId);
             Debug.Log("We have  " + sceneData.SceneObjects.Count + " objects to restore!");
             for (int i = 0; i < sceneData.SceneObjects.Count; ++i) {
-                if (sceneData.SceneObjects[i].MustLoadAsset) {
+                if (persistentObjects.ContainsKey(sceneData.SceneObjects[i].UUID)) {
+                    // This is a game object that is not destroyed to retain its object structure and references.
+                    persistentObjects[sceneData.SceneObjects[i].UUID].Restore(sceneData.SceneObjects[i], false);
+                }
+                else if (sceneData.SceneObjects[i].MustLoadAsset) {
                     // load async, wait for finish, then continue
+                    // This creates a game object from asset or prefab.
                     yield return CreateGameObjectFromAsset(sceneData.SceneObjects[i]);
                 }
                 else {
+                    // attempt re-creation of this game object from the component data only.
                     CreateNewGameObject(sceneData.SceneObjects[i]);
                 }
             }

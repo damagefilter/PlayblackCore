@@ -22,6 +22,10 @@ namespace Playblack.Savegame {
         [SerializeField]
         private string assetPath;
 
+        [Tooltip("Do not clear this SaveManagers GO on restore but fill in the data from the save file on it instead.")]
+        [SerializeField]
+        private bool persistOnRestore;
+
         private string uuid;
 
         public string UUID {
@@ -30,8 +34,15 @@ namespace Playblack.Savegame {
             }
         }
 
+        public bool PersistsOnRestore {
+            get {
+                return this.persistOnRestore;
+            }
+        }
+
         private void Awake() {
-            this.uuid = ((GetInstanceID() + Time.time) * UnityEngine.Random.Range(1f, 1024f)).ToString();
+            // unique enough for saveable stuff. that#s all we need
+            this.uuid = this.gameObject.scene.name + this.transform.position + this.name;
             EventDispatcher.Instance.Register<GameSavingEvent>(OnSave);
         }
 
@@ -45,6 +56,7 @@ namespace Playblack.Savegame {
         /// The GameObjectDataBlock will then go into a list which will finally represent the savegame of a scene.
         /// </summary>
         public void OnSave(GameSavingEvent hook) {
+            Debug.Log("Saving " + gameObject.name);
             GameObjectDataBlock goBlock = new GameObjectDataBlock(uuid, gameObject.name, assetBundle, assetPath);
             var components = GetComponentsInChildren<Component>();
             for (int i = 0; i < components.Length; ++i) {
@@ -58,34 +70,42 @@ namespace Playblack.Savegame {
                 var memberSet = type.FieldsAndPropertiesWith(typeof(SaveableFieldAttribute));
                 for (int j = 0; j < memberSet.Count; ++j) {
                     SaveableFieldAttribute a = memberSet[j].Attribute<SaveableFieldAttribute>();
-                    switch (a.fieldType) {
-                        case SaveField.FIELD_PRIMITIVE:
-                        case SaveField.FIELD_SIMPLE_OBJECT:
-                            componentBlock.AddSimpleObject(memberSet[j].Name, components[i].TryGetValue(memberSet[j].Name, Flags.InstanceAnyVisibility));
-                            break;
+                    try {
+                        switch (a.fieldType) {
+                            case SaveField.FIELD_PRIMITIVE:
+                            case SaveField.FIELD_SIMPLE_OBJECT:
+                                componentBlock.AddSimpleObject(memberSet[j].Name, components[i].TryGetValue(memberSet[j].Name, Flags.InstanceAnyVisibility));
+                                break;
 
-                        case SaveField.FIELD_PROTOBUF_OBJECT:
-                            componentBlock.AddProtoObject(memberSet[j].Name, components[i].TryGetValue(memberSet[j].Name, Flags.InstanceAnyVisibility));
-                            break;
-                        case SaveField.FIELD_COLOR:
-                            componentBlock.AddColor(memberSet[j].Name, (Color)components[i].TryGetValue(memberSet[j].Name, Flags.InstanceAnyVisibility));
-                            break;
+                            case SaveField.FIELD_PROTOBUF_OBJECT:
+                                componentBlock.AddProtoObject(memberSet[j].Name, components[i].TryGetValue(memberSet[j].Name, Flags.InstanceAnyVisibility));
+                                break;
+                            case SaveField.FIELD_COLOR:
+                                componentBlock.AddColor(memberSet[j].Name, (Color)components[i].TryGetValue(memberSet[j].Name, Flags.InstanceAnyVisibility));
+                                break;
 
-                        case SaveField.FIELD_VECTOR_2:
-                            componentBlock.AddVector2(memberSet[j].Name, (Vector2)components[i].TryGetValue(memberSet[j].Name, Flags.InstanceAnyVisibility));
-                            break;
+                            case SaveField.FIELD_VECTOR_2:
+                                componentBlock.AddVector2(memberSet[j].Name, (Vector2)components[i].TryGetValue(memberSet[j].Name, Flags.InstanceAnyVisibility));
+                                break;
 
-                        case SaveField.FIELD_VECTOR_3:
-                            componentBlock.AddVector3(memberSet[j].Name, (Vector3)components[i].TryGetValue(memberSet[j].Name, Flags.InstanceAnyVisibility));
-                            break;
-                        case SaveField.FIELD_QUATERNION:
-                            componentBlock.AddQuaternion(memberSet[j].Name, (Quaternion)components[i].TryGetValue(memberSet[j].Name, Flags.InstanceAnyVisibility));
-                            break;
-                        default:
-                            // In case we have new data types and forgot to add it here for processing
-                            Debug.LogError(memberSet[j].Name + " is of unhandled data type " + a.fieldType);
-                            break;
+                            case SaveField.FIELD_VECTOR_3:
+                                componentBlock.AddVector3(memberSet[j].Name, (Vector3)components[i].TryGetValue(memberSet[j].Name, Flags.InstanceAnyVisibility));
+                                break;
+                            case SaveField.FIELD_QUATERNION:
+                                componentBlock.AddQuaternion(memberSet[j].Name, (Quaternion)components[i].TryGetValue(memberSet[j].Name, Flags.InstanceAnyVisibility));
+                                break;
+                            default:
+                                // In case we have new data types and forgot to add it here for processing
+                                Debug.LogError(memberSet[j].Name + " is of unhandled data type " + a.fieldType);
+                                break;
+                        }
                     }
+                    catch (Exception e) {
+                        Debug.LogError(
+                            "Could not store the value from field " + memberSet[j].Name + " on component " + type + ": \n" +
+                            e.Message);
+                    }
+                    
                 }
                 goBlock.AddComponentData(componentBlock);
             }
