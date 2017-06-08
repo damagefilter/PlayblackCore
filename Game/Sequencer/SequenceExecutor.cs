@@ -146,6 +146,7 @@ namespace Playblack.Sequencer {
         /// </summary>
         /// <returns></returns>
         private IEnumerator TickExecutorParallel() {
+            Debug.Log("Entered coroutine. Beginning ticking.");
             while (running) {
                 var status = this.executor.GetStatus();
                 if (status == TaskStatus.SUCCESS || status == TaskStatus.FAILURE) {
@@ -159,18 +160,23 @@ namespace Playblack.Sequencer {
                     yield return 0;
                 }
             }
+            Debug.Log("Sequence executor coroutine control flow ended.");
         }
 
         [InputFunc("TriggerExecution")]
         public void TriggerExecution() {
+            Debug.Log("Trigger execution");
             if (this.TypeOfExecution == ExecutionType.TRIGGER) {
+                Debug.Log("Is trigger. Doing my thing.");
                 if (this.executor == null) {
+                    Debug.Log("Executor is null. Fetching new one.");
                     this.executor = this.GetExecutor();
                 }
                 if (!running) {
                     running = true;
                     StartCoroutine("TickExecutorParallel");
                     this.FireOutput("OnExecutionTrigger");
+                    Debug.Log("Execution triggered, coroutine started");
                 }
             }
         }

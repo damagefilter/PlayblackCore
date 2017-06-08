@@ -3,7 +3,6 @@ using Playblack.Sequencer;
 using PlayBlack.Editor.Sequencer.Renderers;
 using PlayBlack.Editor.Windows;
 using UnityEditor;
-using UnityEditor.SceneManagement;
 
 namespace PlayBlack.Editor.Sequencer {
 
@@ -39,17 +38,14 @@ namespace PlayBlack.Editor.Sequencer {
         }
 
         public void OnDestroy() {
-            // Called when closed
+            // Record the change of the whole thing. Seems a lil wasteful but ... yeah. Huh. Unity.
+            // NOTE: This Undo ain't actually working because it acts on the serialized data
+            // whereas the stuff displayed in the editors is taken from the current in-memory
+            // representation of the model tree (the real thing, that is)
+            // BUT: This will scratch the right itch in Unity to make it save the damn thing.
+            Undo.RecordObject(SequenceExecutorObject, "Serializing behaviour tree");
             this.OperatorRenderer.GetSubjectToRender().UpdateCodeViewDisplay();
-            int currentArraySize = SerializedSequenceExecutor.FindProperty("serializedModelTree.Array.size").intValue;
             SequenceExecutorObject.SerializeModelTree(); // Force update of the model tree data here
-            int newArraySize = SequenceExecutorObject.SerializedModelTree.Length;
-            if (newArraySize != currentArraySize)
-                SerializedSequenceExecutor.FindProperty("serializedModelTree.Array.size").intValue = newArraySize;
-
-            for (int i = 0; i < newArraySize; i++) {
-                SerializedSequenceExecutor.FindProperty(string.Format("serializedModelTree.Array.data[{0}]", i)).intValue = SequenceExecutorObject.SerializedModelTree[i];
-            }
             EditorUtility.SetDirty(SequenceExecutorObject);
         }
     }
