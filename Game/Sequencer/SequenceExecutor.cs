@@ -75,19 +75,6 @@ namespace Playblack.Sequencer {
             }
         }
 
-        // internally used to store the global context of the BT in a save game.
-        // The executor cannot be persisted (doesn't need to be either) but
-        // when we just persist its root context, we can pass it back in and have the state as it was after saving
-        [SaveableField(SaveField.FIELD_PROTOBUF_OBJECT)]
-        private DataContext GlobalContext {
-            get {
-                return executor != null ? executor.GetRootContext() : null;
-            }
-            set {
-                // This is after loading a save game so just create the executor
-                GetExecutor(value);
-            }
-        }
 
         // Means this cannot be re-created via savegames without a valid prefab
         [SerializeField]
@@ -115,9 +102,7 @@ namespace Playblack.Sequencer {
                 }
                 return this.executor;
             }
-            else {
-                return this.GetExecutor(overrideContext != null ? overrideContext : new DataContext(globalDataContext), actor);
-            }
+            return this.GetExecutor(overrideContext ?? new DataContext(globalDataContext), actor);
         }
 
         public IBTExecutor GetExecutor(DataContext context, UnityEngine.Object actor) {
