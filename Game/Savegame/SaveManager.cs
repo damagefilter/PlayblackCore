@@ -25,6 +25,10 @@ namespace Playblack.Savegame {
         [Tooltip("Do not clear this SaveManagers GO on restore but fill in the data from the save file on it instead.")]
         [SerializeField]
         private bool persistOnRestore;
+        
+        [Tooltip("If ticked stores data of child components aswell. Useful for prefabs!")]
+        [SerializeField]
+        private bool storeFullObjectTree;
 
         private string uuid;
 
@@ -58,7 +62,9 @@ namespace Playblack.Savegame {
         public void OnSave(GameSavingEvent hook) {
             Debug.Log("Saving " + gameObject.name);
             GameObjectDataBlock goBlock = new GameObjectDataBlock(uuid, gameObject.name, assetBundle, assetPath);
-            var components = GetComponentsInChildren<Component>();
+            
+            var components = this.storeFullObjectTree ? GetComponentsInChildren<Component>() : GetComponents<Component>();
+            
             for (int i = 0; i < components.Length; ++i) {
                 // Ignore components that are not to be saved.
                 if (!components[i].GetType().IsDefined(typeof(SaveableComponentAttribute), true)) {
