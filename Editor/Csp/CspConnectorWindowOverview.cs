@@ -38,12 +38,13 @@ namespace Playblack.Editor.Csp {
                 return;
             }
             this.processor = processor;
-
+            
             this.outputs = new string[processor.Outputs.Count];
             for (int i = 0; i < processor.Outputs.Count; ++i) {
                 this.outputs[i] = processor.Outputs[i].Name;
             }
             this.dataCache.Clear();
+            Undo.RecordObject(this.processor, "Edit Signal Processor");
         }
 
         public void OnGUI() {
@@ -53,6 +54,10 @@ namespace Playblack.Editor.Csp {
             else {
                 DrawExistingConnections();
             }
+        }
+
+        private void OnDestroy() {
+            EditorUtility.SetDirty(processor);
         }
 
         private void DrawExistingConnections() {

@@ -8,9 +8,7 @@ using Playblack.Savegame;
 using UnityEngine;
 
 #if UNITY_EDITOR
-
 using UnityEditor;
-
 #endif
 
 namespace Playblack.Csp {
@@ -24,7 +22,9 @@ namespace Playblack.Csp {
     /// </summary>
     [DisallowMultipleComponent]
     [SaveableComponent]
+#if UNITY_EDITOR
     [InitializeOnLoad]
+#endif
     public class SignalProcessor : MonoBehaviour {
 
         /// <summary>
@@ -330,7 +330,7 @@ namespace Playblack.Csp {
                         Quaternion rot = Quaternion.LookRotation(direction);
                         Ray r = new Ray(this.transform.position, direction);
                         var pos = r.GetPoint(direction.magnitude - 1f);
-                        Handles.ConeCap(0, pos, rot, 1f);
+                        Handles.ConeHandleCap(0, pos, rot, 1f, EventType.Ignore);
                     }
                     if (needsEntityCleaning) {
                         var list = new List<SignalProcessor>();
