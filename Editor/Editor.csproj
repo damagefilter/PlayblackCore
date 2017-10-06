@@ -11,8 +11,7 @@
     <AssemblyName>PlayBlackEditor</AssemblyName>
     <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
-    <TargetFrameworkProfile>
-    </TargetFrameworkProfile>
+    <LangVersion>4</LangVersion>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -79,14 +78,13 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <Folder Include="Properties\" />
-  </ItemGroup>
-  <ItemGroup>
+    <Compile Include="BehaviourTree\ModelDisplayManager.cs" />
     <Compile Include="Csp\CspContextMenu.cs" />
     <Compile Include="Csp\SignalProcessorInspector.cs" />
+    <Compile Include="Extensions\EditorOnlyHelperExtensions.cs" />
     <Compile Include="Sequencer\OperatorEditorWindow.cs" />
     <Compile Include="Sequencer\Renderers\Bt\BtSequencerRenderer.cs" />
-    <Compile Include="Sequencer\Renderers\Bt\DefaultRenderer.cs" />
+    <Compile Include="Sequencer\Renderers\Bt\DefaultOperatorRenderer.cs" />
     <Compile Include="Sequencer\Renderers\IOperatorRenderer.cs" />
     <Compile Include="Sequencer\Renderers\ISequencerRenderer.cs" />
     <Compile Include="Sequencer\OperatorSelector.cs" />

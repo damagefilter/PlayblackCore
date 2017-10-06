@@ -30,13 +30,6 @@ namespace Playblack.Sequencer {
         [SerializeField]
         [HideInInspector]
         private byte[] serializedModelTree;
-#if UNITY_EDITOR
-        public byte[] SerializedModelTree {
-            get {
-                return serializedModelTree;
-            }
-        }
-#endif
 
         // This is restored when loading a savegame and is ideally the
         // original model tree.
@@ -209,12 +202,7 @@ namespace Playblack.Sequencer {
             using (var ms = new MemoryStream(serializedModelTree)) {
                 ms.Position = 0;
                 var buffer = ms.ToArray();
-                if (buffer != null) {
-                    this.rootModel = DataSerializer.DeserializeProtoObject<UnityBtModel>(buffer);
-                }
-                else {
-                    this.rootModel = UnityBtModel.NewInstance(null, new UnityBtModel(), typeof(ModelSequence).ToString());
-                }
+                this.rootModel = DataSerializer.DeserializeProtoObject<UnityBtModel>(buffer);
                 if (this.rootModel.ModelClassName == null) {
                     // This happens in corner cases where the serialized bt model didn't have a model class. Rare. Nut needs to be accounted for
                     this.rootModel.ModelClassName = typeof(ModelSequence).ToString();

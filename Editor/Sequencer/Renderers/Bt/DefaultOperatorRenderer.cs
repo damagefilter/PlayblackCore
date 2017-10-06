@@ -1,13 +1,15 @@
 ﻿using Playblack.BehaviourTree;
 using PlayBlack.Editor.Windows;
 using System.Collections.Generic;
+using PlayBlack.Editor.BehaviourTree;
 using UnityEditor;
 using UnityEngine;
 
 namespace PlayBlack.Editor.Sequencer.Renderers.Bt {
 
-    public class DefaultRenderer : IOperatorRenderer<UnityBtModel> {
+    public class DefaultOperatorRenderer : IOperatorRenderer<UnityBtModel> {
         protected UnityBtModel modelToRender;
+        protected ModelDisplayManager displayManager;
         protected UnityBtModel parentModel;
         private IList<ChildDescriptorAttribute> childStructure;
         private Vector2 scrollPos;
@@ -37,7 +39,7 @@ namespace PlayBlack.Editor.Sequencer.Renderers.Bt {
                 return;
             }
             int indent = sequenceRenderer.IndentLevel;
-            sequenceRenderer.RenderEditOperatorButton(modelToRender.CodeViewDisplay, modelToRender, parentModel, this);
+            sequenceRenderer.RenderEditOperatorButton(displayManager.CodeViewDisplay, modelToRender, parentModel, this);
             sequenceRenderer.IndentLevel += 10;
 
             foreach (var kvp in childStructure) {
@@ -55,16 +57,15 @@ namespace PlayBlack.Editor.Sequencer.Renderers.Bt {
                             // And update again because otherwise this will be deserialized as a default instance
                             // causing ghost data that cannot be removed.
                             ((BtSequencerRenderer)sequenceRenderer).UpdateSerializedModelTree();
-                            continue;
                         }
                         else {
-                            DefaultRenderer r = null;
+                            DefaultOperatorRenderer r;
                             if (childRenderers.Count > i + 1) {
                                 r = childRenderers[i];
                             }
                             else {
                                 while (childRenderers.Count < i + 1) { // index is 0-based, count is not, so add one. Just sayin.
-                                    childRenderers.Add(new DefaultRenderer());
+                                    childRenderers.Add(new DefaultOperatorRenderer());
                                 }
                                 r = childRenderers[i];
                             }
@@ -82,7 +83,7 @@ namespace PlayBlack.Editor.Sequencer.Renderers.Bt {
                 }
 
                 // Displays a name for structuring purposes.
-                sequenceRenderer.RenderOperatorDummyButton(modelToRender.GetChildDisplayName(kvp.InsertIndex));
+                sequenceRenderer.RenderOperatorDummyButton(displayManager.GetChildDisplayName(kvp.InsertIndex));
                 sequenceRenderer.IndentLevel += 10;
                 // Make sure the index we want to access exists at all.
                 if (modelToRender.children.Count < kvp.InsertIndex + 1) { // index is 0-based, count is not, so add one. Just sayin.
@@ -94,13 +95,13 @@ namespace PlayBlack.Editor.Sequencer.Renderers.Bt {
                     sequenceRenderer.RenderAddOperatorButton(modelToRender, kvp.InsertIndex);
                 }
                 else {
-                    DefaultRenderer r = null;
+                    DefaultOperatorRenderer r;
                     if (childRenderers.Count >= kvp.InsertIndex + 1) {
                         r = childRenderers[kvp.InsertIndex];
                     }
                     else {
                         while (childRenderers.Count < kvp.InsertIndex + 1) { // index is 0-based, count is not, so add one. Just sayin.
-                            childRenderers.Add(new DefaultRenderer());
+                            childRenderers.Add(new DefaultOperatorRenderer());
                         }
                         r = childRenderers[kvp.InsertIndex];
                     }
@@ -194,14 +195,15 @@ namespace PlayBlack.Editor.Sequencer.Renderers.Bt {
             // this.DrawRemoveButton();
         }
 
-        private List<DefaultRenderer> childRenderers;
+        private List<DefaultOperatorRenderer> childRenderers;
 
         public void SetSubjects(params UnityBtModel[] subjects) {
             var model = subjects[0];
             if (this.modelToRender != model) {
+                this.displayManager = new ModelDisplayManager(this.modelToRender);
                 if (model != null) {
                     if (model.ModelClassName != null) {
-                        this.childStructure = model.GetChildStructure();
+                        this.childStructure = this.displayManager.GetChildStructure();
                     }
                     else {
                         // When ModelClassName is null, means we're having a deserialized default element here
@@ -211,14 +213,14 @@ namespace PlayBlack.Editor.Sequencer.Renderers.Bt {
                         model = null;
                     }
                     if (model != null && model.children != null && model.children.Count > 0) {
-                        this.childRenderers = new List<DefaultRenderer>(model.children.Count);
+                        this.childRenderers = new List<DefaultOperatorRenderer>(model.children.Count);
                         // Pre-create all renderers for the models children.
                         for (int i = 0; i < model.children.Count; ++i) {
-                            this.childRenderers.Add(new DefaultRenderer());
+                            this.childRenderers.Add(new DefaultOperatorRenderer());
                         }
                     }
                     else {
-                        this.childRenderers = new List<DefaultRenderer>(3);
+                        this.childRenderers = new List<DefaultOperatorRenderer>(3);
                     }
                 }
                 this.modelToRender = model;

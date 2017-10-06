@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using UnityEditor;
 using UnityEngine;
 using Playblack.Sequencer;
+using PlayBlack.Editor.Extensions;
 
 namespace PlayBlack.Editor.Sequencer.Renderers.Bt {
 
@@ -40,7 +41,7 @@ namespace PlayBlack.Editor.Sequencer.Renderers.Bt {
             set;
         }
 
-        public DefaultRenderer OperatorRenderer {
+        public DefaultOperatorRenderer OperatorRenderer {
             get {
                 return operatorRenderer;
             }
@@ -53,7 +54,7 @@ namespace PlayBlack.Editor.Sequencer.Renderers.Bt {
         public SerializedObject SerializedSequenceExecutor { get; set; }
         public SequenceExecutor SequenceExecutorObject { get; set; }
 
-        private DefaultRenderer operatorRenderer = new DefaultRenderer();
+        private DefaultOperatorRenderer operatorRenderer = new DefaultOperatorRenderer();
 
         /// <summary>
         /// Handles rendering of all the things and cleans up messes and rearrangements
@@ -118,7 +119,6 @@ namespace PlayBlack.Editor.Sequencer.Renderers.Bt {
         public void RenderEditOperatorButton(string label, UnityBtModel referenceObject, UnityBtModel referenceParentObject, IOperatorRenderer<UnityBtModel> operatorRenderer) {
             EditorGUILayout.BeginHorizontal();
             {
-                var opr = operatorRenderer as DefaultRenderer;
                 var indent = EditorGUI.indentLevel;
                 EditorGUI.indentLevel = this.IndentLevel;
                 if (referenceParentObject != null) {
@@ -145,10 +145,6 @@ namespace PlayBlack.Editor.Sequencer.Renderers.Bt {
                     }
 
                     if (GUILayout.Button("x", EditorSkin.button, GUILayout.Width(18))) {
-                        if (referenceParentObject == null) {
-                            Debug.LogError("Tried to remove a root object or corrupted model " + referenceObject.ModelClassName);
-                            return;
-                        }
                         if (!referenceParentObject.NullChild(referenceObject)) {
                             Debug.LogError("Failed to remove a model from its parent (but it is in there!)" + referenceObject.ModelClassName);
                         }
@@ -166,12 +162,13 @@ namespace PlayBlack.Editor.Sequencer.Renderers.Bt {
         public void UpdateSerializedModelTree() {
             int currentArraySize = SerializedSequenceExecutor.FindProperty("serializedModelTree.Array.size").intValue;
             SequenceExecutorObject.SerializeModelTree(); // Force update of the model tree data here
-            int newArraySize = SequenceExecutorObject.SerializedModelTree.Length;
+            var modelTree = SequenceExecutorObject.GetSerializedModelTree();
+            int newArraySize = modelTree.Length;
             if (newArraySize != currentArraySize)
                 SerializedSequenceExecutor.FindProperty("serializedModelTree.Array.size").intValue = newArraySize;
 
             for (int i = 0; i < newArraySize; i++) {
-                SerializedSequenceExecutor.FindProperty(string.Format("serializedModelTree.Array.data[{0}]", i)).intValue = SequenceExecutorObject.SerializedModelTree[i];
+                SerializedSequenceExecutor.FindProperty(string.Format("serializedModelTree.Array.data[{0}]", i)).intValue = modelTree[i];
             }
             EditorUtility.SetDirty(SequenceExecutorObject);
         }

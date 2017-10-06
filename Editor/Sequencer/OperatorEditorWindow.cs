@@ -44,7 +44,6 @@ namespace PlayBlack.Editor.Sequencer {
             // representation of the model tree (the real thing, that is)
             // BUT: This will scratch the right itch in Unity to make it save the damn thing.
             Undo.RecordObject(SequenceExecutorObject, "Serializing behaviour tree");
-            this.OperatorRenderer.GetSubjectToRender().UpdateCodeViewDisplay();
             SequenceExecutorObject.SerializeModelTree(); // Force update of the model tree data here
             EditorUtility.SetDirty(SequenceExecutorObject);
         }

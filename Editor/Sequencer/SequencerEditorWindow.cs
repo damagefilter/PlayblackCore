@@ -26,7 +26,7 @@ namespace PlayBlack.Editor.Sequencer {
                 Debug.Log("RootModel in sequencer editor window is null... but y tho");
             }
             this.sequencerWindow = new BtSequencerRenderer();
-            this.sequencerWindow.OperatorRenderer = new DefaultRenderer();
+            this.sequencerWindow.OperatorRenderer = new DefaultOperatorRenderer();
             this.sequencerWindow.OperatorRenderer.SetSubjects(subject.RootModel);
 
             // We need to drag this along into the operator editor where it will be saved and set dirty 

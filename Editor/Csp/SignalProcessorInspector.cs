@@ -10,15 +10,27 @@ namespace Playblack.Editor.Csp {
 
         public override void OnInspectorGUI() {
             if (GUILayout.Button("Open Outputs")) {
-                if (edWindow == null) {
-                    edWindow = EditorWindow.CreateInstance<CspConnectorWindowOverview>();
-                }
-                if (target == null) {
-                    Debug.LogError("Target for sigproc is empty!");
-                }
-                edWindow.Prepare((SignalProcessor)target);
-                edWindow.Show();
+                OpenCspEditorWindow((SignalProcessor)target);
             }
+        }
+
+        public static void OpenCspEditorWindow(SignalProcessor target, SignalProcessor previousTarget = null) {
+            if (edWindow == null) {
+                edWindow = CreateInstance<CspConnectorWindowOverview>();
+            }
+            else {
+                edWindow.Close();
+                edWindow = CreateInstance<CspConnectorWindowOverview>();
+            }
+            if (target == null) {
+                Debug.LogError("Target for sigproc is empty!");
+                return;
+            }
+            Debug.Log("Switching target to " + target.name);
+            Debug.Log("Previous? " + (previousTarget != null ? previousTarget.name : "none"));
+            edWindow.Prepare(target);
+            edWindow.SetPreviousTarget(previousTarget);
+            edWindow.Show();
         }
     }
 }

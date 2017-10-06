@@ -7,9 +7,6 @@ using Playblack.Pooling;
 using Playblack.Savegame;
 using UnityEngine;
 
-#if UNITY_EDITOR
-using UnityEditor;
-#endif
 
 namespace Playblack.Csp {
 
@@ -22,9 +19,6 @@ namespace Playblack.Csp {
     /// </summary>
     [DisallowMultipleComponent]
     [SaveableComponent]
-#if UNITY_EDITOR
-    [InitializeOnLoad]
-#endif
     public class SignalProcessor : MonoBehaviour {
 
         /// <summary>
@@ -54,11 +48,6 @@ namespace Playblack.Csp {
                 }
                 return this.outputs;
             }
-#if UNITY_EDITOR
-            set {
-                this.outputs = value;
-            }
-#endif
         }
 
         /// <summary>
@@ -91,7 +80,7 @@ namespace Playblack.Csp {
         /// for things to call when an output is fired.
         /// </summary>
         private void RebuildInputs() {
-            Debug.Log("Rebuilding InputFunc cache on " + this.gameObject.name);
+//            Debug.Log("Rebuilding InputFunc cache on " + this.gameObject.name);
             var components = GetComponents<Component>();
             if (inputFuncs == null) {
                 inputFuncs = new Dictionary<string, List<InputFunc>>();
@@ -283,71 +272,5 @@ namespace Playblack.Csp {
         }
 
         #endregion Unity Related
-
-#if UNITY_EDITOR
-
-        public virtual void OnDrawGizmos() {
-            if (outputs == null || outputs.Count <= 0) {
-                return;
-            }
-            Gizmos.color = new Color32(240, 40, 16, 255);
-
-            for (int i = 0; i < outputs.Count; ++i) {
-                if (outputs[i].Listeners == null) {
-                    continue; // can be null after deserialization
-                }
-                for (int j = 0; j < outputs[i].Listeners.Count; ++j) {
-                    bool needsEntityCleaning = false;
-                    if (outputs[i].Listeners[j] == null || outputs[i].Listeners[j].matchedProcessors == null) {
-                        continue;
-                    }
-                    for (int k = 0; k < outputs[i].Listeners[j].matchedProcessors.Count; ++k) {
-                        if (outputs[i].Listeners[j].matchedProcessors[k] == null) {
-                            needsEntityCleaning = true;
-                            continue;
-                        }
-                        if (outputs[i].Listeners[j].matchedProcessors[k] == this) {
-                            continue; // for self-connections don't draw stuff
-                        }
-                        Gizmos.color = new Color32(240, 40, 16, 255);
-                        
-                        var targetPos = outputs[i].Listeners[j].matchedProcessors[k].transform.position;
-                        
-                        // Prepare the orientation for a cone cap
-                        // to display in which direction the connection goes
-                        var direction = targetPos - this.transform.position;
-                        // This may or may not work
-                        if (UnityEditor.EditorSettings.defaultBehaviorMode == UnityEditor.EditorBehaviorMode.Mode2D) {
-                            direction.z = 0f; // this is only needed for 2D where z is just confusing the direction
-                        }
-                        if (direction == Vector3.zero) {
-                            continue; // No direction, no line, no cone
-                        }
-                        // Draw the line
-                        Gizmos.DrawLine(this.transform.position, targetPos);
-                        
-                        // Draw the cone cap
-                        Quaternion rot = Quaternion.LookRotation(direction);
-                        Ray r = new Ray(this.transform.position, direction);
-                        var pos = r.GetPoint(direction.magnitude - 1f);
-                        Handles.ConeHandleCap(0, pos, rot, 1f, EventType.Ignore);
-                    }
-                    if (needsEntityCleaning) {
-                        var list = new List<SignalProcessor>();
-                        // TODO: Better way to clean null refs?
-                        for (int k = 0; k < outputs[i].Listeners[j].matchedProcessors.Count; k++) {
-                            if (outputs[i].Listeners[j].matchedProcessors[k] == null) {
-                                continue;
-                            }
-                            list.Add(outputs[i].Listeners[j].matchedProcessors[k]);
-                        }
-
-                        outputs[i].Listeners[j].matchedProcessors = list;
-                    }
-                }
-            }
-        }
-
-#endif
     }
 }

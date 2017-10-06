@@ -1,9 +1,6 @@
 ﻿using Fasterflect;
 using Playblack.BehaviourTree.Model.Core;
 using Playblack.Extensions;
-#if UNITY_EDITOR
-using Playblack.Sequencer;
-#endif
 using ProtoBuf;
 using System;
 using System.Collections.Generic;
@@ -40,6 +37,7 @@ namespace Playblack.BehaviourTree {
             }
             set {
                 this.modelClassName = value;
+                this.internalModelType = null;
                 // Update context data if empty
                 if (this.contextData == null || this.contextData.Count == 0) {
                     this.contextData = new List<ValueField>();
@@ -56,7 +54,7 @@ namespace Playblack.BehaviourTree {
         }
 
         [ProtoMember(40)]
-        private int numChildren = 0;
+        private int numChildren;
 
         [ProtoMember(50)]
         private string displayName;
@@ -103,100 +101,30 @@ namespace Playblack.BehaviourTree {
             }
         }
 
+        private Type internalModelType;
         public Type ModelType {
             get {
-                var type = Type.GetType(this.modelClassName);
+                if (internalModelType != null) {
+                    return internalModelType;
+                }
+                internalModelType = InternalGetModelType();
+                return internalModelType;
+            }
+        }
+
+        private Type InternalGetModelType() {
+            var type = Type.GetType(this.modelClassName);
+            if (type != null) {
+                return type;
+            }
+            foreach (var a in AppDomain.CurrentDomain.GetAssemblies()) {
+                type = a.GetType(this.modelClassName);
                 if (type != null) {
                     return type;
                 }
-                foreach (var a in AppDomain.CurrentDomain.GetAssemblies()) {
-                    type = a.GetType(this.modelClassName);
-                    if (type != null) {
-                        return type;
-                    }
-                }
-                return null;
             }
+            return null;
         }
-
-#if UNITY_EDITOR
-        private string cachedCodeViewDisplay;
-        private Dictionary<int, string> childDisplayCache = new Dictionary<int, string>();
-
-        public string CodeViewDisplay {
-            get {
-                if (cachedCodeViewDisplay == null) {
-                    UpdateCodeViewDisplay();
-                }
-                return cachedCodeViewDisplay;
-            }
-        }
-
-        public void UpdateCodeViewDisplay() {
-            if (contextData == null || contextData.Count == 0) {
-                cachedCodeViewDisplay = this.DisplayName;
-                return;
-            }
-            var t = ModelType;
-            if (t == null) {
-                // There's nothing yet, use displayname if any
-                // otherwise stuff is just null.
-                cachedCodeViewDisplay = this.DisplayName;
-                return;
-            }
-            var attrib = t.Attribute<CodeViewFormattingHintAttribute>();
-            if (attrib == null) {
-                cachedCodeViewDisplay = this.DisplayName;
-                return;
-            }
-
-            var theString = attrib.Format;
-            theString = ReplacePlaceholdersWithContextData(theString);
-            cachedCodeViewDisplay = theString;
-            this.childDisplayCache.Clear();
-        }
-
-        private string ReplacePlaceholdersWithContextData(string theString) {
-            foreach (var valueField in this.contextData) {
-                string valueString = valueField.UnityValue;
-                if (string.IsNullOrEmpty(valueString)) {
-                    continue;
-                }
-                if (!string.IsNullOrEmpty(valueString) && valueString.Length > 50) {
-                    valueString = valueString.Substring(0, 47) + "...";
-                }
-                theString = theString.Replace("{" + valueField.Name + "}", valueString);
-            }
-
-            return theString;
-        }
-
-        public string GetChildDisplayName(int insertIndex) {
-            if (childDisplayCache.ContainsKey(insertIndex)) {
-                return childDisplayCache[insertIndex];
-            }
-            var childs = GetChildStructure();
-            bool foundInsertIndex = false;
-            for (int i = 0; i < childs.Count; ++i) {
-                if (childs[i].InsertIndex == insertIndex) {
-                    var theString = ReplacePlaceholdersWithContextData(childs[i].Name);
-                    this.childDisplayCache.Add(insertIndex, theString);
-                    foundInsertIndex = true;
-                    break;
-                }
-            }
-            if (!foundInsertIndex) {
-                if (childs.Count < insertIndex && childs.Count > 0) {
-                    childDisplayCache.Add(insertIndex, childs[insertIndex].Name);
-                }
-                else {
-                    return "No child descriptor on insert index " + insertIndex;
-                }
-            }
-            return childDisplayCache[insertIndex];
-        }
-
-#endif
 
         public static UnityBtModel NewInstance(UnityBtModel parent) {
             var model = new UnityBtModel();
@@ -229,7 +157,7 @@ namespace Playblack.BehaviourTree {
             if (parent != null) {
                 // NOTE: This means the children list must be populated already, at least with nulls!
                 if (insertIndex >= parent.children.Count) {
-                    parent.children.Resize(insertIndex + 1, null);
+                    parent.children.Resize(insertIndex + 1);
                 }
                 parent.children[insertIndex] = model;
             }
@@ -240,9 +168,7 @@ namespace Playblack.BehaviourTree {
         public bool RemoveChild(UnityBtModel model) {
             int index = this.children.IndexOf(model);
             if (index >= 0) {
-                var child = children[index];
                 children.RemoveAt(index);
-                // child.ResizeChildren(); // why do this?
                 return true;
             }
             return false;
@@ -280,7 +206,7 @@ namespace Playblack.BehaviourTree {
                         this.children.Add(null);
                     }
                     else {
-                        UnityBtModel.NewInstance(this);
+                        NewInstance(this);
                     }
                 }
             }
@@ -291,7 +217,6 @@ namespace Playblack.BehaviourTree {
                     children.RemoveAt(children.Count - 1);
                     // Make sure the now inaccessible children get pruged properly
                     child.ResizeChildren(useNulls);
-                    child = null;
                 }
             }
             // just to be sure
@@ -366,42 +291,5 @@ namespace Playblack.BehaviourTree {
         public int GetProposedNumChildren() {
             return ModelType.Attribute<ModelDataDescriptorAttribute>().NumChildren;
         }
-
-#if UNITY_EDITOR
-        private List<ChildDescriptorAttribute> childStructure;
-
-        public IList<ChildDescriptorAttribute> GetChildStructure() {
-            if (childStructure != null) {
-                return childStructure;
-            }
-            if (this.ModelClassName == null) {
-                // NOTE: So far this seems to be fixed.
-                // I'll keep the condition ust in case (20161120)
-                Debug.LogError("No classname specified ... Much error!");
-                return new List<ChildDescriptorAttribute>(0);
-            }
-            this.childStructure = new List<ChildDescriptorAttribute>();
-            // unity doesn't want the type argument version so we gotta do this instead ...
-            var childDescriptors = ModelType.Attributes(typeof(ChildDescriptorAttribute));
-            for (int i = 0; i < childDescriptors.Count; ++i) {
-                this.childStructure.Add((ChildDescriptorAttribute)childDescriptors[i]);
-                
-            }
-
-            this.childStructure.Sort((a, b) => {
-                if (a.DisplayDelta > b.DisplayDelta) {
-                    return -1;
-                }
-                else if (a.DisplayDelta < b.DisplayDelta) {
-                    return 1;
-                }
-                else {
-                    return 0;
-                }
-            });
-            return this.childStructure;
-        }
-
-#endif
     }
 }
