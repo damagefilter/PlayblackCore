@@ -33,11 +33,7 @@ namespace Playblack.Savegame {
             }
 
             sf.Add(hook.SceneData);
-            using (MemoryStream saveFileData = new MemoryStream(DataSerializer.SerializeProtoObject(sf))) {
-                // Holds final zipped file data bytes.
-                saveFileData.Position = 0;
-                File.WriteAllBytes(fileName, ZipTools.CompressBytes(saveFileData.ToArray()));
-            }
+            File.WriteAllBytes(fileName, ZipTools.CompressBytes(DataSerializer.SerializeProtoObject(sf)));
         }
 
         public IEnumerator RestoreSave(string dataId) {
@@ -56,11 +52,9 @@ namespace Playblack.Savegame {
                     persistentObjects.Add(managers[i].UUID, managers[i]);
                 }
             }
-            SaveFile file = null;
-            using (MemoryStream ms = new MemoryStream(File.ReadAllBytes(Application.persistentDataPath + "/" + SaveName + ".save"))) {
-                ms.Position = 0;
-                file = DataSerializer.DeserializeProtoObject<SaveFile>(ZipTools.DecompressBytes(ms.ToArray()));
-            }
+            SaveFile file = DataSerializer.DeserializeProtoObject<SaveFile>(
+                ZipTools.DecompressBytes(File.ReadAllBytes(Application.persistentDataPath + "/" + SaveName + ".save"))
+            );
             var sceneData = (SceneDataBlock)file.Get(dataId);
             Debug.Log("We have  " + sceneData.SceneObjects.Count + " objects to restore!");
             for (int i = 0; i < sceneData.SceneObjects.Count; ++i) {
