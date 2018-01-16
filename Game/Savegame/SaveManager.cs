@@ -47,11 +47,11 @@ namespace Playblack.Savegame {
         private void Awake() {
             // unique enough for saveable stuff. that#s all we need
             this.uuid = this.gameObject.scene.name + this.transform.position + this.name;
-            EventDispatcher.Instance.Register<GameSavingEvent>(OnSave);
+            GameSavingEvent.Register(OnSave);
         }
 
         private void OnDestroy() {
-            EventDispatcher.Instance.Unregister<GameSavingEvent>(OnSave);
+            GameSavingEvent.Unregister(OnSave);
         }
 
         /// <summary>

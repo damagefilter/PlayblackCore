@@ -97,7 +97,7 @@ namespace Playblack.Savegame {
         /// <returns>The game object from asset.</returns>
         /// <param name="dataBlock">Data block.</param>
         public Coroutine CreateGameObjectFromAsset(GameObjectDataBlock dataBlock) {
-            var hook = (RequestAssetEvent)new RequestAssetEvent(dataBlock.AssetBundle, dataBlock.AssetPath, (UnityEngine.Object loadedAsset) => {
+            var hook = new RequestAssetEvent(dataBlock.AssetBundle, dataBlock.AssetPath, (UnityEngine.Object loadedAsset) => {
                 Debug.Log("Instantiating asset " + dataBlock.AssetPath);
                 var go = (GameObject)UnityEngine.Object.Instantiate(loadedAsset);
                 Debug.Log("Restoring " + dataBlock.AssetPath);
@@ -105,7 +105,8 @@ namespace Playblack.Savegame {
                 var sm = go.GetComponent<SaveManager>();
                 Debug.Assert(sm);
                 sm.Restore(dataBlock, false);
-            }).Call();
+            });
+            hook.Call();
             return hook.AssetLoadingProcess;
         }
     }

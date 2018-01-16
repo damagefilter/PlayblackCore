@@ -25,15 +25,15 @@ namespace Playblack.Savegame {
                 Debug.LogError(saveTypeImpl + " is not a valid ISaveState! Cannot save the game.");
             }
             else {
-                EventDispatcher.Instance.Register<RequestSaveEvent>(OnSaveRequest);
-                EventDispatcher.Instance.Register<RequestSaveLoadEvent>(OnSavegameLoad);
+                RequestSaveEvent.Register(OnSaveRequest);
+                RequestSaveLoadEvent.Register(OnSavegameLoad);
             }
             DontDestroyOnLoad(this.gameObject);
         }
 
         private void OnDestroy() {
-            EventDispatcher.Instance.Unregister<RequestSaveEvent>(OnSaveRequest);
-            EventDispatcher.Instance.Unregister<RequestSaveLoadEvent>(OnSavegameLoad);
+            RequestSaveEvent.Unregister(OnSaveRequest);
+            RequestSaveLoadEvent.Unregister(OnSavegameLoad);
         }
 
         private void OnSaveRequest(RequestSaveEvent hook) {
