@@ -200,7 +200,7 @@ namespace PlayBlack.Editor.Sequencer.Renderers.Bt {
         public void SetSubjects(params UnityBtModel[] subjects) {
             var model = subjects[0];
             if (this.modelToRender != model) {
-                this.displayManager = new ModelDisplayManager(this.modelToRender);
+                this.displayManager = new ModelDisplayManager(model);
                 if (model != null) {
                     if (model.ModelClassName != null) {
                         this.childStructure = this.displayManager.GetChildStructure();
