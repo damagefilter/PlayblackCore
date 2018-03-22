@@ -4,7 +4,7 @@ namespace Playblack.Csp {
     /// Represents an input function.
     /// </summary>
     public abstract class InputFunc {
-        protected string name;
+        private readonly string name;
 
         public string Name {
             get {

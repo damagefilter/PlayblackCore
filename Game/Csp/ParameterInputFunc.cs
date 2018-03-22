@@ -1,7 +1,7 @@
 namespace Playblack.Csp {
 
     public class ParameterInputFunc : InputFunc {
-        private ParameterSignal callback;
+        private readonly ParameterSignal callback;
 
         public ParameterInputFunc(string name, ParameterSignal callback) : base(name) {
             this.callback = callback;

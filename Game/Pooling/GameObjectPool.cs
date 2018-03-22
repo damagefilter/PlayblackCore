@@ -4,8 +4,8 @@ using UnityEngine;
 namespace Playblack.Pooling {
 
     public class GameObjectPool {
-        private List<PooledObject<GameObject>> pooledObjects;
-        private int maxCapacity;
+        private readonly List<PooledObject<GameObject>> pooledObjects;
+        private readonly int maxCapacity;
 
         public int CurrentSize {
             get {

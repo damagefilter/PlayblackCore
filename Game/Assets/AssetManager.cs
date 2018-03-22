@@ -5,7 +5,7 @@ using UnityEngine;
 namespace Playblack.Assets {
 
     public class AssetManager {
-        private Dictionary<string, AssetReference> bundles = new Dictionary<string, AssetReference>();
+        private readonly Dictionary<string, AssetReference> bundles = new Dictionary<string, AssetReference>();
 
         public void AddAssetBundle(string bundleName, AssetBundle bundle) {
             if (bundles.ContainsKey(bundleName)) {

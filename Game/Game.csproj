@@ -133,7 +133,6 @@
     <Compile Include="Assets\AssetReference.cs" />
     <Compile Include="EventSystem\Events\RequestAssetEvent.cs" />
     <Compile Include="Csp\SignalProcessor.cs" />
-    <Compile Include="Csp\SignalProcessorTracker.cs" />
     <Compile Include="Csp\OutputAwareAttribute.cs" />
     <Compile Include="Csp\InputFuncAttribute.cs" />
     <Compile Include="BehaviourTree\UnityBtModel.cs" />

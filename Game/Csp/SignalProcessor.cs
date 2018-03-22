@@ -54,7 +54,7 @@ namespace Playblack.Csp {
         /// This cache is used to speed up the lookups for input funcs on components by remembering
         /// their type and all attached attributes to it.
         /// </summary>
-        private GenericObjectPoolMap<Type, InputFuncAttribute[]> inputFuncCache = new GenericObjectPoolMap<Type, InputFuncAttribute[]>(10, 50);
+        private readonly GenericObjectPoolMap<Type, InputFuncAttribute[]> inputFuncCache = new GenericObjectPoolMap<Type, InputFuncAttribute[]>(10, 50);
 
         public InputFunc GetInputFunc(string name, string component) {
             if (inputFuncs == null || inputFuncs.Count == 0) {

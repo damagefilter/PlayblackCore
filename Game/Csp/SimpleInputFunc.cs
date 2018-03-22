@@ -1,7 +1,7 @@
 namespace Playblack.Csp {
 
     public class SimpleInputFunc : InputFunc {
-        private SimpleSignal callback;
+        private readonly SimpleSignal callback;
 
         public SimpleInputFunc(string name, SimpleSignal callback) : base(name) {
             this.callback = callback;

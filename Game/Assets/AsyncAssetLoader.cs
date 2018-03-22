@@ -13,7 +13,7 @@ namespace Playblack.Assets {
         /// </summary>
         public delegate void AssetLoaded(UnityEngine.Object loadedObj);
 
-        private AssetManager assetManager;
+        private readonly AssetManager assetManager;
 
         public AsyncAssetLoader() {
             assetManager = new AssetManager();

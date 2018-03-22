@@ -7,8 +7,8 @@ namespace Playblack.Pooling {
     /// An object pool that pools named objects.
     /// </summary>
     public class GenericObjectPoolMap<TKey, TValue> {
-        private Dictionary<TKey, PooledObject<TValue>> pooledObjects;
-        private int maxCapacity;
+        private readonly Dictionary<TKey, PooledObject<TValue>> pooledObjects;
+        private readonly int maxCapacity;
 
         public GenericObjectPoolMap(int initCapacity, int maxCapacity) {
             pooledObjects = new Dictionary<TKey, PooledObject<TValue>>(initCapacity);

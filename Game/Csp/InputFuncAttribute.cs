@@ -12,12 +12,12 @@ namespace Playblack.Csp {
     /// The parameter must be string containing your information.
     /// It will be set by the level designer / mapper inside the editor.
     /// </summary>
-    [AttributeUsage(AttributeTargets.Method, Inherited = true)]
+    [AttributeUsage(AttributeTargets.Method)]
     public class InputFuncAttribute : System.Attribute {
-        public string MethodName;
+        public readonly string MethodName;
         public string DisplayName;
 
-        public bool WithParameter;
+        public readonly bool WithParameter;
 
         /// <summary>
         /// Passing in the method name in ctor because that way we don't actually need to reference the MethodInfo later.
@@ -26,6 +26,7 @@ namespace Playblack.Csp {
         public InputFuncAttribute(string methodName) {
             this.MethodName = methodName;
             this.DisplayName = methodName;
+            this.WithParameter = false;
         }
     }
 }
