@@ -20,6 +20,8 @@
         /// <param name="subject"></param>
         void SetSubjects(params TRenderType[] subject);
 
+        void UpdateCodeView();
+
         /// <summary>
         /// Returns the primary rendering subject
         /// </summary>

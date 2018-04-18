@@ -43,6 +43,7 @@ namespace PlayBlack.Editor.Sequencer {
             // whereas the stuff displayed in the editors is taken from the current in-memory
             // representation of the model tree (the real thing, that is)
             // BUT: This will scratch the right itch in Unity to make it save the damn thing.
+            OperatorRenderer.UpdateCodeView();
             Undo.RecordObject(SequenceExecutorObject, "Serializing behaviour tree");
             SequenceExecutorObject.SerializeModelTree(); // Force update of the model tree data here
             EditorUtility.SetDirty(SequenceExecutorObject);

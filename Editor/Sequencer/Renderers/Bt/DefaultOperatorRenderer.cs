@@ -234,6 +234,10 @@ namespace PlayBlack.Editor.Sequencer.Renderers.Bt {
             return this.modelToRender;
         }
 
+        public void UpdateCodeView() {
+            this.displayManager.UpdateCodeViewDisplay();
+        }
+
         protected void DrawRemoveButton() {
             if (GUILayout.Button("Delete this")) {
                 if (this.parentModel == null) {
