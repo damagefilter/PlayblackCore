@@ -14,10 +14,10 @@ namespace Playblack.Csp {
     /// </summary>
     [AttributeUsage(AttributeTargets.Method)]
     public class InputFuncAttribute : System.Attribute {
-        public readonly string MethodName;
+        public string MethodName;
         public string DisplayName;
 
-        public readonly bool WithParameter;
+        public bool WithParameter;
 
         /// <summary>
         /// Passing in the method name in ctor because that way we don't actually need to reference the MethodInfo later.

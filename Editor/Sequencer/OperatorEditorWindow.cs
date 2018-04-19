@@ -1,8 +1,11 @@
-﻿using Playblack.BehaviourTree;
+﻿using System;
+using Playblack.BehaviourTree;
 using Playblack.Sequencer;
 using PlayBlack.Editor.Sequencer.Renderers;
+using PlayBlack.Editor.Sequencer.Renderers.Bt;
 using PlayBlack.Editor.Windows;
 using UnityEditor;
+using UnityEngine;
 
 namespace PlayBlack.Editor.Sequencer {
 
@@ -44,9 +47,15 @@ namespace PlayBlack.Editor.Sequencer {
             // representation of the model tree (the real thing, that is)
             // BUT: This will scratch the right itch in Unity to make it save the damn thing.
             OperatorRenderer.UpdateCodeView();
-            Undo.RecordObject(SequenceExecutorObject, "Serializing behaviour tree");
-            SequenceExecutorObject.SerializeModelTree(); // Force update of the model tree data here
-            EditorUtility.SetDirty(SequenceExecutorObject);
+            try {
+                (SequencerRenderer as BtSequencerRenderer).IsDiry = true;
+            }
+            catch(Exception e) {
+                Debug.LogError("Oh boy something went wrong when setting the sequencer dirty ...");
+                Debug.LogError(e.Message);
+                Debug.LogError(e.StackTrace);
+            }
+
         }
     }
 }

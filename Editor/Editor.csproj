@@ -78,10 +78,10 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="BehaviourTree\ModelDisplayManager.cs" />
     <Compile Include="Csp\CspContextMenu.cs" />
     <Compile Include="Csp\SignalProcessorInspector.cs" />
     <Compile Include="Extensions\EditorOnlyHelperExtensions.cs" />
+    <Compile Include="Sequencer\ModelDisplayManager.cs" />
     <Compile Include="Sequencer\OperatorEditorWindow.cs" />
     <Compile Include="Sequencer\Renderers\Bt\BtSequencerRenderer.cs" />
     <Compile Include="Sequencer\Renderers\Bt\DefaultOperatorRenderer.cs" />

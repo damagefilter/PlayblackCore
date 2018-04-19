@@ -76,6 +76,12 @@ namespace Playblack.BehaviourTree {
         /// </summary>
         private Dictionary<UnityBtModel, int> scheduledReorders = new Dictionary<UnityBtModel, int>();
 
+        public bool NeedsReorders {
+            get {
+                return scheduledReorders != null && scheduledReorders.Count > 0;
+            }
+        }
+
         private ModelTask mtInstance;
 
         public ModelTask Model {

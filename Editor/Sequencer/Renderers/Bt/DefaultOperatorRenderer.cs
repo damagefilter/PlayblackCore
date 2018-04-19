@@ -1,7 +1,6 @@
 ﻿using Playblack.BehaviourTree;
 using PlayBlack.Editor.Windows;
 using System.Collections.Generic;
-using PlayBlack.Editor.BehaviourTree;
 using UnityEditor;
 using UnityEngine;
 
@@ -56,7 +55,7 @@ namespace PlayBlack.Editor.Sequencer.Renderers.Bt {
                             Debug.Log("Removed null child in default list");
                             // And update again because otherwise this will be deserialized as a default instance
                             // causing ghost data that cannot be removed.
-                            ((BtSequencerRenderer)sequenceRenderer).UpdateSerializedModelTree();
+                            ((BtSequencerRenderer)sequenceRenderer).IsDiry = true;
                         }
                         else {
                             DefaultOperatorRenderer r;

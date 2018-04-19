@@ -17,7 +17,38 @@ namespace PlayBlack.Editor.Sequencer {
         }
 
         public override void InternalInit() {
+            EditorApplication.playmodeStateChanged += CheckIfDirty;
             //throw new NotImplementedException();
+        }
+
+        private void CheckIfDirty() { // need for that playmodeStateChanged callback
+            CheckIfDirty(false);
+        }
+
+        private void CheckIfDirty(bool ignoreEditorState) {
+            if (sequencerWindow == null) {
+                Debug.Log("Sequencer Window was destroyed. Cannot check if dirty.");
+                return;
+            }
+            if (ignoreEditorState) {
+                if (sequencerWindow.IsDiry) {
+                    sequencerWindow.UpdateSerializedModelTree();
+                }
+            }
+            // If we're in playmode don't try saving. It'll just be derping.
+            if (EditorApplication.isPlaying) {
+                Debug.Log("Editor is playing, not updating data");
+                return;
+            }
+            // if we are not playing but about to switch to it, and if sequencer is dirty, dump the changes before playing!
+            if (EditorApplication.isPlayingOrWillChangePlaymode && !EditorApplication.isPlaying && sequencerWindow.IsDiry) {
+                Debug.Log("Updating BT serialized data. Prior to play");
+                sequencerWindow.UpdateSerializedModelTree();
+            }
+            else {
+                Debug.Log("Cannot BT update data prior to play. Playmode isorwill: " + (EditorApplication.isPlayingOrWillChangePlaymode) + ", isDirty: " + sequencerWindow.IsDiry);
+            }
+
         }
 
         public void SetData(SequenceExecutor subject, SerializedObject serializedSequenceExecutor) {
@@ -64,6 +95,11 @@ namespace PlayBlack.Editor.Sequencer {
             }
             EditorGUILayout.EndHorizontal();
             Repaint();
+        }
+
+        private void OnDestroy() {
+            EditorApplication.playmodeStateChanged -= CheckIfDirty;
+            CheckIfDirty(true);
         }
     }
 }

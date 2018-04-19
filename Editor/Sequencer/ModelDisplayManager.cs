@@ -4,7 +4,7 @@ using Playblack.BehaviourTree;
 using Playblack.Sequencer;
 using UnityEngine;
 
-namespace PlayBlack.Editor.BehaviourTree {
+namespace PlayBlack.Editor.Sequencer {
 
     /// <summary>
     /// Takes care of the editor logic of displaying a sequencer.

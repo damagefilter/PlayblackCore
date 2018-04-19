@@ -27,6 +27,21 @@ namespace PlayBlack.Editor.Sequencer.Renderers.Bt {
             }
         }
 
+        private bool isDirty;
+
+        /// <summary>
+        /// Dirty flag is used in the sequencereditorwindow to check if model tree needs updating.
+        /// the UpdateModelTree method will then take care of all else
+        /// </summary>
+        public bool IsDiry {
+            get {
+                return isDirty;
+            }
+            set {
+                isDirty = value;
+            }
+        }
+
         public BtSequencerRenderer() {
             this.corruptedModels = new List<UnityBtModel>();
             if (editorSkin == null) {
@@ -80,6 +95,7 @@ namespace PlayBlack.Editor.Sequencer.Renderers.Bt {
                     rootModel.children.Remove(corrupted);
                 }
                 corruptedModels.Clear();
+                isDirty = true;
             }
         }
 
@@ -90,12 +106,16 @@ namespace PlayBlack.Editor.Sequencer.Renderers.Bt {
                 // There are 4 children but not all of them are actually something useful
                 return;
             }
-            // First change the child list
-            m.ProcessReorders();
-            // Then run through the child list to see if there are more reorders
-            foreach (var child in m.children) {
-                DoScheduledReorders(child);
+            if (m.NeedsReorders) {
+                isDirty = true;
+                // First change the child list
+                m.ProcessReorders();
+                // Then run through the child list to see if there are more reorders
+                foreach (var child in m.children) {
+                    DoScheduledReorders(child);
+                }
             }
+
         }
 
         #endregion Rendering Process
@@ -136,12 +156,12 @@ namespace PlayBlack.Editor.Sequencer.Renderers.Bt {
                     if (GUILayout.Button("up", EditorSkin.button, GUILayout.Width(25))) {
                         int newIndex = referenceParentObject.children.IndexOf(referenceObject) - 1;
                         referenceParentObject.ScheduleChildReorder(referenceObject, newIndex);
-                        UpdateSerializedModelTree();
+                        isDirty = true;
                     }
                     if (GUILayout.Button("dn", EditorSkin.button, GUILayout.Width(25))) {
                         int newIndex = referenceParentObject.children.IndexOf(referenceObject) + 1;
                         referenceParentObject.ScheduleChildReorder(referenceObject, newIndex);
-                        UpdateSerializedModelTree();
+                        isDirty = true;
                     }
 
                     if (GUILayout.Button("x", EditorSkin.button, GUILayout.Width(18))) {
@@ -150,7 +170,7 @@ namespace PlayBlack.Editor.Sequencer.Renderers.Bt {
                         }
                         else {
                             Debug.Log("Nulled child.");
-                            UpdateSerializedModelTree();
+                            isDirty = true;
                         }
                     }
                 }
@@ -160,6 +180,8 @@ namespace PlayBlack.Editor.Sequencer.Renderers.Bt {
         }
 
         public void UpdateSerializedModelTree() {
+            Undo.RecordObject(SequenceExecutorObject, "Serializing behaviour tree");
+            isDirty = false;
             int currentArraySize = SerializedSequenceExecutor.FindProperty("serializedModelTree.Array.size").intValue;
             SequenceExecutorObject.SerializeModelTree(); // Force update of the model tree data here
             var modelTree = SequenceExecutorObject.GetSerializedModelTree();
