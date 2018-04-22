@@ -34,6 +34,10 @@ namespace PlayBlack.Editor.Sequencer {
         private static List<Type> knownLogicOperators;
 
         private static List<Type> knownGameplayOperators;
+        
+        private static List<Type> knownGraphicsOperators;
+        
+        private static List<Type> knownDialogueOperators;
 
         public override string GetTitle() {
             return "Operator Selector";
@@ -84,6 +88,30 @@ namespace PlayBlack.Editor.Sequencer {
                     });
                 knownGameplayOperators = gameplayType.ToList();
             }
+            
+            if (knownGraphicsOperators == null || forceNew) {
+                var gameplayType = AppDomain.CurrentDomain.GetAssemblies()
+                    .SelectMany(t => t.GetTypes())
+                    .Where(t => {
+                        bool typeValid = t.IsClass && !t.IsAbstract;
+                        var attr = t.Attribute<ModelDataDescriptorAttribute>();
+                        bool hasDescriptor = attr != null && attr.DescriptorType == DescriptorType.GRAPHICS;
+                        return typeValid && hasDescriptor && t.IsSubclassOf(typeof(ModelTask));
+                    });
+                knownGraphicsOperators = gameplayType.ToList();
+            }
+            
+            if (knownDialogueOperators == null || forceNew) {
+                var gameplayType = AppDomain.CurrentDomain.GetAssemblies()
+                    .SelectMany(t => t.GetTypes())
+                    .Where(t => {
+                        bool typeValid = t.IsClass && !t.IsAbstract;
+                        var attr = t.Attribute<ModelDataDescriptorAttribute>();
+                        bool hasDescriptor = attr != null && attr.DescriptorType == DescriptorType.DIALOGUE;
+                        return typeValid && hasDescriptor && t.IsSubclassOf(typeof(ModelTask));
+                    });
+                knownDialogueOperators = gameplayType.ToList();
+            }
         }
 
         public void OnGUI() {
@@ -100,7 +128,7 @@ namespace PlayBlack.Editor.Sequencer {
         }
 
         private void ShowOptions() {
-            if (knownAiOperators == null || knownLogicOperators == null || knownGameplayOperators == null) {
+            if (knownAiOperators == null || knownLogicOperators == null || knownGameplayOperators == null ||knownGraphicsOperators == null || knownDialogueOperators == null) {
                 EditorGUILayout.HelpBox("Window wasn't initialised. Reopen it ...?", MessageType.Error);
                 return;
             }
@@ -118,12 +146,18 @@ namespace PlayBlack.Editor.Sequencer {
                 case DescriptorType.GAMEPLAY:
                     models = knownGameplayOperators;
                     break;
+                case DescriptorType.GRAPHICS:
+                    models = knownGraphicsOperators;
+                    break;
+                case DescriptorType.DIALOGUE:
+                    models = knownDialogueOperators;
+                    break;
             }
             if (models == null) {
                 EditorGUILayout.HelpBox("No operators to display ...", MessageType.Warning);
                 return;
             }
-            EditorGUILayout.LabelField("Showing operators for: " + this.displayedOperators.ToString());
+            EditorGUILayout.LabelField("Showing operators for: " + this.displayedOperators);
             scrollPos = EditorGUILayout.BeginScrollView(scrollPos);
             {
                 EditorGUILayout.BeginVertical();

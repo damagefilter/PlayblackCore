@@ -3,6 +3,8 @@
     public enum DescriptorType {
         AI,
         LOGIC,
-        GAMEPLAY
+        GAMEPLAY,
+        GRAPHICS,
+        DIALOGUE
     }
 }
