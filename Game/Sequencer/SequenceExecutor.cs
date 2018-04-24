@@ -87,6 +87,7 @@ namespace Playblack.Sequencer {
             // persist the global context
             if (this.executor != null) {
                 if (executor.GetStatus() != TaskStatus.UNINITIALISED) {
+                    Debug.Log("Already have executor. Terminating and resetting.");
                     executor.Terminate();
                     executor.Reset();
                 }
@@ -105,6 +106,7 @@ namespace Playblack.Sequencer {
             }
             var root = RootModel.Model;
             RecursiveLoadModelTree(rootModel, root);
+            Debug.Log("Creating new bt executor.");
             // TODO: Fetch an implementation from a factory
             return new CachingBtExecutor(root, context);
         }
@@ -112,7 +114,6 @@ namespace Playblack.Sequencer {
         public void Start() {
             this.executor = this.GetExecutor();
             if (this.TypeOfExecution == ExecutionType.AUTO) {
-                running = true;
                 StartCoroutine("TickExecutorParallel");
             }
         }
@@ -125,33 +126,34 @@ namespace Playblack.Sequencer {
         /// <returns></returns>
         private IEnumerator TickExecutorParallel() {
             Debug.Log("Entered coroutine. Beginning ticking.");
-            while (running) {
-                var status = this.executor.GetStatus();
-                if (status == TaskStatus.SUCCESS || status == TaskStatus.FAILURE) {
-                    Debug.Log("Terminating Sequence Executor. Status is " + status);
-                    this.executor.Terminate();
-                    this.FireOutput("OnExecutionFinish");
-                    running = false;
-                }
-                else {
-                    this.executor.Tick();
-                    yield return 0;
-                }
+            running = true;
+            var status = this.executor.GetStatus();
+            while (!(status == TaskStatus.SUCCESS || status == TaskStatus.FAILURE)) {
+                this.executor.Tick();
+                status = this.executor.GetStatus();
+                yield return null;
             }
+            Debug.Log("Terminating Sequence Executor. Status is " + status);
+            TerminateExecutorAndFinish();
             Debug.Log("Sequence executor coroutine control flow ended.");
+        }
+
+        private void TerminateExecutorAndFinish() {
+            running = false;
+            this.executor.Terminate();
+            this.executor.Reset();
+            this.FireOutput("OnExecutionFinish");
         }
 
         [InputFunc("TriggerExecution")]
         public void TriggerExecution() {
             Debug.Log("Trigger execution");
             if (this.TypeOfExecution == ExecutionType.TRIGGER) {
-                Debug.Log("Is trigger. Doing my thing.");
                 if (this.executor == null) {
                     Debug.Log("Executor is null. Fetching new one.");
                     this.executor = this.GetExecutor();
                 }
                 if (!running) {
-                    running = true;
                     StartCoroutine("TickExecutorParallel");
                     this.FireOutput("OnExecutionTrigger");
                     Debug.Log("Execution triggered, coroutine started");
@@ -172,10 +174,9 @@ namespace Playblack.Sequencer {
             if (this.executor == null) {
                 return; // nothing to reset
             }
-            this.executor.Terminate();
+
             StopCoroutine("TickExecutorParallel");
-            running = false;
-            this.FireOutput("OnExecutionTerminated");
+            TerminateExecutorAndFinish();
         }
 
         private void RecursiveLoadModelTree(UnityBtModel current, ModelTask root) {
