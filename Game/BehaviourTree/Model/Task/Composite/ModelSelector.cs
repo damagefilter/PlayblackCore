@@ -4,7 +4,7 @@ using Playblack.BehaviourTree.Model.Core;
 
 namespace Playblack.BehaviourTree.Model.Task.Composite {
 
-    [ModelDataDescriptor("Run until SUCCESS or end", DescriptorType.LOGIC, -1, typeof(ExecutionSelector))]
+    [ModelDataDescriptor("Run Selector", DescriptorType.LOGIC, -1, typeof(ExecutionSelector))]
     [ChildDescriptor("default")]
     public class ModelSelector : ModelComposite {
 
