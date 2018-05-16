@@ -108,12 +108,11 @@ namespace PlayBlack.Editor.Sequencer.Renderers.Bt {
             }
             if (m.NeedsReorders) {
                 isDirty = true;
-                // First change the child list
                 m.ProcessReorders();
-                // Then run through the child list to see if there are more reorders
-                foreach (var child in m.children) {
-                    DoScheduledReorders(child);
-                }
+            }
+            // Check the children if they need reordering.
+            foreach (var child in m.children) {
+                DoScheduledReorders(child);
             }
 
         }
@@ -182,16 +181,20 @@ namespace PlayBlack.Editor.Sequencer.Renderers.Bt {
         public void UpdateSerializedModelTree() {
             Undo.RecordObject(SequenceExecutorObject, "Serializing behaviour tree");
             isDirty = false;
-            int currentArraySize = SerializedSequenceExecutor.FindProperty("serializedModelTree.Array.size").intValue;
+//            int currentArraySize = SerializedSequenceExecutor.FindProperty("serializedModelTree.Array.size").intValue;
             SequenceExecutorObject.SerializeModelTree(); // Force update of the model tree data here
-            var modelTree = SequenceExecutorObject.GetSerializedModelTree();
-            int newArraySize = modelTree.Length;
-            if (newArraySize != currentArraySize)
-                SerializedSequenceExecutor.FindProperty("serializedModelTree.Array.size").intValue = newArraySize;
-
-            for (int i = 0; i < newArraySize; i++) {
-                SerializedSequenceExecutor.FindProperty(string.Format("serializedModelTree.Array.data[{0}]", i)).intValue = modelTree[i];
-            }
+//            var modelTree = SequenceExecutorObject.GetSerializedModelTree();
+//            int newArraySize = modelTree.Length;
+//            if (newArraySize != currentArraySize) {
+//                SerializedSequenceExecutor.FindProperty("serializedModelTree.Array.size").intValue = newArraySize;
+//            }
+//
+//            var arrayProp = SerializedSequenceExecutor.FindProperty("serializedModelTree.Array");
+//            for (int i = 0; i < newArraySize; i++) {
+//                arrayProp.FindPropertyRelative($"data[{i}]").intValue = modelTree[i];
+//                //SerializedSequenceExecutor.FindProperty(string.Format("serializedModelTree.Array.data[{0}]", i)).intValue = modelTree[i];
+//            }
+            
             EditorUtility.SetDirty(SequenceExecutorObject);
         }
 
