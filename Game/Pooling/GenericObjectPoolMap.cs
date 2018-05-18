@@ -9,16 +9,24 @@ namespace Playblack.Pooling {
     public class GenericObjectPoolMap<TKey, TValue> {
         private readonly Dictionary<TKey, PooledObject<TValue>> pooledObjects;
         private readonly int maxCapacity;
+        private bool ignoreInUse;
 
         public GenericObjectPoolMap(int initCapacity, int maxCapacity) {
             pooledObjects = new Dictionary<TKey, PooledObject<TValue>>(initCapacity);
             this.maxCapacity = maxCapacity;
         }
 
+        // it's a little silly and we might as well remove the in-use part
+        // for the current use-cases within this code but it might has "external" use cases.
+        // so we'll keep it.
+        public void SetIgnoreInUse(bool ignoreInUse) {
+            this.ignoreInUse = ignoreInUse;
+        }
+
         public TValue Get(TKey key) {
             if (pooledObjects.ContainsKey(key)) {
                 var ob = pooledObjects[key];
-                if (ob.IsInUse) {
+                if (ob.IsInUse && !this.ignoreInUse) {
                     return default(TValue);
                 }
                 ob.IsInUse = true;

@@ -12,34 +12,28 @@ namespace Playblack.Editor.Csp {
     public class SignalDataCache {
         private Dictionary<string, string[]> inputMapping; // must be arrays because they are used from the unity GUI which does not work on lists
         private string[] componentList;
+        private OutputEventListener listener;
 
         public SignalDataCache(SignalProcessor localProcessor, OutputEventListener listener) {
+            this.listener = listener;
+            RecreateDataCache();
+
+        }
+
+        public void RecreateDataCache() {
             // Generates data.
             // This is a more or lesss expensive task which is why the results are stored for later re-use.
             listener.matchedProcessors.Clear();
-             // expensive but it's not used THAT often
+            // expensive but it's not used THAT often
             Dictionary<string, List<string>> inputMap = new Dictionary<string, List<string>>();
             if (!string.IsNullOrEmpty(listener.targetProcessorName)) { // check if target processor name is okay
-                var hits = UnityEngine.Object.FindObjectsOfType<SignalProcessor>();
-                for (int i = 0; i < hits.Length; ++i) {
-                    if (!hits[i].name.StartsWith(listener.targetProcessorName, StringComparison.Ordinal)) {
-                        continue;
-                    }
-                    listener.matchedProcessors.Add(hits[i]);
-                    if (hits[i].InputFuncs.Count == 0) {
-                        UnityEngine.Debug.LogError("No inputfunc components on processor " + hits[i].name);
-                    }
-                    foreach (var kvp in hits[i].InputFuncs) {
-                        if (!inputMap.ContainsKey(kvp.Key)) {
-                            inputMap.Add(kvp.Key, new List<string>());
-                        }
-                        for (int j = 0; j < kvp.Value.Count; ++j) {
-                            inputMap[kvp.Key].Add(kvp.Value[j].Name);
-                        }
-                    }
-                }
+                GenerateInputMap(listener, inputMap);
             }
 
+            BindInputMap(inputMap);
+        }
+
+        private void BindInputMap(Dictionary<string, List<string>> inputMap) {
             this.inputMapping = new Dictionary<string, string[]>(inputMap.Count);
             componentList = new string[inputMap.Count];
             int k = 0;
@@ -49,6 +43,30 @@ namespace Playblack.Editor.Csp {
                 inputMapping.Add(kvp.Key, kvp.Value.ToArray());
                 componentList[k] = kvp.Key;
                 ++k;
+            }
+        }
+
+        private static void GenerateInputMap(OutputEventListener listener, Dictionary<string, List<string>> inputMap) {
+            var hits = UnityEngine.Object.FindObjectsOfType<SignalProcessor>();
+            for (int i = 0; i < hits.Length; ++i) {
+                if (!hits[i].name.StartsWith(listener.targetProcessorName, StringComparison.Ordinal)) {
+                    continue;
+                }
+
+                listener.matchedProcessors.Add(hits[i]);
+                if (hits[i].InputFuncs.Count == 0) {
+                    UnityEngine.Debug.LogError("No inputfunc components on processor " + hits[i].name);
+                }
+
+                foreach (var kvp in hits[i].InputFuncs) {
+                    if (!inputMap.ContainsKey(kvp.Key)) {
+                        inputMap.Add(kvp.Key, new List<string>());
+                    }
+
+                    for (int j = 0; j < kvp.Value.Count; ++j) {
+                        inputMap[kvp.Key].Add(kvp.Value[j].Name);
+                    }
+                }
             }
         }
 

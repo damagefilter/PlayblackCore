@@ -54,6 +54,11 @@ namespace Playblack.Editor.Csp {
             }
         }
 
+        private void InvalidateDataCache() {
+
+            this.dataCache.Clear();
+        }
+
         private void OnDestroy() {
             EditorUtility.SetDirty(processor);
         }
@@ -85,8 +90,9 @@ namespace Playblack.Editor.Csp {
                     EditorGUILayout.LabelField("With Input", GUILayout.Width(ListFieldSize));
                     EditorGUILayout.LabelField("Parameters", GUILayout.Width(ListFieldSize));
                     EditorGUILayout.LabelField("Delay", GUILayout.Width(ListFieldSize));
-                    EditorGUILayout.LabelField("To Target", GUILayout.Width(ListFieldSize));
-                    EditorGUILayout.LabelField("Delete", GUILayout.Width(ListFieldSize));
+                    EditorGUILayout.LabelField("To Target", GUILayout.Width(ListFieldSize/3f));
+                    EditorGUILayout.LabelField("Rebuild Inputs", GUILayout.Width(ListFieldSize/3f));
+                    EditorGUILayout.LabelField("Delete", GUILayout.Width(ListFieldSize/3f));
                 }
                 EditorGUILayout.EndHorizontal();
                 for (int i = 0; i < processor.Outputs.Count; ++i) {
@@ -145,20 +151,23 @@ namespace Playblack.Editor.Csp {
                         EditorGUILayout.LabelField("Target is null", GUILayout.Width(ListFieldSize));
                         EditorGUILayout.LabelField("No parameter on null target", GUILayout.Width(ListFieldSize));
                         EditorGUILayout.LabelField("No delay on null target", GUILayout.Width(ListFieldSize));
-                        EditorGUILayout.LabelField("No target to go to", GUILayout.Width(ListFieldSize));
+                        EditorGUILayout.LabelField("No target to go to", GUILayout.Width(ListFieldSize/3f));
+                        EditorGUILayout.LabelField("Nothing to clear", GUILayout.Width(ListFieldSize/3f));
                     }
                     else if (data.GetComponentList() == null || data.GetComponentList().Length == 0) {
                         // That means we need to rebuild it since it's all empty!
                         EditorGUILayout.LabelField("No input data on target", GUILayout.Width(ListFieldSize));
                         EditorGUILayout.LabelField("No parameter on input", GUILayout.Width(ListFieldSize));
                         EditorGUILayout.LabelField("No target, no delay", GUILayout.Width(ListFieldSize));
-                        EditorGUILayout.LabelField("No target to go to", GUILayout.Width(ListFieldSize));
+                        EditorGUILayout.LabelField("No target to go to", GUILayout.Width(ListFieldSize/3f));
+                        EditorGUILayout.LabelField("Nothing to clear", GUILayout.Width(ListFieldSize/3f));
                     }
                     else if (output.Listeners[i] == null) {
                         EditorGUILayout.LabelField("No output listeners target", GUILayout.Width(ListFieldSize));
                         EditorGUILayout.LabelField("No parameter on input", GUILayout.Width(ListFieldSize));
                         EditorGUILayout.LabelField("No target, no delay", GUILayout.Width(ListFieldSize));
-                        EditorGUILayout.LabelField("No target to go to", GUILayout.Width(ListFieldSize));
+                        EditorGUILayout.LabelField("No target to go to", GUILayout.Width(ListFieldSize/3f));
+                        EditorGUILayout.LabelField("Nothing to clear", GUILayout.Width(ListFieldSize/3f));
                     }
                     else {
                         // Select which input. needs 2 dropdowns because of component selection.
@@ -196,15 +205,24 @@ namespace Playblack.Editor.Csp {
                                 EditorGUILayout.LabelField("No parameter on input", GUILayout.Width(ListFieldSize));
                             }
                             output.Listeners[i].delay = EditorGUILayout.FloatField(output.Listeners[i].delay, GUILayout.Width(ListFieldSize));
-                            if (GUILayout.Button("=>", GUILayout.Width(ListFieldSize))) {
+                            if (GUILayout.Button("=>", GUILayout.Width(ListFieldSize/3f))) {
                                 if (output.Listeners[i].matchedProcessors.Count > 0) {
                                     jumpTarget = output.Listeners[i].matchedProcessors[0];
+                                }
+                            }
+                            if (GUILayout.Button("C", GUILayout.Width(ListFieldSize/3f))) {
+                                if (output.Listeners[i].matchedProcessors.Count > 0) {
+                                    var procs = output.Listeners[i].matchedProcessors;
+                                    for (int j = 0; j < procs.Count; ++j) {
+                                        procs[j].RebuildInputs();
+                                    }
+                                    dataCache.Clear();
                                 }
                             }
                         }
                     }
 
-                    if (GUILayout.Button("X", GUILayout.Width(ListFieldSize))) {
+                    if (GUILayout.Button("X", GUILayout.Width(ListFieldSize/3))) {
                         // Schedule listener for removal
                         toRemove = i;
                     }
@@ -259,8 +277,19 @@ namespace Playblack.Editor.Csp {
                                 this.outputs[i] = processor.Outputs[i].Name;
                             }
                         }
+
                     }
                     EditorUtility.SetDirty(processor);
+                    EditorGUILayout.Space();
+                    EditorGUILayout.Space();
+                    EditorGUILayout.HelpBox("Use this button if the components dropdown is wonky.", MessageType.Info);
+                    if (GUILayout.Button("Invalidate Signal Cache")) {
+                        var result = EditorUtility.DisplayDialog("Invalidate Signal Cache", "Are you sure?", "Do it!", "Nope, return!");
+                        if (result) {
+                            InvalidateDataCache();
+                        }
+                        EditorUtility.SetDirty(processor);
+                    }
                     if (GUILayout.Button("Force-Save")) {
                         EditorSceneManager.SaveScene(EditorSceneManager.GetActiveScene());
 

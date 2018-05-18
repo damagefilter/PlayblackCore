@@ -78,8 +78,11 @@ namespace Playblack.Csp {
         /// This needs to be called everytime the signalprocessor object is instantiated.
         /// The data is used in OutputEvent. It will look in a SignalProcessors input-list
         /// for things to call when an output is fired.
+        /// Also use this if you know that a new CSP component was added after the CSP
+        /// and the InputFunc list is already populated.
         /// </summary>
-        private void RebuildInputs() {
+        public void RebuildInputs() {
+            inputFuncCache.SetIgnoreInUse(true);
 //            Debug.Log("Rebuilding InputFunc cache on " + this.gameObject.name);
             var components = GetComponents<Component>();
             if (inputFuncs == null) {
