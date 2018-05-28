@@ -93,6 +93,7 @@
     <Compile Include="Mods\BuildTools.cs" />
     <Compile Include="Csp\CspConnectorWindowOverview.cs" />
     <Compile Include="Csp\SignalDataCache.cs" />
+    <Compile Include="Sequencer\Renderers\OperatorClipboard.cs" />
     <Compile Include="Sequencer\SequencerEditorWindow.cs" />
     <Compile Include="Sequencer\SequencerInspector.cs" />
     <Compile Include="Windows\GenericPopupWindow.cs" />

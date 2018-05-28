@@ -141,6 +141,13 @@ namespace Playblack.BehaviourTree {
             return model;
         }
 
+        public static UnityBtModel NewInstance(string className) {
+            var model = new UnityBtModel();
+            model.children = new List<UnityBtModel>();
+            model.ModelClassName = className;
+            return model;
+        }
+
         public static UnityBtModel NewInstance(UnityBtModel parent, UnityBtModel model, string modelClassName) {
             if (model != null) { // We can explicitly set null values you see
                 model.children = new List<UnityBtModel>();
@@ -235,14 +242,29 @@ namespace Playblack.BehaviourTree {
 
         public void ProcessReorders() {
             foreach (var kvp in scheduledReorders) {
-                if (kvp.Value >= this.children.Count || kvp.Value < 0) {
-                    // This means we're either at the beginning or at the end
-                    Debug.Log("Hit one end of a list, not reordering this child. New Index is told to be " + kvp.Value);
-                    continue;
-                }
                 int i = this.children.IndexOf(kvp.Key);
-                this.children.RemoveAt(i);
-                this.children.Insert(kvp.Value, kvp.Key);
+                if (i >= 0) { // is a child that exists
+                    if (kvp.Value >= this.children.Count || kvp.Value < 0) {
+                        // This means we're either at the beginning or at the end
+                        Debug.Log("Hit one end of a list, not reordering this child. New Index is told to be " + kvp.Value);
+                        continue;
+                    }
+                    this.children.RemoveAt(i);
+                    this.children.Insert(kvp.Value, kvp.Key);
+                }
+                else {
+                    // Since we do copy / paste it can happen that the child doesn't actually exist,
+                    // but needs to be inserted at the given index.
+                    if (kvp.Value >= this.children.Count) {
+                        this.children.Add(kvp.Key);
+                    }
+                    else if (kvp.Value < 0) {
+                        this.children.Insert(0, kvp.Key);
+                    }
+                    else {
+                        this.children.Insert(kvp.Value, kvp.Key);
+                    }
+                }
             }
             scheduledReorders.Clear();
         }
@@ -296,6 +318,34 @@ namespace Playblack.BehaviourTree {
         /// <returns></returns>
         public int GetProposedNumChildren() {
             return ModelType.Attribute<ModelDataDescriptorAttribute>().NumChildren;
+        }
+
+        /// <summary>
+        /// Makes a copy of this UnityBtModel.
+        /// Copies children recursively (creates new references).
+        /// Copies the context data and internal class descriptors.
+        /// </summary>
+        /// <returns></returns>
+        public UnityBtModel Copy() {
+            var model = new UnityBtModel();
+
+            // must run through the lists like that to get rid of references.
+            // otherwise changing childrens or context data will affect the source reference too.
+            // And that'd be causing some pretty crazy havoc.
+            model.children = new List<UnityBtModel>(children.Count);
+            for (int i = 0; i < children.Count; ++i) {
+                model.children.Add(children[i].Copy());
+            }
+
+            model.contextData = new List<ValueField>(contextData.Count);
+            for (int i = 0; i < contextData.Count; ++i) {
+                var data = contextData[i];
+                model.contextData.Add(new ValueField(data.Name, data.UnityValue, data.Type));
+            }
+            model.displayName = displayName;
+            model.modelClassName = modelClassName;
+            model.numChildren = numChildren;
+            return model;
         }
     }
 }

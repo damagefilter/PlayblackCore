@@ -125,6 +125,7 @@ namespace PlayBlack.Editor.Sequencer.Renderers.Bt {
             DrawButton("<>", () => {
                 var window = GenericPopupWindow.Popup<OperatorSelector>();
                 window.SetRelativeRootModel(referenceObject);
+                window.SetNoOverride(false);
             });
         }
 
@@ -132,6 +133,7 @@ namespace PlayBlack.Editor.Sequencer.Renderers.Bt {
             DrawButton("<>", () => {
                 var window = GenericPopupWindow.Popup<OperatorSelector>();
                 window.SetRelativeRootModel(referenceObject, insertIndex);
+                window.SetNoOverride(false);
             });
         }
 
@@ -162,7 +164,47 @@ namespace PlayBlack.Editor.Sequencer.Renderers.Bt {
                         referenceParentObject.ScheduleChildReorder(referenceObject, newIndex);
                         isDirty = true;
                     }
+                    // TODO: Also do copy?
+                    if (GUILayout.Button("ct", EditorSkin.button, GUILayout.Width(25))) {
+                        // cut this operator out.
+                        // if operator clipboard has content, its gonna be available in the selector window.
+                        // so you can insert new things or cut / paste like that.
+                        // sames goes for the default "add operator" button.
+                        if (!OperatorClipboard.TryStore(referenceObject)) {
+                            var result = EditorUtility.DisplayDialog(
+                                "Clipboard content override",
+                                "There is something in the clipboard you have cut / copied but not pasted yet. You wanna override?",
+                                "Yes, override", "No, wait!");
+                            if (result) {
+                                OperatorClipboard.ForceStore(referenceObject);
+                                referenceParentObject.NullChild(referenceObject);
+                                isDirty = true;
+                            }
+                        }
+                        else {
+                            OperatorClipboard.ForceStore(referenceObject);
+                            referenceParentObject.NullChild(referenceObject);
+                            isDirty = true;
+                        }
+                    }
 
+                    // Works only on things without a fixed child structure which
+                    // is indicated by proposedchildren being negative.
+                    // That is to retain data integrity
+                    if (referenceParentObject.GetProposedNumChildren() < 0) {
+                        if (GUILayout.Button("/\\", EditorSkin.button, GUILayout.Width(25))) {
+                            // insert above
+                            var window = GenericPopupWindow.Popup<OperatorSelector>();
+                            window.SetRelativeRootModel(referenceParentObject, referenceParentObject.children.IndexOf(referenceObject));
+                            window.SetNoOverride(true);
+                        }
+                        if (GUILayout.Button("\\/", EditorSkin.button, GUILayout.Width(25))) {
+                            // insert below
+                            var window = GenericPopupWindow.Popup<OperatorSelector>();
+                            window.SetRelativeRootModel(referenceParentObject, referenceParentObject.children.IndexOf(referenceObject) + 1);
+                            window.SetNoOverride(true);
+                        }
+                    }
                     if (GUILayout.Button("x", EditorSkin.button, GUILayout.Width(18))) {
                         if (!referenceParentObject.NullChild(referenceObject)) {
                             Debug.LogError("Failed to remove a model from its parent (but it is in there!)" + referenceObject.ModelClassName);

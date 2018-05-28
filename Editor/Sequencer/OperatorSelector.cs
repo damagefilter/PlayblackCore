@@ -5,6 +5,7 @@ using PlayBlack.Editor.Windows;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using PlayBlack.Editor.Sequencer.Renderers;
 using UnityEditor;
 using UnityEngine;
 
@@ -21,6 +22,12 @@ namespace PlayBlack.Editor.Sequencer {
         /// Used to indicate where in the model the children should go, at which index
         /// </summary>
         private int insertIndex = -1;
+
+        /// <summary>
+        /// If true, instead of overriding an operator at the given index,
+        /// one will be inserted at the index, causing subsequent operators to be pushed down by one.
+        /// </summary>
+        private bool noOverride;
 
         private Vector2 scrollPos;
 
@@ -41,6 +48,15 @@ namespace PlayBlack.Editor.Sequencer {
 
         public override string GetTitle() {
             return "Operator Selector";
+        }
+
+        /// <summary>
+        /// If true, instead of overriding an operator at the given index,
+        /// one will be inserted at the index, causing subsequent operators to be pushed down by one.
+        /// </summary>
+        /// <param name="noOverride"></param>
+        public void SetNoOverride(bool noOverride) {
+            this.noOverride = noOverride;
         }
 
         public override void InternalInit() {
@@ -115,6 +131,11 @@ namespace PlayBlack.Editor.Sequencer {
         }
 
         public void OnGUI() {
+            if (OperatorClipboard.HasContent()) {
+                if (GUILayout.Button("Insert from clipboard")) {
+                    InsertFromClipboard();
+                }
+            }
             EditorGUILayout.BeginHorizontal();
             {
                 foreach (DescriptorType t in Enum.GetValues(typeof(DescriptorType))) {
@@ -174,16 +195,38 @@ namespace PlayBlack.Editor.Sequencer {
             EditorGUILayout.EndScrollView();
         }
 
-        private UnityBtModel CreateNewModel(string className) {
+        private void CreateNewModel(string className) {
             UnityBtModel newModel = null;
-            // NewInstance does all the things we need to ensure data integrity
-            if (insertIndex >= 0) {
-                newModel = UnityBtModel.NewInstance(rootModel, new UnityBtModel(), className, insertIndex);
+            if (noOverride) {
+                newModel = UnityBtModel.NewInstance(className);
+                if (insertIndex >= 0) {
+                    rootModel.ScheduleChildReorder(newModel, insertIndex);
+                }
+                else {
+                    // force appending
+                    rootModel.ScheduleChildReorder(newModel, rootModel.children.Count+1);
+                }
             }
             else {
-                newModel = UnityBtModel.NewInstance(rootModel, new UnityBtModel(), className);
+                // NewInstance does all the things we need to ensure data integrity
+                if (insertIndex >= 0) {
+                    newModel = UnityBtModel.NewInstance(rootModel, new UnityBtModel(), className, insertIndex);
+                }
+                else {
+                    newModel = UnityBtModel.NewInstance(rootModel, new UnityBtModel(), className);
+                }
             }
-            return newModel;
+        }
+
+        private void InsertFromClipboard() {
+            var newModel = OperatorClipboard.Paste();
+            if (insertIndex >= 0) {
+                rootModel.ScheduleChildReorder(newModel, insertIndex);
+            }
+            else {
+                // force appending
+                rootModel.ScheduleChildReorder(newModel, rootModel.children.Count+1);
+            }
         }
 
         /// <summary>
