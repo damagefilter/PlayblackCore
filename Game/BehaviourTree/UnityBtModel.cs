@@ -48,6 +48,8 @@ namespace Playblack.BehaviourTree {
                     children = new List<UnityBtModel>();
                 }
                 if ((children.Count == 0 || children.Count < proposedNumChildren) && proposedNumChildren != -1) {
+                    // FIXME: Since numChildren is 0 at this point for new models, this should basically do nothing?
+                    // seems to have no side effects though
                     this.ResizeChildren(true);
                 }
             }
@@ -343,7 +345,7 @@ namespace Playblack.BehaviourTree {
                 model.contextData.Add(new ValueField(data.Name, data.UnityValue, data.Type));
             }
             model.displayName = displayName;
-            model.modelClassName = modelClassName;
+            model.ModelClassName = modelClassName;
             model.numChildren = numChildren;
             return model;
         }
