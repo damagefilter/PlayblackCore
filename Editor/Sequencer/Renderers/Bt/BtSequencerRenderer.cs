@@ -170,19 +170,20 @@ namespace PlayBlack.Editor.Sequencer.Renderers.Bt {
                         // if operator clipboard has content, its gonna be available in the selector window.
                         // so you can insert new things or cut / paste like that.
                         // sames goes for the default "add operator" button.
-                        if (!OperatorClipboard.TryStore(referenceObject)) {
+                        var copyOfRefObj = referenceObject.Copy();
+                        if (!OperatorClipboard.TryStore(copyOfRefObj)) {
                             var result = EditorUtility.DisplayDialog(
                                 "Clipboard content override",
                                 "There is something in the clipboard you have cut / copied but not pasted yet. You wanna override?",
                                 "Yes, override", "No, wait!");
                             if (result) {
-                                OperatorClipboard.ForceStore(referenceObject);
+                                OperatorClipboard.ForceStore(copyOfRefObj);
                                 referenceParentObject.NullChild(referenceObject);
                                 isDirty = true;
                             }
                         }
                         else {
-                            OperatorClipboard.ForceStore(referenceObject);
+                            OperatorClipboard.ForceStore(copyOfRefObj);
                             referenceParentObject.NullChild(referenceObject);
                             isDirty = true;
                         }

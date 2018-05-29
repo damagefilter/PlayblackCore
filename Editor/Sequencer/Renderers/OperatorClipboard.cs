@@ -4,32 +4,43 @@ namespace PlayBlack.Editor.Sequencer.Renderers {
     /// <summary>
     /// Helper for copy / cut / paste operations. in sequencer editor.
     /// </summary>
-    public static class OperatorClipboard {
-        private static UnityBtModel currentContent;
-        private static bool wasPasted;
+    public class OperatorClipboard {
+        private UnityBtModel currentContent;
+        private bool wasPasted;
 
+        private static OperatorClipboard instance;
+
+        public static void Ensure() {
+            if (instance == null) {
+                instance = new OperatorClipboard();
+            }
+        }
         public static bool TryStore(UnityBtModel model) {
-            if (!wasPasted && currentContent != null) {
+            Ensure();
+            if (!instance.wasPasted && instance.currentContent != null) {
                 return false;
             }
 
-            wasPasted = false;
-            currentContent = model;
+            instance.wasPasted = false;
+            instance.currentContent = model;
             return true;
         }
 
         public static void ForceStore(UnityBtModel model) {
-            wasPasted = false;
-            currentContent = model;
+            Ensure();
+            instance.wasPasted = false;
+            instance.currentContent = model;
         }
 
         public static UnityBtModel Paste() {
-            wasPasted = true;
-            return currentContent.Copy();
+            Ensure();
+            instance.wasPasted = true;
+            return instance.currentContent.Copy();
         }
 
         public static bool HasContent() {
-            return currentContent != null;
+            Ensure();
+            return instance.currentContent != null;
         }
     }
 }
