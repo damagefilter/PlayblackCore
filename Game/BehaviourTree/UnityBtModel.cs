@@ -291,10 +291,12 @@ namespace Playblack.BehaviourTree {
                     // Since this is used to map back to the actual field on the executor class, it must be unique.
                     // Uniqueness is enfored in the datadescriptor constructor.
                     newValueField.Name = kvp.Value.DisplayName;
+                    newValueField.SystemType = kvp.Value.TypeInfo; // this is optional. mostly for making enums work
 
                     if (kvp.Value.DefaultUnityValue != null) {
                         newValueField.Value = kvp.Value.DefaultUnityValue;
                     }
+
                     valueFields[i++] = newValueField;
                 }
                 return valueFields;
@@ -342,7 +344,9 @@ namespace Playblack.BehaviourTree {
             model.contextData = new List<ValueField>(contextData.Count);
             for (int i = 0; i < contextData.Count; ++i) {
                 var data = contextData[i];
-                model.contextData.Add(new ValueField(data.Name, data.UnityValue, data.Type));
+                model.contextData.Add(new ValueField(data.Name, data.UnityValue, data.Type) {
+                    SystemType = data.SystemType
+                });
             }
             model.displayName = displayName;
             model.ModelClassName = modelClassName;

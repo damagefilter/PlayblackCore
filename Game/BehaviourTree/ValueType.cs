@@ -8,6 +8,7 @@ namespace Playblack.BehaviourTree {
         INT,
         STRING, // one-liners
         TEXT, // long texts
-        BOOL
+        BOOL,
+        ENUM
     }
 }

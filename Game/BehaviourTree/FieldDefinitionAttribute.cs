@@ -1,9 +1,12 @@
-﻿namespace Playblack.BehaviourTree {
+﻿using System;
+
+namespace Playblack.BehaviourTree {
 
     public class FieldDefinitionAttribute : System.Attribute {
         private string defaultUnityValue = null;
         private ValueType fieldValueType;
         private string displayName;
+        private Type typeInfo; // used for enums currently to create the correct enum dropdown in editor window.
 
         public string DefaultUnityValue {
             get {
@@ -14,6 +17,12 @@
         public string DisplayName {
             get {
                 return displayName;
+            }
+        }
+
+        public Type TypeInfo {
+            get {
+                return typeInfo;
             }
         }
 
@@ -32,6 +41,11 @@
         public FieldDefinitionAttribute(string displayName, ValueType valueType) {
             this.displayName = displayName;
             this.fieldValueType = valueType;
+        }
+        public FieldDefinitionAttribute(string displayName, ValueType valueType, Type typeInfo) {
+            this.displayName = displayName;
+            this.fieldValueType = valueType;
+            this.typeInfo = typeInfo;
         }
 
         /// <summary>

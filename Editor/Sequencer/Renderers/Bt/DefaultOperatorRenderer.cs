@@ -1,4 +1,5 @@
-﻿using Playblack.BehaviourTree;
+﻿using System;
+using Playblack.BehaviourTree;
 using PlayBlack.Editor.Windows;
 using System.Collections.Generic;
 using UnityEditor;
@@ -154,6 +155,7 @@ namespace PlayBlack.Editor.Sequencer.Renderers.Bt {
                                     bool boolVal = (bool)data.Value;
                                     data.Value = EditorGUILayout.Toggle(boolVal, GUILayout.Width(150));
                                 }
+
                                 break;
 
                             case Playblack.BehaviourTree.ValueType.FLOAT:
@@ -164,6 +166,7 @@ namespace PlayBlack.Editor.Sequencer.Renderers.Bt {
                                     float floatVal = (float)data.Value;
                                     data.Value = EditorGUILayout.FloatField(floatVal, GUILayout.Width(150));
                                 }
+
                                 break;
 
                             case Playblack.BehaviourTree.ValueType.INT:
@@ -174,6 +177,17 @@ namespace PlayBlack.Editor.Sequencer.Renderers.Bt {
                                     int intVal = (int)data.Value;
                                     data.Value = EditorGUILayout.IntField(intVal, GUILayout.Width(150));
                                 }
+
+                                break;
+                            case Playblack.BehaviourTree.ValueType.ENUM:
+                                if (data.Value == null) {
+                                    data.Value = EditorGUILayout.EnumPopup((Enum)Enum.Parse(data.SystemType, "0"), GUILayout.Width(150));
+                                }
+                                else {
+                                    string enumValue = data.Value.ToString();
+                                    data.Value = EditorGUILayout.EnumPopup((Enum)Enum.Parse(data.SystemType, enumValue), GUILayout.Width(150));
+                                }
+
                                 break;
 
                             case Playblack.BehaviourTree.ValueType.STRING:

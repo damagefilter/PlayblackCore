@@ -47,6 +47,8 @@ namespace Playblack.BehaviourTree {
 
                         case ValueType.INT:
                             return int.Parse(unityValue);
+                        case ValueType.ENUM:
+                            return Enum.Parse(systemType, unityValue);
 
                         case ValueType.STRING:
                         case ValueType.TEXT:
@@ -75,6 +77,19 @@ namespace Playblack.BehaviourTree {
             }
             set {
                 varType = value;
+            }
+        }
+
+        [SerializeField]
+        [ProtoMember(4)]
+        private Type systemType;
+
+        public Type SystemType {
+            get {
+                return systemType;
+            }
+            set {
+                systemType = value;
             }
         }
 
