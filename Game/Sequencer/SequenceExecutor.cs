@@ -95,7 +95,6 @@ namespace Playblack.Sequencer {
         }
 
         public IBTExecutor GetExecutor(DataContext context, UnityEngine.Object actor) {
-            context["actor"] = actor;
             if (RootModel == null) {
                 throw new InvalidOperationException("Tried initializing BTExecutor but root model is null");
             }
@@ -103,7 +102,9 @@ namespace Playblack.Sequencer {
             RecursiveLoadModelTree(rootModel, root);
             Debug.Log("Creating new bt executor.");
             // TODO: Fetch an implementation from a factory
-            return new CachingBtExecutor(root, context);
+            var exec = new CachingBtExecutor(root, context);
+            exec.Actor = actor;
+            return exec;
         }
 
         public void Start() {
@@ -152,8 +153,7 @@ namespace Playblack.Sequencer {
                     }
                 }
 
-                if (!found && key != "actor") { // actor is a special object that shouldn't be serialized at all.
-
+                if (!found) {
                     var updateValue = contextUpdate.Get(key);
 
                     // reference types are basically too complex and we don't do them in ValueFields.

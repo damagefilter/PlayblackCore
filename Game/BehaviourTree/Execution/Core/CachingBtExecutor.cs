@@ -1,6 +1,7 @@
 ﻿using Playblack.BehaviourTree.Model.Core;
 using System;
 using System.Collections.Generic;
+using Object = UnityEngine.Object;
 
 namespace Playblack.BehaviourTree.Execution.Core {
 
@@ -60,6 +61,11 @@ namespace Playblack.BehaviourTree.Execution.Core {
             this.tickableTasksDeletionQueue = new List<ExecutionTask>();
             this.tickableTasksInsertionQueue = new List<ExecutionTask>();
             this.taskStates = new Dictionary<Position, DataContext>();
+        }
+
+        public Object Actor {
+            get;
+            set;
         }
 
         public void Reset() {

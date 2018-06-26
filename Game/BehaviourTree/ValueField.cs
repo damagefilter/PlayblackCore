@@ -150,12 +150,7 @@ namespace Playblack.BehaviourTree {
                 return ValueType.BOOL;
             }
 
-            // Actors are special, do not notify about them.
-            // everything else is very problematic and should ne shown as error as it could cause the save state to get corrupted
-            if (fieldName != "actor") {
-                Debug.LogError("Could not determine a valuetype for " + t + " on field " + fieldName);
-            }
-
+            Debug.LogError("Could not determine a valuetype for " + t + " on field " + fieldName);
             return ValueType.STRING;
         }
     }

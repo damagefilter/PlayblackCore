@@ -5,6 +5,15 @@ namespace Playblack.BehaviourTree.Execution.Core {
     public interface IBTExecutor {
 
         /// <summary>
+        /// The actor object on which the sequence is executed.
+        /// Depending on behaviour within the sequence,
+        /// this has a bigger relevance or not.
+        /// </summary>
+        UnityEngine.Object Actor {
+            get;
+            set;
+        }
+        /// <summary>
         /// Resets the Execution state.
         /// </summary>
         void Reset();
