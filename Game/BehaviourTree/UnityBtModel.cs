@@ -344,9 +344,7 @@ namespace Playblack.BehaviourTree {
             model.contextData = new List<ValueField>(contextData.Count);
             for (int i = 0; i < contextData.Count; ++i) {
                 var data = contextData[i];
-                model.contextData.Add(new ValueField(data.Name, data.UnityValue, data.Type) {
-                    SystemType = data.SystemType
-                });
+                model.contextData.Add(new ValueField(data));
             }
             model.displayName = displayName;
             model.ModelClassName = modelClassName;

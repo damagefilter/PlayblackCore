@@ -1,5 +1,6 @@
 ﻿using ProtoBuf;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace Playblack.BehaviourTree {
 
@@ -10,7 +11,7 @@ namespace Playblack.BehaviourTree {
     public class DataContext {
 
         [ProtoMember(1)]
-        private Dictionary<string, object> internalData;
+        private Dictionary<string, ValueField> internalData;
 
         public int Count {
             get {
@@ -19,21 +20,21 @@ namespace Playblack.BehaviourTree {
         }
 
         public DataContext() {
-            this.internalData = new Dictionary<string, object>();
+            this.internalData = new Dictionary<string, ValueField>();
         }
 
-        public DataContext(Dictionary<string, object> data) {
+        public DataContext(Dictionary<string, ValueField> data) {
             this.internalData = data;
         }
 
+        public IList<string> GetKeys() {
+            return internalData.Keys.ToList();
+        }
+
         public DataContext(IList<ValueField> data) {
-            this.internalData = new Dictionary<string, object>();
+            this.internalData = new Dictionary<string, ValueField>();
             if (data != null) {
                 foreach (var value in data) {
-                    if (value == null) {
-                        UnityEngine.Debug.Log("context data value was null, skipping");
-                        continue;
-                    }
                     if (value.Name == null) {
                         // This might happen in composite tasks where there are x children prepared but only y are used from the sequencer
                         UnityEngine.Debug.LogWarning("context data value without name, skipping");
@@ -44,7 +45,7 @@ namespace Playblack.BehaviourTree {
                         UnityEngine.Debug.LogWarning("This DataContext already has a key names " + value.Name + ". The value is " + internalData[value.Name]);
                         continue;
                     }
-                    internalData.Add(value.Name, value.Value);
+                    internalData.Add(value.Name, value);
                 }
             }
         }
@@ -58,15 +59,30 @@ namespace Playblack.BehaviourTree {
             }
         }
 
+        public ValueField Get(string key) {
+            ValueField val;
+            return internalData.TryGetValue(key, out val) ? val : default(ValueField);
+        }
+
         public object this[string key] {
             get {
                 if (internalData.ContainsKey(key)) {
-                    return internalData[key];
+                    return internalData[key].Value;
                 }
                 return null;
             }
             set {
-                internalData[key] = value;
+                ValueField val;
+                if (internalData.TryGetValue(key, out val)) {
+                    val.Value = value;
+                    internalData[key] = val;
+                    return;
+                }
+                internalData.Add(key, new ValueField(key, value));
+                var thing = internalData[key];
+                thing.Value = value;
+                internalData[key] = thing;
+
             }
         }
     }

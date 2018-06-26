@@ -78,16 +78,11 @@ namespace Playblack.Sequencer {
 
         private bool running;
 
-        public SequenceExecutor() {
-            //this.rootModel = UnityBtModel.NewInstance(null, new UnityBtModel(), typeof(ModelSequence).ToString());
-        }
-
         public IBTExecutor GetExecutor(DataContext overrideContext = null) {
             // recycle this for performance reasons but also to
             // persist the global context
             if (this.executor != null) {
                 if (executor.GetStatus() != TaskStatus.UNINITIALISED) {
-                    Debug.Log("Already have executor. Terminating and resetting.");
                     executor.Terminate();
                     executor.Reset();
                 }
@@ -125,7 +120,6 @@ namespace Playblack.Sequencer {
         /// </summary>
         /// <returns></returns>
         private IEnumerator TickExecutorParallel() {
-            Debug.Log("Entered coroutine. Beginning ticking.");
             running = true;
             var status = this.executor.GetStatus();
             while (!(status == TaskStatus.SUCCESS || status == TaskStatus.FAILURE)) {
@@ -133,9 +127,7 @@ namespace Playblack.Sequencer {
                 status = this.executor.GetStatus();
                 yield return null;
             }
-            Debug.Log("Terminating Sequence Executor. Status is " + status);
             TerminateExecutorAndFinish();
-            Debug.Log("Sequence executor coroutine control flow ended.");
         }
 
         private void TerminateExecutorAndFinish() {
@@ -143,6 +135,36 @@ namespace Playblack.Sequencer {
             this.executor.Terminate();
             this.executor.Reset();
             this.FireOutput("OnExecutionFinish");
+            // Update the serialized / saved global data context with the current state.
+            // That will ensure, when this is saved, the context is retained when it's restored.
+            var contextUpdate = this.executor.GetRootContext();
+            var keys = contextUpdate.GetKeys();
+            for (int i = 0; i < keys.Count; ++i) {
+                var key = keys[i];
+                bool found = false;
+                for (int j = 0; j < globalDataContext.Count; ++j) {
+                    if (globalDataContext[j].Name == key) {
+                        var tmp = globalDataContext[j];
+                        tmp.Value = contextUpdate[key];
+                        globalDataContext[j] = tmp;
+                        found = true;
+                        break;
+                    }
+                }
+
+                if (!found && key != "actor") { // actor is a special object that shouldn't be serialized at all.
+
+                    var updateValue = contextUpdate.Get(key);
+
+                    // reference types are basically too complex and we don't do them in ValueFields.
+                    // If one has accidentally entered the playing field, we skip it.
+                    if (!updateValue.Value.GetType().IsValueType) {
+                        Debug.LogWarning(string.Format("A reference type ({0}) was found in the context data of a sequencer {1}", updateValue.Value.GetType(), this.gameObject.name));
+                        continue;
+                    }
+                    globalDataContext.Add(new ValueField(updateValue));
+                }
+            }
         }
 
         [InputFunc("TriggerExecution")]
@@ -150,13 +172,11 @@ namespace Playblack.Sequencer {
             Debug.Log("Trigger execution");
             if (this.TypeOfExecution == ExecutionType.TRIGGER) {
                 if (this.executor == null) {
-                    Debug.Log("Executor is null. Fetching new one.");
                     this.executor = this.GetExecutor();
                 }
                 if (!running) {
                     StartCoroutine("TickExecutorParallel");
                     this.FireOutput("OnExecutionTrigger");
-                    Debug.Log("Execution triggered, coroutine started");
                 }
             }
         }

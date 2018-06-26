@@ -135,8 +135,8 @@ namespace PlayBlack.Editor.Sequencer.Renderers.Bt {
             {
                 // Iterate over data fields on context
                 for (int i = 0; i < modelToRender.contextData.Count; ++i) {
-                    // Skip junk (really shouldn't be happening
-                    if (modelToRender.contextData[i] == null) {
+                    // Skip junk (really shouldn't be happening)
+                    if (modelToRender.contextData[i].Name == null) {
                         Debug.LogWarning("Found null Value in operator context at index " + i);
                         continue;
                     }
@@ -198,6 +198,8 @@ namespace PlayBlack.Editor.Sequencer.Renderers.Bt {
                                 data.Value = EditorGUILayout.TextArea(data.UnityValue, GUILayout.Width(150), GUILayout.Height(50));
                                 break;
                         }
+
+                        modelToRender.contextData[i] = data; // is value type. Need putting back
                     }
                     EditorGUILayout.EndHorizontal();
                     EditorGUILayout.Space();

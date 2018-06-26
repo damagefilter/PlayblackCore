@@ -1,6 +1,7 @@
 ﻿using ProtoBuf;
 using System;
 using UnityEngine;
+using UnityEngine.Windows.Speech;
 
 namespace Playblack.BehaviourTree {
     /**
@@ -10,7 +11,7 @@ namespace Playblack.BehaviourTree {
 
     [Serializable]
     [ProtoContract]
-    public class ValueField {
+    public struct ValueField {
 
         [SerializeField]
         [ProtoMember(1)]
@@ -35,25 +36,41 @@ namespace Playblack.BehaviourTree {
             }
         }
 
+        private object cachedValue;
+
         public object Value {
             get {
+                if (cachedValue != null) {
+                    return cachedValue;
+                }
                 if (unityValue != null) {
                     switch (varType) {
                         case ValueType.BOOL:
-                            return bool.Parse(unityValue);
+                            cachedValue = bool.Parse(unityValue);
+                            break;
 
                         case ValueType.FLOAT:
-                            return float.Parse(unityValue);
+                            cachedValue = float.Parse(unityValue);
+                            break;
 
                         case ValueType.INT:
-                            return int.Parse(unityValue);
+                            cachedValue = int.Parse(unityValue);
+                            break;
+
                         case ValueType.ENUM:
-                            return Enum.Parse(systemType, unityValue);
+                            cachedValue = Enum.Parse(systemType, unityValue);
+                            break;
 
                         case ValueType.STRING:
                         case ValueType.TEXT:
-                            return unityValue;
+                            cachedValue = unityValue;
+                            break;
+                        default:
+                            Debug.LogWarning("ValueField: No known ValueType given, returning null as concrete value for type: " + varType);
+                            break;
                     }
+
+                    return cachedValue;
                 }
                 return null;
             }
@@ -64,6 +81,8 @@ namespace Playblack.BehaviourTree {
                 else {
                     this.unityValue = null;
                 }
+
+                cachedValue = null;
             }
         }
 
@@ -93,13 +112,51 @@ namespace Playblack.BehaviourTree {
             }
         }
 
-        public ValueField() {
+        public ValueField(string pName, object value) {
+            name = pName;
+            cachedValue = value;
+            varType = ValueTypeFromSystemType(value.GetType(), pName);
+            systemType = value.GetType();
+            unityValue = null;
+            Value = value;
         }
 
-        public ValueField(string name, string value, ValueType type) {
-            this.Name = name;
-            this.unityValue = value;
-            this.Type = type;
+        public ValueField(ValueField toCopy) {
+            name = toCopy.name;
+            varType = toCopy.varType;
+            systemType = toCopy.systemType;
+            unityValue = toCopy.unityValue;
+            cachedValue = null; // don't copy to avoid having cross references here since the values have been boxed.
+        }
+
+        private static ValueType ValueTypeFromSystemType(Type t, string fieldName) {
+            if (t.IsEnum) {
+                return ValueType.ENUM;
+            }
+
+            if (t == typeof(string)) {
+                return ValueType.STRING;
+            }
+
+            if (t == typeof(int)) {
+                return ValueType.INT;
+            }
+
+            if (t == typeof(float)) {
+                return ValueType.FLOAT;
+            }
+
+            if (t == typeof(bool)) {
+                return ValueType.BOOL;
+            }
+
+            // Actors are special, do not notify about them.
+            // everything else is very problematic and should ne shown as error as it could cause the save state to get corrupted
+            if (fieldName != "actor") {
+                Debug.LogError("Could not determine a valuetype for " + t + " on field " + fieldName);
+            }
+
+            return ValueType.STRING;
         }
     }
 }
