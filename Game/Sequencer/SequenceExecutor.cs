@@ -156,9 +156,10 @@ namespace Playblack.Sequencer {
                 if (!found) {
                     var updateValue = contextUpdate.Get(key);
 
-                    // reference types are basically too complex and we don't do them in ValueFields.
+                    // reference types other than swtrings are basically too complex and we don't do them in ValueFields.
                     // If one has accidentally entered the playing field, we skip it.
-                    if (!updateValue.Value.GetType().IsValueType) {
+                    var type = updateValue.Value.GetType();
+                    if (!updateValue.Value.GetType().IsValueType && type != typeof(string)) {
                         Debug.LogWarning(string.Format("A reference type ({0}) was found in the context data of a sequencer {1}", updateValue.Value.GetType(), this.gameObject.name));
                         continue;
                     }
