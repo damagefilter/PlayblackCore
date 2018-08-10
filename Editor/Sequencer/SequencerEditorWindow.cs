@@ -56,7 +56,7 @@ namespace PlayBlack.Editor.Sequencer {
             if (subject.RootModel == null) {
                 Debug.Log("RootModel in sequencer editor window is null... but y tho");
             }
-            this.sequencerWindow = new BtSequencerRenderer();
+            this.sequencerWindow = new BtSequencerRenderer(this);
             this.sequencerWindow.OperatorRenderer = new DefaultOperatorRenderer();
             this.sequencerWindow.OperatorRenderer.SetSubjects(subject.RootModel);
 

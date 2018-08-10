@@ -42,11 +42,15 @@ namespace PlayBlack.Editor.Sequencer.Renderers.Bt {
             }
         }
 
-        public BtSequencerRenderer() {
+        private EditorWindow hostWindow;
+
+        public BtSequencerRenderer(EditorWindow hostWindow) {
             this.corruptedModels = new List<UnityBtModel>();
             if (editorSkin == null) {
                 editorSkin = Resources.Load<GUISkin>("SequenceEditorLight");
             }
+
+            this.hostWindow = hostWindow;
         }
 
         #region Rendering Process
@@ -93,6 +97,7 @@ namespace PlayBlack.Editor.Sequencer.Renderers.Bt {
                 // Must be done here because otherwise we'll end up with concurrent modification exceptions
                 foreach (var corrupted in corruptedModels) {
                     rootModel.children.Remove(corrupted);
+                    hostWindow.Repaint();
                 }
                 corruptedModels.Clear();
                 isDirty = true;
@@ -109,6 +114,7 @@ namespace PlayBlack.Editor.Sequencer.Renderers.Bt {
             if (m.NeedsReorders) {
                 isDirty = true;
                 m.ProcessReorders();
+                hostWindow.Repaint();
             }
             // Check the children if they need reordering.
             foreach (var child in m.children) {
