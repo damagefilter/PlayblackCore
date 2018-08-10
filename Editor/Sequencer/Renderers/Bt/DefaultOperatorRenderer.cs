@@ -127,11 +127,11 @@ namespace PlayBlack.Editor.Sequencer.Renderers.Bt {
             {
                 // EditorGUILayout.LabelField("Value Type", GUILayout.Width(100));
                 EditorGUILayout.LabelField("Var Name", GUILayout.Width(150));
-                EditorGUILayout.LabelField("Var Value", GUILayout.Width(150));
+                EditorGUILayout.LabelField("Var Value", GUILayout.Width(300));
             }
             EditorGUILayout.EndHorizontal();
 
-            scrollPos = EditorGUILayout.BeginScrollView(scrollPos, GUILayout.Width(320), GUILayout.Height(460));
+            scrollPos = EditorGUILayout.BeginScrollView(scrollPos, GUILayout.Width(500), GUILayout.Height(500));
             {
                 // Iterate over data fields on context
                 for (int i = 0; i < modelToRender.contextData.Count; ++i) {
@@ -149,53 +149,53 @@ namespace PlayBlack.Editor.Sequencer.Renderers.Bt {
                         switch (data.Type) {
                             case Playblack.BehaviourTree.ValueType.BOOL:
                                 if (data.Value == null) {
-                                    data.Value = EditorGUILayout.Toggle(false, GUILayout.Width(150));
+                                    data.Value = EditorGUILayout.Toggle(false, GUILayout.Width(300));
                                 }
                                 else {
                                     bool boolVal = (bool)data.Value;
-                                    data.Value = EditorGUILayout.Toggle(boolVal, GUILayout.Width(150));
+                                    data.Value = EditorGUILayout.Toggle(boolVal, GUILayout.Width(300));
                                 }
 
                                 break;
 
                             case Playblack.BehaviourTree.ValueType.FLOAT:
                                 if (data.Value == null) {
-                                    data.Value = EditorGUILayout.FloatField(0f, GUILayout.Width(150));
+                                    data.Value = EditorGUILayout.FloatField(0f, GUILayout.Width(300));
                                 }
                                 else {
                                     float floatVal = (float)data.Value;
-                                    data.Value = EditorGUILayout.FloatField(floatVal, GUILayout.Width(150));
+                                    data.Value = EditorGUILayout.FloatField(floatVal, GUILayout.Width(300));
                                 }
 
                                 break;
 
                             case Playblack.BehaviourTree.ValueType.INT:
                                 if (data.Value == null) {
-                                    data.Value = EditorGUILayout.IntField(0, GUILayout.Width(150));
+                                    data.Value = EditorGUILayout.IntField(0, GUILayout.Width(300));
                                 }
                                 else {
                                     int intVal = (int)data.Value;
-                                    data.Value = EditorGUILayout.IntField(intVal, GUILayout.Width(150));
+                                    data.Value = EditorGUILayout.IntField(intVal, GUILayout.Width(300));
                                 }
 
                                 break;
                             case Playblack.BehaviourTree.ValueType.ENUM:
                                 if (data.Value == null) {
-                                    data.Value = EditorGUILayout.EnumPopup((Enum)Enum.Parse(data.SystemType, "0"), GUILayout.Width(150));
+                                    data.Value = EditorGUILayout.EnumPopup((Enum)Enum.Parse(data.SystemType, "0"), GUILayout.Width(300));
                                 }
                                 else {
                                     string enumValue = data.Value.ToString();
-                                    data.Value = EditorGUILayout.EnumPopup((Enum)Enum.Parse(data.SystemType, enumValue), GUILayout.Width(150));
+                                    data.Value = EditorGUILayout.EnumPopup((Enum)Enum.Parse(data.SystemType, enumValue), GUILayout.Width(300));
                                 }
 
                                 break;
 
                             case Playblack.BehaviourTree.ValueType.STRING:
-                                data.Value = EditorGUILayout.TextField(data.UnityValue, GUILayout.Width(150));
+                                data.Value = EditorGUILayout.TextField(data.UnityValue, GUILayout.Width(300));
                                 break;
 
                             case Playblack.BehaviourTree.ValueType.TEXT:
-                                data.Value = EditorGUILayout.TextArea(data.UnityValue, GUILayout.Width(150), GUILayout.Height(50));
+                                data.Value = EditorGUILayout.TextArea(data.UnityValue, GUILayout.Width(300), GUILayout.Height(80));
                                 break;
                         }
 
