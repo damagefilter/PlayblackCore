@@ -19,6 +19,7 @@ namespace Playblack.Sequencer {
     /// </summary>
     [OutputAware("OnExecutionFinish", "OnExecutionTrigger", "OnExecutionTerminated")]
     [SaveableComponent]
+    [DefaultExecutionOrder(-1000)] // Likely puts this before any other script requiring its data. Resolves race conditions in savegames
     public class SequenceExecutor : MonoBehaviour {
 
         [SerializeField]

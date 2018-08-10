@@ -81,6 +81,8 @@
     <Compile Include="Csp\CspContextMenu.cs" />
     <Compile Include="Csp\SignalProcessorInspector.cs" />
     <Compile Include="Extensions\EditorOnlyHelperExtensions.cs" />
+    <Compile Include="Savegame\UniqueIdDrawer.cs" />
+    <Compile Include="Savegame\UniqueIdInspector.cs" />
     <Compile Include="Sequencer\ModelDisplayManager.cs" />
     <Compile Include="Sequencer\OperatorEditorWindow.cs" />
     <Compile Include="Sequencer\Renderers\Bt\BtSequencerRenderer.cs" />

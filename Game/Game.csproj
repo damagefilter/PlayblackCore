@@ -115,6 +115,7 @@
     <Compile Include="Savegame\Model\SceneDataBlock.cs" />
     <Compile Include="Savegame\SaveableFieldAttribute.cs" />
     <Compile Include="Savegame\SaveField.cs" />
+    <Compile Include="Savegame\UniqueId.cs" />
     <Compile Include="Sequencer\CodeViewFormattingHintAttribute.cs" />
     <Compile Include="Sequencer\ExecutionType.cs" />
     <Compile Include="Savegame\Model\ComponentDataBlock.cs" />

@@ -12,6 +12,7 @@ namespace Playblack.Savegame {
     /// This can be attached to prefabs and gameobjects that should be manageable by
     /// the savegame system.
     /// </summary>
+    [RequireComponent(typeof(UniqueId))]
     public class SaveManager : MonoBehaviour {
 
         [Tooltip("If non-empty the save manager will assume the resource under assetPath is from the specified assetbundle name")]
@@ -30,11 +31,15 @@ namespace Playblack.Savegame {
         [SerializeField]
         private bool storeFullObjectTree;
 
-        private string uuid;
+        private UniqueId uid;
 
         public string UUID {
             get {
-                return uuid;
+                if (uid == null) {
+                    uid = GetComponent<UniqueId>();
+                }
+
+                return uid.UId;
             }
         }
 
@@ -46,7 +51,6 @@ namespace Playblack.Savegame {
 
         private void Awake() {
             // unique enough for saveable stuff. that#s all we need
-            this.uuid = this.gameObject.scene.name + this.transform.position + this.name;
             GameSavingEvent.Register(OnSave);
         }
 
@@ -61,7 +65,7 @@ namespace Playblack.Savegame {
         /// </summary>
         public void OnSave(GameSavingEvent hook) {
             Debug.Log("Saving " + gameObject.name);
-            GameObjectDataBlock goBlock = new GameObjectDataBlock(uuid, gameObject.name, assetBundle, assetPath);
+            GameObjectDataBlock goBlock = new GameObjectDataBlock(UUID, gameObject.name, assetBundle, assetPath);
             
             var components = this.storeFullObjectTree ? GetComponentsInChildren<Component>() : GetComponents<Component>();
             
@@ -127,7 +131,6 @@ namespace Playblack.Savegame {
                 Destroy(this.gameObject);
                 return;
             }
-            this.uuid = data.UUID;
             gameObject.name = data.SceneName;
             this.assetPath = data.AssetPath;
             this.assetBundle = data.AssetBundle;
@@ -136,7 +139,7 @@ namespace Playblack.Savegame {
                 return;
             }
             for (int i = 0; i < data.ComponentList.Count; ++i) {
-                Component component = null;
+                Component component;
                 var componentType = Type.GetType(data.ComponentList[i].ComponentName + "," + data.ComponentList[i].AssemblyName);
                 if (componentType == null) {
                     Debug.LogError("Failed restoring component type " + data.ComponentList[i].ComponentName + " from assembly " + data.ComponentList[i].AssemblyName);
@@ -151,6 +154,10 @@ namespace Playblack.Savegame {
                 }
                 else {
                     component = storeFullObjectTree ? this.gameObject.GetComponentInChildren(componentType) : this.gameObject.GetComponent(componentType);
+                }
+                if (component == null) {
+                    Debug.LogError(string.Format("The component {0} does not exist on the GO named {1}. You missed marking the GO persistent or didn't add a prefab path?", componentType, this.name));
+                    continue;
                 }
                 var memberSet = componentType.FieldsAndPropertiesWith(typeof(SaveableFieldAttribute));
                 for (int j = 0; j < memberSet.Count; ++j) {
@@ -185,9 +192,8 @@ namespace Playblack.Savegame {
                         }
                     }
                     catch (Exception e) {
-                        Debug.LogError(
-                            "Could not restore the value from field " + memberSet[j].Name + " on component " + componentType + ": \n" +
-                            e.Message);
+                        string str = string.Format("Restore failed on GO '{0}' for field '{1}' for component '{2}'\n{3}\nStack:\n{4}", this.name, memberSet[j].Name, componentType, e.Message, e.StackTrace);
+                        Debug.LogError(str);
                     }
                     
                 }
