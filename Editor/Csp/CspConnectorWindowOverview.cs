@@ -245,6 +245,7 @@ namespace Playblack.Editor.Csp {
         private OutputConfig outputCfg;
 
         private void DrawAddForm() {
+            Undo.RecordObject(processor, "Change CSP Connections");
             EditorGUILayout.BeginHorizontal(GUILayout.Width(ListFieldSize * 3)); // half the space of the things above will do
             {
                 EditorGUILayout.BeginVertical();
@@ -282,14 +283,6 @@ namespace Playblack.Editor.Csp {
                     EditorUtility.SetDirty(processor);
                     EditorGUILayout.Space();
                     EditorGUILayout.Space();
-                    EditorGUILayout.HelpBox("Use this button if the components dropdown is wonky.", MessageType.Info);
-                    if (GUILayout.Button("Invalidate Signal Cache")) {
-                        var result = EditorUtility.DisplayDialog("Invalidate Signal Cache", "Are you sure?", "Do it!", "Nope, return!");
-                        if (result) {
-                            InvalidateDataCache();
-                        }
-                        EditorUtility.SetDirty(processor);
-                    }
                     if (GUILayout.Button("Force-Save")) {
                         EditorSceneManager.SaveScene(EditorSceneManager.GetActiveScene());
 
