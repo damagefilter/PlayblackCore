@@ -56,6 +56,10 @@ namespace Playblack.Savegame.Model {
             }
         }
 
+        public static byte[] SerializeInteger(int val) {
+            return BitConverter.GetBytes(val);
+        }
+
         #endregion Serialize
 
         #region Deserialize
@@ -121,6 +125,10 @@ namespace Playblack.Savegame.Model {
                 var obj = ProtoBuf.Serializer.Deserialize<T>(ms);
                 return obj;
             }
+        }
+
+        public static int DeserializeInteger(byte[] val) {
+            return BitConverter.ToInt32(val, 0);
         }
 
         #endregion Deserialize
