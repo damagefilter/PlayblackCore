@@ -44,6 +44,7 @@ namespace Playblack.Csp {
                         Debug.LogWarning(method + " is not a declared input func on " + matchedProcessors[i].gameObject.name);
                         continue;
                     }
+                    processor.SetTrace(trace);
                     trace.Add(caller.gameObject, owner, processor.gameObject, func);
                     if (delay > 0) {
                         processor.StartCoroutine(ExecuteDelayed(func));

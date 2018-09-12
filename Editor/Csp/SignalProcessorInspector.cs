@@ -9,6 +9,8 @@ namespace Playblack.Editor.Csp {
         private static CspConnectorWindowOverview edWindow;
 
         public override void OnInspectorGUI() {
+            var csp = target as SignalProcessor;
+            csp.debug = EditorGUILayout.Toggle("Enable Tracer Output", csp.debug);
             if (GUILayout.Button("Open Outputs")) {
                 OpenCspEditorWindow((SignalProcessor)target);
             }

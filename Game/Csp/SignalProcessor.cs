@@ -22,6 +22,30 @@ namespace Playblack.Csp {
     public class SignalProcessor : MonoBehaviour {
 
         /// <summary>
+        /// When true, the FireOutput will, at the end of the execution,
+        /// dump the traced signal processing chain into the console.
+        /// </summary>
+        [SerializeField]
+        [SaveableField(SaveField.FIELD_PRIMITIVE)]
+        public bool debug;
+        
+        /// <summary>
+        /// Flag to indicate if an output is currently being processed.
+        /// This is used to get correct debug output when a chain is running
+        /// with multiple consecutive outputs and these are fired on the same signal processor.
+        /// Otherwise it could lead to multiple outputs being dumped into the console.
+        /// And that's weird.
+        /// </summary>
+        private bool outputChainActive;
+        
+        /// <summary>
+        /// Next time a FireOutput is called, this trace is used,
+        /// instead of a new one. This is useful when the fired output
+        /// is a cause on an InputFunc
+        /// </summary>
+        private Trace currentTrace;
+        
+        /// <summary>
         /// Signals this Entity can receive and process.
         /// This list represents volatile information and needs to be rebuilt
         /// manually each time a signal processor is instantiated
@@ -83,7 +107,7 @@ namespace Playblack.Csp {
         /// </summary>
         public void RebuildInputs() {
             inputFuncCache.SetIgnoreInUse(true);
-//            Debug.Log("Rebuilding InputFunc cache on " + this.gameObject.name);
+//            Debug.Log("Rebuilding InputFunc cache on " + this.gameObject.outputName);
             var components = GetComponents<Component>();
             if (inputFuncs == null) {
                 inputFuncs = new Dictionary<string, List<InputFunc>>();
@@ -175,12 +199,12 @@ namespace Playblack.Csp {
         }
 
         /// <summary>
-        /// Links an editor callback name to a method inside this entity.
+        /// Links an editor callback outputName to a method inside this entity.
         /// This data is exposed for the I/O system.
         /// </summary>
-        /// <param name="name">Name.</param>
-        /// <param name = "component"></param>
-        /// <param name="callback">Callback.</param>
+        /// <param outputName="name">Name.</param>
+        /// <param outputName = "component"></param>
+        /// <param outputName="callback">Callback.</param>
         protected void DefineInputFunc(string name, string component, SimpleSignal callback) {
             if (!inputFuncs.ContainsKey(component)) {
                 inputFuncs.Add(component, new List<InputFunc>(5));
@@ -189,12 +213,12 @@ namespace Playblack.Csp {
         }
 
         /// <summary>
-        /// Links an editor callback name to a method inside this entity.
+        /// Links an editor callback outputName to a method inside this entity.
         /// This data is exposed for the I/O system.
         /// </summary>
-        /// <param name="name">Name.</param>
-        /// <param name = "component"></param>
-        /// <param name="callback">Callback.</param>
+        /// <param outputName="name">Name.</param>
+        /// <param outputName = "component"></param>
+        /// <param outputName="callback">Callback.</param>
         protected void DefineInputFunc(string name, string component, ParameterSignal callback) {
             if (!inputFuncs.ContainsKey(component)) {
                 inputFuncs.Add(component, new List<InputFunc>(5));
@@ -207,7 +231,7 @@ namespace Playblack.Csp {
         /// InputFunc objects get attached to these events. They are identified by their names.
         /// Previously declared output events cannot be re-declared.
         /// </summary>
-        /// <param name="name">Name.</param>
+        /// <param outputName="name">Name.</param>
         protected void DefineOutput(string name) {
             for (int i = 0; i < outputs.Count; ++i) {
                 if (outputs[i].Name == name) {
@@ -219,26 +243,57 @@ namespace Playblack.Csp {
         }
 
         /// <summary>
-        /// Makes the signal handler fire an output with the given name.
-        /// This will trigger all outputs in all components filed under this name.
+        /// Makes the signal handler fire an output with the given outputName.
+        /// This will trigger all outputs in all components filed under this outputName.
         /// This could reach deactivated game objects but it will not because it is invoked
         /// by an extension method that calls SendMessage and that only works on active objects.
         /// You could, for instance, turn a receiver on or off with this but you couldn't raise
         /// an Output directly on a disabled gameobject
         /// </summary>
-        /// <param name="name">Name.</param>
-        /// <param name="trace"></param>
-        public void InternalFireOutput(string name, Trace trace) {
-            if (trace == null) {
-                trace = new Trace(this);
+        /// <param name="outputName">Name.</param>
+        public void FireOutput(string outputName) {
+            Trace localTrace;
+            if (currentTrace != null && !currentTrace.HasReturnedToCaller) {
+                localTrace = currentTrace;
+                currentTrace = null;
+            }
+            else {
+                localTrace = new Trace(this);
+            }
+
+            bool isActivator = !outputChainActive;
+            if (isActivator) {
+                outputChainActive = true;
             }
             for (int i = 0; i < outputs.Count; ++i) {
-                if (outputs[i].Name == name) {
-                    trace.Add(this.gameObject, outputs[i], null, null);
-                    outputs[i].Invoke(this, trace);
-                    return;
+                if (outputs[i].Name == outputName) {
+                    outputs[i].Invoke(this, localTrace);
+                    break;
                 }
             }
+
+            if (isActivator) {
+                outputChainActive = false;
+            }
+            if (debug && isActivator) {
+                Debug.Log(localTrace.GetTraceAsStringBuilder().ToString());
+            }
+
+            localTrace.HasReturnedToCaller = true;
+            currentTrace = null; // Make sur we ain't holding on to this thing
+        }
+
+        
+
+        /// <summary>
+        /// Set a transient trace object.
+        /// Next time a FireOutput is called, this trace is used,
+        /// instead of a new one. This is useful when the fired output
+        /// is a cause on an InputFunc
+        /// </summary>
+        /// <param name="trace"></param>
+        public void SetTrace(Trace trace) {
+            currentTrace = trace;
         }
 
         /// <summary>
@@ -280,6 +335,7 @@ namespace Playblack.Csp {
         public void OnDestroy() {
             // SignalProcessorTracker.Instance.Untrack(this);
             EventDispatcher.Instance.Unregister<SaveGameLoadedEvent>(OnSaveGameLoaded);
+            currentTrace = null;
         }
 
         #endregion Unity Related

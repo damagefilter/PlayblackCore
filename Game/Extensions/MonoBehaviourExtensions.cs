@@ -7,30 +7,16 @@ namespace Playblack.Extensions {
         /// <summary>
         /// OutputAware objects can use this to fire CSP events.
         /// The signal processor on the current gameobject will receive and process it.
-        /// NOTE: Deactivated signal processors will not react to this
         /// </summary>
         /// <param name="behaviour">Behaviour.</param>
         /// <param name="outputName">Output name.</param>
-        /// <param name="trace"></param>
-        public static void FireOutput(this MonoBehaviour behaviour, string outputName, Trace trace = null) {
+        public static void FireOutput(this MonoBehaviour behaviour, string outputName) {
             var csp = behaviour.gameObject.GetComponent<SignalProcessor>();
             if (csp != null) {
-                csp.InternalFireOutput(outputName, trace);
+                // NOTE: CSP being null is a valid situation when we are using a CSP enabled object without the signal processor.
+                // in cases where the CSP object has behaviour that doesn't rely on CSP but can be controlled by it.
+                csp.FireOutput(outputName);
             }
-            else {
-                Debug.LogError(string.Format("No SignalProcessor on {0} to call output {1}", behaviour.gameObject.name, outputName));
-            }
-        }
-
-        /// <summary>
-        /// Fires a CSP event upwards in the game object hierarchy all CSPs on the current GameObject
-        /// and on all ancestors will receive this event.
-        /// NOTE: Deactivated signal processors will not react to this
-        /// </summary>
-        /// <param name="behaviour">Behaviour.</param>
-        /// <param name="outputName">Output name.</param>
-        public static void FireOutputUpwards(this MonoBehaviour behaviour, string outputName) {
-            behaviour.SendMessageUpwards("InternalFireOutput", outputName, SendMessageOptions.DontRequireReceiver);
         }
     }
 }
