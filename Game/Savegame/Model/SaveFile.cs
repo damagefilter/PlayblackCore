@@ -49,12 +49,32 @@ namespace Playblack.Savegame.Model {
             return saveFileEntry != null ? saveFileEntry.DataBlock : null;
         }
 
+        /// <summary>
+        /// Finds a part of the stream and loads it as defined in the
+        /// give SaveFileIndexPointer.
+        /// </summary>
+        /// <param name="idx"></param>
+        /// <returns></returns>
         private SaveFileEntry FindAndLoad(SaveFileIndexPointer idx) {
-            readStream.Position = idx.startOffset + offsetLength;
-            byte[] buffer = new byte[idx.chunkLength];
-            readStream.Read(buffer, 0, idx.chunkLength);
-            Debug.Log($"READ: data id: {idx.dataId} from offset {idx.startOffset + offsetLength} with length: {idx.chunkLength}");
-            return buffer.Length == 0 ? null : DataSerializer.DeserializeProtoObject<SaveFileEntry>(buffer);
+            try {
+                readStream.Position = idx.startOffset + offsetLength;
+                byte[] buffer = new byte[idx.chunkLength];
+                readStream.Read(buffer, 0, idx.chunkLength);
+                return buffer.Length == 0 ? null : DataSerializer.DeserializeProtoObject<SaveFileEntry>(buffer);
+            }
+            catch (Exception e) {
+                Debug.LogError(
+                    string.Format(
+                        "Failed to read Save File entry. Possibly invalid index pointer. index start: {0}, chunk length: {1}, data id: {4}\nMessage: {2}\nStack: {3}",
+                        idx.startOffset,
+                        idx.chunkLength,
+                        e.Message,
+                        e.StackTrace,
+                        idx.dataId
+                    )
+                );
+                return null;
+            }
         }
 
         public void Save(string saveFile) {
@@ -66,7 +86,6 @@ namespace Playblack.Savegame.Model {
                     long startOffset = mainDataStream.Length;
                     mainDataStream.Write(buffer, 0, buffer.Length);
                     dataIdIndex.Add(new SaveFileIndexPointer(sfe.dataId, startOffset, buffer.Length));
-                    Debug.Log($"WRITE {sfe.dataId} startoffset: {startOffset} - length: {buffer.Length}");
                 }
 
                 mainDataStream.Position = 0;
@@ -126,18 +145,27 @@ namespace Playblack.Savegame.Model {
             readStream.Read(offsetBuffer, 0, offsetBuffer.Length);
             offsetLength = DataSerializer.DeserializeInteger(offsetBuffer);
 
-            Debug.Log($"Found index length is {indexLength}");
-            Debug.Log($"Found offset length is {offsetLength}");
-            Debug.Log($"stream position is now {readStream.Position}");
             byte[] indexData = new byte[indexLength];
-            int bytesRead = readStream.Read(indexData, 0, indexData.Length);
-            Debug.Log($"Read {bytesRead} bytes to represent index");
-            var tmpIndex = DataSerializer.DeserializeProtoObject<List<SaveFileIndexPointer>>(indexData);
-            if (tmpIndex != null) {
-                dataIdIndex = tmpIndex;
-                return true;
+            readStream.Read(indexData, 0, indexData.Length);
+            try {
+                var tmpIndex = DataSerializer.DeserializeProtoObject<List<SaveFileIndexPointer>>(indexData);
+                if (tmpIndex != null) {
+                    dataIdIndex = tmpIndex;
+                    return true;
+                }
+
+                return false;
             }
-            return false;
+            catch (Exception e) {
+                Debug.LogError(
+                    string.Format(
+                        "Failed to read file index header. Cannot load save file (possibly corrupted). Message: {0}\nStack:{1}",
+                        e.Message,
+                        e.StackTrace
+                    )
+                );
+                return false;
+            }
         }
 
         /// <summary>
