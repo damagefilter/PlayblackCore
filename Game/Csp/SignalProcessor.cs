@@ -221,13 +221,21 @@ namespace Playblack.Csp {
         /// <summary>
         /// Makes the signal handler fire an output with the given name.
         /// This will trigger all outputs in all components filed under this name.
-        /// This will also reach deactivated game objects.
+        /// This could reach deactivated game objects but it will not because it is invoked
+        /// by an extension method that calls SendMessage and that only works on active objects.
+        /// You could, for instance, turn a receiver on or off with this but you couldn't raise
+        /// an Output directly on a disabled gameobject
         /// </summary>
         /// <param name="name">Name.</param>
-        protected void InternalFireOutput(string name) {
+        /// <param name="trace"></param>
+        public void InternalFireOutput(string name, Trace trace) {
+            if (trace == null) {
+                trace = new Trace(this);
+            }
             for (int i = 0; i < outputs.Count; ++i) {
                 if (outputs[i].Name == name) {
-                    outputs[i].Invoke();
+                    trace.Add(this.gameObject, outputs[i], null, null);
+                    outputs[i].Invoke(this, trace);
                     return;
                 }
             }

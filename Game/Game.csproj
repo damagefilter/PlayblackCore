@@ -104,6 +104,7 @@
     <Compile Include="BehaviourTree\Model\Task\Decorator\ModelStatusResponder.cs" />
     <Compile Include="BehaviourTree\Model\Task\Leaf\ModelAction.cs" />
     <Compile Include="BehaviourTree\Model\Task\Leaf\ModelLeaf.cs" />
+    <Compile Include="Csp\Trace.cs" />
     <Compile Include="EventSystem\EventDispatcher.cs" />
     <Compile Include="EventSystem\Events\GameSavingEvent.cs" />
     <Compile Include="EventSystem\Event.cs" />

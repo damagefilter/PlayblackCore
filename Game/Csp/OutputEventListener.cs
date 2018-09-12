@@ -2,6 +2,7 @@ using ProtoBuf;
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Text.RegularExpressions;
 using UnityEngine;
 
 namespace Playblack.Csp {
@@ -34,16 +35,18 @@ namespace Playblack.Csp {
         [ProtoMember(5)]
         public string component;
 
-        public void Execute() {
+        public void Execute(OutputFunc owner, SignalProcessor caller, Trace trace) {
             if (matchedProcessors != null) {
                 for (int i = 0; i < matchedProcessors.Count; ++i) {
-                    var func = matchedProcessors[i].GetInputFunc(method, component);
+                    var processor = matchedProcessors[i];
+                    var func = processor.GetInputFunc(method, component);
                     if (func == null) {
                         Debug.LogWarning(method + " is not a declared input func on " + matchedProcessors[i].gameObject.name);
                         continue;
                     }
+                    trace.Add(caller.gameObject, owner, processor.gameObject, func);
                     if (delay > 0) {
-                        matchedProcessors[i].StartCoroutine(ExecuteDelayed(func));
+                        processor.StartCoroutine(ExecuteDelayed(func));
                     }
                     else {
                         Invoke(func);

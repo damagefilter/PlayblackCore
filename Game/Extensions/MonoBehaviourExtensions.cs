@@ -1,9 +1,9 @@
-﻿using UnityEngine;
+﻿using Playblack.Csp;
+using UnityEngine;
 
 namespace Playblack.Extensions {
 
     public static class MonoBehaviourExtensions {
-
         /// <summary>
         /// OutputAware objects can use this to fire CSP events.
         /// The signal processor on the current gameobject will receive and process it.
@@ -11,8 +11,15 @@ namespace Playblack.Extensions {
         /// </summary>
         /// <param name="behaviour">Behaviour.</param>
         /// <param name="outputName">Output name.</param>
-        public static void FireOutput(this MonoBehaviour behaviour, string outputName) {
-            behaviour.SendMessage("InternalFireOutput", outputName, SendMessageOptions.DontRequireReceiver);
+        /// <param name="trace"></param>
+        public static void FireOutput(this MonoBehaviour behaviour, string outputName, Trace trace = null) {
+            var csp = behaviour.gameObject.GetComponent<SignalProcessor>();
+            if (csp != null) {
+                csp.InternalFireOutput(outputName, trace);
+            }
+            else {
+                Debug.LogError(string.Format("No SignalProcessor on {0} to call output {1}", behaviour.gameObject.name, outputName));
+            }
         }
 
         /// <summary>

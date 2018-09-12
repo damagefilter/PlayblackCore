@@ -42,7 +42,7 @@ namespace Playblack.Csp {
             this.outputName = outputName;
         }
 
-        public void Invoke() {
+        public void Invoke(SignalProcessor caller, Trace trace) {
             if (registeredListeners == null) {
                 return; // happens in a state after savegame load (deserialization)
             }
@@ -50,7 +50,8 @@ namespace Playblack.Csp {
                 if (registeredListeners[i].matchedProcessors == null) {
                     continue; // happens in a state after savegame load (deserialization)
                 }
-                registeredListeners[i].Execute();
+
+                registeredListeners[i].Execute(this, caller, trace);
             }
         }
 
