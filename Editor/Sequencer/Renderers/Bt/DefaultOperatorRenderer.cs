@@ -2,15 +2,17 @@
 using Playblack.BehaviourTree;
 using PlayBlack.Editor.Windows;
 using System.Collections.Generic;
+using PlayBlack.Sequencer;
 using UnityEditor;
 using UnityEngine;
+using ValueType = Playblack.BehaviourTree.ValueType;
 
 namespace PlayBlack.Editor.Sequencer.Renderers.Bt {
 
     public class DefaultOperatorRenderer : IOperatorRenderer<UnityBtModel> {
-        protected UnityBtModel modelToRender;
-        protected ModelDisplayManager displayManager;
-        protected UnityBtModel parentModel;
+        private UnityBtModel modelToRender;
+        private ModelDisplayManager displayManager;
+        private UnityBtModel parentModel;
         private IList<ChildDescriptorAttribute> childStructure;
         private Vector2 scrollPos;
         private int insertIndex; // used when the model to render is null and we need to add-operator on the correct index
@@ -20,7 +22,7 @@ namespace PlayBlack.Editor.Sequencer.Renderers.Bt {
             this.insertIndex = -1;
         }
 
-        public virtual void RenderCodeView(ISequencerRenderer<UnityBtModel> sequenceRenderer) {
+        public void RenderCodeView(ISequencerRenderer<UnityBtModel> sequenceRenderer) {
             // Happens in the best families.
             // That's when we're processing an empty child slot, which means we wanna add the add-operator button and get out.
             if (modelToRender == null) {
@@ -121,7 +123,7 @@ namespace PlayBlack.Editor.Sequencer.Renderers.Bt {
             this.insertIndex = insertIndex;
         }
 
-        public virtual void RenderEditorWindowView(ISequencerRenderer<UnityBtModel> sequenceRenderer) {
+        public void RenderEditorWindowView(ISequencerRenderer<UnityBtModel> sequenceRenderer) {
             // Draw the Header Information
             EditorGUILayout.BeginHorizontal();
             {
@@ -188,6 +190,9 @@ namespace PlayBlack.Editor.Sequencer.Renderers.Bt {
                                     data.Value = EditorGUILayout.EnumPopup((Enum)Enum.Parse(data.SystemType, enumValue), GUILayout.Width(300));
                                 }
 
+                                break;
+                            case ValueType.CUSTOM:
+                                data.Value = FieldRendererManager.Instance.GetRenderer(data.SystemType).DrawFieldEditor(data.Value);
                                 break;
 
                             case Playblack.BehaviourTree.ValueType.STRING:

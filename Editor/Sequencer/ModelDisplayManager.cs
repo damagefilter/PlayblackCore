@@ -2,6 +2,7 @@
 using Fasterflect;
 using Playblack.BehaviourTree;
 using Playblack.Sequencer;
+using PlayBlack.Sequencer;
 using UnityEngine;
 
 namespace PlayBlack.Editor.Sequencer {
@@ -59,10 +60,18 @@ namespace PlayBlack.Editor.Sequencer {
                 if (string.IsNullOrEmpty(valueString)) {
                     continue;
                 }
+
+                if (valueField.Type == ValueType.CUSTOM) {
+                    var r = FieldRendererManager.Instance.GetRenderer(valueField.SystemType);
+                    if (r != null) {
+                        valueString = r.GetEditorDisplayValue(valueField.Value);
+                    }
+                }
                 if (!string.IsNullOrEmpty(valueString) && valueString.Length > 50) {
                     valueString = valueString.Substring(0, 47) + "...";
                 }
                 theString = theString.Replace("{" + valueField.Name + "}", valueString);
+                
             }
 
             return theString;

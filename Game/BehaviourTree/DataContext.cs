@@ -64,6 +64,11 @@ namespace Playblack.BehaviourTree {
             return internalData.TryGetValue(key, out val) ? val : default(ValueField);
         }
 
+        /// <summary>
+        /// BEWARE: When setting values to the DataContext with this indexer, do NOT USE CUSTOM ValeType!
+        /// It's gonna get confused and cause breakage.
+        /// </summary>
+        /// <param name="key"></param>
         public object this[string key] {
             get {
                 if (internalData.ContainsKey(key)) {

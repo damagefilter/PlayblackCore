@@ -17,7 +17,7 @@ namespace Playblack.Sequencer {
     /// <summary>
     /// Executes a behaviour tree of some description.
     /// </summary>
-    [OutputAware("OnExecutionFinish", "OnExecutionTrigger", "OnExecutionTerminated")]
+    [OutputAware("OnExecutionFinish", "OnExecutionTrigger", "OnExecutionTerminated", "OnPauseExecution", "OnContinueExecution")]
     [SaveableComponent]
     [DefaultExecutionOrder(-1000)] // Likely puts this before any other script requiring its data. Resolves race conditions in savegames
     public class SequenceExecutor : MonoBehaviour {
@@ -79,6 +79,8 @@ namespace Playblack.Sequencer {
 
         private bool running;
 
+        private bool isPaused;
+
         public IBTExecutor GetExecutor(DataContext overrideContext = null) {
             // recycle this for performance reasons but also to
             // persist the global context
@@ -123,10 +125,13 @@ namespace Playblack.Sequencer {
         /// <returns></returns>
         private IEnumerator TickExecutorParallel() {
             running = true;
+            isPaused = false;
             var status = this.executor.GetStatus();
             while (!(status == TaskStatus.SUCCESS || status == TaskStatus.FAILURE)) {
-                this.executor.Tick();
-                status = this.executor.GetStatus();
+                if (!isPaused) {
+                    this.executor.Tick();
+                    status = this.executor.GetStatus();
+                }
                 yield return null;
             }
             TerminateExecutorAndFinish();
@@ -181,6 +186,18 @@ namespace Playblack.Sequencer {
                     this.FireOutput("OnExecutionTrigger");
                 }
             }
+        }
+
+        [InputFunc("PauseExecution")]
+        public void PauseExecution() {
+            isPaused = true;
+            this.FireOutput("OnPauseExecution");
+        }
+        
+        [InputFunc("ContinueExecution")]
+        public void ContinueExecution() {
+            isPaused = false;
+            this.FireOutput("OnContinueExecution");
         }
 
         [InputFunc("ResetSequencer")]

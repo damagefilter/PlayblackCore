@@ -158,6 +158,8 @@
     <Compile Include="BehaviourTree\Execution\Core\CachingBtExecutor.cs" />
     <Compile Include="Mods\IMod.cs" />
     <Compile Include="Extensions\MonoBehaviourExtensions.cs" />
+    <Compile Include="Sequencer\FieldRendererManager.cs" />
+    <Compile Include="Sequencer\ICustomFieldRenderer.cs" />
     <Compile Include="Sequencer\SequenceExecutor.cs" />
   </ItemGroup>
   <ItemGroup />

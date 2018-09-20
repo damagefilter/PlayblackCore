@@ -9,6 +9,7 @@ namespace Playblack.BehaviourTree {
         STRING, // one-liners
         TEXT, // long texts
         BOOL,
-        ENUM
+        ENUM,
+        CUSTOM, // use custom editor components
     }
 }

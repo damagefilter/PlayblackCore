@@ -1,7 +1,7 @@
-﻿using ProtoBuf;
+﻿﻿using ProtoBuf;
 using System;
-using UnityEngine;
-using UnityEngine.Windows.Speech;
+ using PlayBlack.Sequencer;
+ using UnityEngine;
 
 namespace Playblack.BehaviourTree {
     /**
@@ -64,6 +64,9 @@ namespace Playblack.BehaviourTree {
                         case ValueType.STRING:
                         case ValueType.TEXT:
                             cachedValue = unityValue;
+                            break;
+                        case ValueType.CUSTOM:
+                            cachedValue = FieldRendererManager.Instance.GetRenderer(systemType).GetDataFromString(unityValue);
                             break;
                         default:
                             Debug.LogWarning("ValueField: No known ValueType given, returning null as concrete value for type: " + varType);
@@ -149,9 +152,7 @@ namespace Playblack.BehaviourTree {
             if (t == typeof(bool)) {
                 return ValueType.BOOL;
             }
-
-            Debug.LogError("Could not determine a valuetype for " + t + " on field " + fieldName);
-            return ValueType.STRING;
+            throw new ArgumentException("Could not determine a valid valuetype for type " + t + " on field " + fieldName);
         }
     }
 }
