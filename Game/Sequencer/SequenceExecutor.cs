@@ -75,6 +75,10 @@ namespace Playblack.Sequencer {
         [Tooltip("The object on which this sequencer is acting (for instance the object that handles AI movement or such thing.")]
         private UnityEngine.Object actor;
 
+        public event Action OnSequenceFinished;
+
+        public event Action OnSequenceStarted;
+        
         private IBTExecutor executor;
 
         private bool running;
@@ -142,6 +146,7 @@ namespace Playblack.Sequencer {
             this.executor.Terminate();
             this.executor.Reset();
             this.FireOutput("OnExecutionFinish");
+            OnSequenceFinished?.Invoke();
             // Update the serialized / saved global data context with the current state.
             // That will ensure, when this is saved, the context is retained when it's restored.
             var contextUpdate = this.executor.GetRootContext();
@@ -183,6 +188,7 @@ namespace Playblack.Sequencer {
                 }
                 if (!running) {
                     StartCoroutine("TickExecutorParallel");
+                    OnSequenceStarted?.Invoke();
                     this.FireOutput("OnExecutionTrigger");
                 }
             }

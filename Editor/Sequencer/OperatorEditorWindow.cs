@@ -48,7 +48,7 @@ namespace PlayBlack.Editor.Sequencer {
             // BUT: This will scratch the right itch in Unity to make it save the damn thing.
             OperatorRenderer.UpdateCodeView();
             try {
-                (SequencerRenderer as BtSequencerRenderer).IsDiry = true;
+                (SequencerRenderer as BtSequencerRenderer).IsDirty = true;
             }
             catch(Exception e) {
                 Debug.LogError("Oh boy something went wrong when setting the sequencer dirty ...");

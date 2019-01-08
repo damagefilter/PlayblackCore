@@ -17,11 +17,10 @@ namespace PlayBlack.Editor.Sequencer {
         }
 
         public override void InternalInit() {
-            EditorApplication.playmodeStateChanged += CheckIfDirty;
-            //throw new NotImplementedException();
+            EditorApplication.pauseStateChanged += CheckIfDirty;
         }
 
-        private void CheckIfDirty() { // need for that playmodeStateChanged callback
+        private void CheckIfDirty(PauseState pstate) { // need for that playmodeStateChanged callback
             CheckIfDirty(false);
         }
 
@@ -31,7 +30,7 @@ namespace PlayBlack.Editor.Sequencer {
                 return;
             }
             if (ignoreEditorState) {
-                if (sequencerWindow.IsDiry) {
+                if (sequencerWindow.IsDirty) {
                     sequencerWindow.UpdateSerializedModelTree();
                 }
             }
@@ -41,14 +40,10 @@ namespace PlayBlack.Editor.Sequencer {
                 return;
             }
             // if we are not playing but about to switch to it, and if sequencer is dirty, dump the changes before playing!
-            if (EditorApplication.isPlayingOrWillChangePlaymode && !EditorApplication.isPlaying && sequencerWindow.IsDiry) {
+            if (!EditorApplication.isPlayingOrWillChangePlaymode && sequencerWindow.IsDirty) {
                 Debug.Log("Updating BT serialized data. Prior to play");
                 sequencerWindow.UpdateSerializedModelTree();
             }
-            else {
-                Debug.Log("Cannot BT update data prior to play. Playmode isorwill: " + (EditorApplication.isPlayingOrWillChangePlaymode) + ", isDirty: " + sequencerWindow.IsDiry);
-            }
-
         }
 
         public void SetData(SequenceExecutor subject, SerializedObject serializedSequenceExecutor) {
@@ -98,7 +93,7 @@ namespace PlayBlack.Editor.Sequencer {
         }
 
         private void OnDestroy() {
-            EditorApplication.playmodeStateChanged -= CheckIfDirty;
+            EditorApplication.pauseStateChanged -= CheckIfDirty;
             CheckIfDirty(true);
         }
     }

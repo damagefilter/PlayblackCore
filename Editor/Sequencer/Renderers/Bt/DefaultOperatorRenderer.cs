@@ -58,7 +58,7 @@ namespace PlayBlack.Editor.Sequencer.Renderers.Bt {
                             Debug.Log("Removed null child in default list");
                             // And update again because otherwise this will be deserialized as a default instance
                             // causing ghost data that cannot be removed.
-                            ((BtSequencerRenderer)sequenceRenderer).IsDiry = true;
+                            ((BtSequencerRenderer)sequenceRenderer).IsDirty = true;
                         }
                         else {
                             DefaultOperatorRenderer r;

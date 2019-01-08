@@ -33,7 +33,7 @@ namespace PlayBlack.Editor.Sequencer.Renderers.Bt {
         /// Dirty flag is used in the sequencereditorwindow to check if model tree needs updating.
         /// the UpdateModelTree method will then take care of all else
         /// </summary>
-        public bool IsDiry {
+        public bool IsDirty {
             get {
                 return isDirty;
             }
